@@ -24,14 +24,52 @@ import com.google.ortools.constraintsolver.IntVar;
 import com.google.ortools.constraintsolver.OptimizeVar;
 import com.google.ortools.constraintsolver.Solver;
 
+/**
+ * This class contains static functions that are used for general purposes
+ * throughout the Disaggregation Module.
+ * 
+ * @author Antonios Chrysopoulos
+ * @version 0.9, Date: 29.07.2013
+ */
+
 public class Utils
 {
 
+  /** Loading a library for integer programming. */
+  static {
+    System.loadLibrary("jniconstraintsolver");
+  }
+
+  /**
+   * This function is estimating the absolute euclidean distance of the active
+   * and reactive power vector distance of two points of interest in the form of
+   * arrays.
+   * 
+   * @param a1
+   *          The first array of values
+   * @param a2
+   *          The second array of values
+   * 
+   * @return the estimated absolute euclidean distance.
+   */
   public static double absoluteEuclideanDistance (double[] a1, double[] a2)
   {
     return Math.sqrt(Math.pow(a1[0] - a2[0], 2) + Math.pow(a1[1] - a2[1], 2));
   }
 
+  /**
+   * This function is estimating the percentage euclidean distance of the active
+   * and reactive power vector distance of two points of interest in the form of
+   * arrays.
+   * 
+   * @param a1
+   *          The first array of values
+   * 
+   * @param a2
+   *          The second array of values
+   * 
+   * @return the estimated percentage euclidean distance.
+   */
   public static double percentageEuclideanDistance (double[] a1, double[] a2)
   {
     return 100
@@ -39,20 +77,49 @@ public class Utils
            / norm(a1);
   }
 
+  /**
+   * This function is estimating the euclidean length (or norm) of an array of
+   * two values
+   * 
+   * @param poi
+   *          The point of interest's array of values
+   * @return the euclidean length of the array.
+   */
   public static double norm (double[] poi)
   {
     return Math.sqrt(Math.pow(poi[0], 2) + Math.pow(poi[1], 2));
   }
 
+  /**
+   * This function is used in order to check if a certain appliance is within
+   * the permitted limits
+   * 
+   * @param trueValue
+   *          The value under examination
+   * @param limit
+   *          The limit value that is used as threshold
+   * @return true if it is within limits, false otherwise
+   */
   public static boolean checkLimit (double trueValue, double limit)
   {
 
     double upperLimit = (1 + Constants.ERROR_FRINGE) * limit;
-    double lowerLimit = (1 - Constants.ERROR_FRINGE) * limit;
 
-    return (trueValue < upperLimit && trueValue > lowerLimit);
+    return (trueValue < upperLimit);
   }
 
+  /**
+   * This function is used for the detection of reduction points following a
+   * rising point, so that there is a possibility they can be connected as a
+   * pair
+   * 
+   * @param index
+   *          The index of the rising point of interest.
+   * @param pois
+   *          The list of points of interest under examination.
+   * @return an array of indices that contain possible combinatorial reduction
+   *         points of interest.
+   */
   public static Integer[] findRedPoints (int index,
                                          ArrayList<PointOfInterest> pois)
   {
@@ -72,6 +139,18 @@ public class Utils
 
   }
 
+  /**
+   * This function is used for the detection of rising points preceding a
+   * reduction point, so that there is a possibility they can be connected as a
+   * pair
+   * 
+   * @param index
+   *          The index of the reduction point of interest.
+   * @param pois
+   *          The list of points of interest under examination.
+   * @return an array of indices that contain possible combinatorial rising
+   *         points of interest.
+   */
   public static Integer[] findRisPoints (int index,
                                          ArrayList<PointOfInterest> pois)
   {
@@ -91,6 +170,14 @@ public class Utils
 
   }
 
+  /**
+   * This is an auxiliary function used to estimate the mean values of a pair of
+   * points of interest.
+   * 
+   * @param pois
+   *          The pair of points of interest under examination.
+   * @return an array of the mean values of active and reactive power.
+   */
   public static double[] meanValues (PointOfInterest[] pois)
   {
 
@@ -102,6 +189,17 @@ public class Utils
 
   }
 
+  /**
+   * This auxiliary function checks if two pairs of points of interest are cross
+   * covered
+   * or not into time.
+   * 
+   * @param poi1
+   *          The first pair of the points of interest.
+   * @param poi2
+   *          The second pair of the points of interest.
+   * @return true if they are not cross covered, false otherwise.
+   */
   public static boolean independentPair (PointOfInterest[] poi1,
                                          PointOfInterest[] poi2)
   {
@@ -118,7 +216,108 @@ public class Utils
     return sum;
   }
 
-  public static ArrayList<Integer> solve (int[][] input, double[] cost)
+  /**
+   * This is an integer programming solver.
+   * 
+   * @param input
+   *          The input array of alternatives.
+   * @param cost
+   *          The cost array of the alternatives.
+   * @return a list of all the solutions.
+   */
+  public static ArrayList<ArrayList<Integer>> solve (int[][] input,
+                                                     double[] cost)
+  {
+    ArrayList<ArrayList<Integer>> solutions =
+      new ArrayList<ArrayList<Integer>>();
+    Solver solver = new Solver("Integer Programming");
+
+    int num_alternatives = cost.length;
+    int num_objects = input[0].length;
+
+    int[] costNew = new int[cost.length];
+    int lambda = 1000;
+    for (int i = 0; i < costNew.length; i++) {
+      costNew[i] = (int) (100 * cost[i]);
+      costNew[i] *= lambda;
+    }
+    //
+    // variables
+    //
+    IntVar[] x = solver.makeIntVarArray(num_alternatives, 0, 1, "x");
+
+    // number of assigned senators, to be minimize
+    IntVar z = solver.makeScalProd(x, costNew).var();
+
+    //
+    // constraints
+    //
+
+    for (int j = 0; j < num_objects; j++) {
+      IntVar[] b = new IntVar[num_alternatives];
+      for (int i = 0; i < num_alternatives; i++) {
+        b[i] = solver.makeProd(x[i], input[i][j]).var();
+      }
+
+      solver.addConstraint(solver.makeSumLessOrEqual(b, 1));
+
+    }
+
+    //
+    // objective
+    //
+    OptimizeVar objective = solver.makeMaximize(z, 1);
+
+    //
+    // search
+    //
+    DecisionBuilder db =
+      solver.makePhase(x, solver.INT_VAR_DEFAULT, solver.INT_VALUE_DEFAULT);
+    solver.newSearch(db, objective);
+
+    //
+    // output
+    //
+
+    // ArrayList<Integer> temp = ArrayList<Integer>()
+    ArrayList<Integer> temp = null;
+    while (solver.nextSolution()) {
+      temp = new ArrayList<Integer>();
+      System.out.println("z: " + z.value());
+      System.out.print("Selected alternatives: ");
+      for (int i = 0; i < num_alternatives; i++) {
+        if (x[i].value() == 1) {
+          System.out.print((1 + i) + " ");
+          temp.add(i);
+        }
+      }
+      solutions.add(temp);
+      // System.out.println("\n");
+
+    }
+    solver.endSearch();
+
+    // Statistics
+    System.out.println();
+    System.out.println("Solutions: " + solver.solutions());
+    System.out.println("Failures: " + solver.failures());
+    System.out.println("Branches: " + solver.branches());
+    System.out.println("Wall time: " + solver.wallTime() + "ms");
+
+    return solutions;
+
+  }
+
+  /**
+   * This is an integer programming solver.
+   * 
+   * @param input
+   *          The input array of alternatives.
+   * @param cost
+   *          The cost array of the alternatives.
+   * @return a list of the indexes of the solution alternatives.
+   */
+  public static ArrayList<Integer> solve2 (int[][] input, double[] cost)
   {
 
     Solver solver = new Solver("Integer Programming");
@@ -195,13 +394,27 @@ public class Utils
 
   }
 
+  /**
+   * This function is used for the creation of final matching pairs of points of
+   * interest from the solutions that the integer programming solver has
+   * provided.
+   * 
+   * @param pois
+   *          The list of points of interest under examination.
+   * @param array
+   *          An array of 0-1 that shows which points of interest are included
+   *          in the solution.
+   * @return a list of pairs of points of interest.
+   */
   public static ArrayList<PointOfInterest[]>
     createFinalPairs (ArrayList<PointOfInterest> pois, int[] array)
   {
+    // Initializing the auxiliary variables.
     ArrayList<PointOfInterest[]> result = new ArrayList<PointOfInterest[]>();
     ArrayList<PointOfInterest> rising = new ArrayList<PointOfInterest>();
     ArrayList<PointOfInterest> reduction = new ArrayList<PointOfInterest>();
 
+    // For all the points if the are 1 are included in the solution
     for (int i = 0; i < array.length; i++) {
 
       if (array[i] == 1) {
@@ -213,11 +426,13 @@ public class Utils
 
     }
 
+    // If there are one of each point types.
     if (rising.size() == 1 && reduction.size() == 1) {
 
       PointOfInterest[] temp = { rising.get(0), reduction.get(0) };
       result.add(temp);
     }
+    // If there is only one rising
     else if (rising.size() == 1) {
 
       for (PointOfInterest red: reduction) {
@@ -231,6 +446,7 @@ public class Utils
       }
 
     }
+    // If there is only one reduction
     else {
       for (PointOfInterest rise: rising) {
 

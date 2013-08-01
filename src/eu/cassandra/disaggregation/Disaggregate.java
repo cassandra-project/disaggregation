@@ -22,12 +22,45 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
+/**
+ * This is the main class that is used for implementing the Disaggregation
+ * procedure which is incorporated in the Training Module. The procedure
+ * extracts two files that contain the appliances detected from the installation
+ * measurements as well as the consumption events for each appliance /
+ * activity.The results are appearing in the respective lists in the Training
+ * Module GUI.
+ * 
+ * @author Antonios Chrysopoulos
+ * @version 0.7, Date: 29.07.2013
+ */
+
 public class Disaggregate
 {
-  ArrayList<Event> events = new ArrayList<Event>();
 
-  public Disaggregate (String filename) throws Exception
+  /**
+   * This variable is a list of the events as been extracted from the
+   * measurements file.
+   */
+  static ArrayList<Event> events = new ArrayList<Event>();
+
+  /**
+   * This is the disaggregation function of the Disaggregation class.
+   * 
+   * @param filename
+   *          The file name of the consumption measurements of an installation.
+   * @param outputAppliance
+   *          The file name of the output file containing the appliances.
+   * @param outputActivity
+   *          The file name of the output file containing the activities.
+   * @throws Exception
+   */
+  public static void initDisaggregation (String filename,
+                                         String outputAppliance,
+                                         String outputActivity)
+    throws Exception
   {
+    // Adding a file as a second output that will help keep track of the
+    // procedure.
     FileOutputStream fout = null;
     try {
       fout = new FileOutputStream("Demo/test.txt");
@@ -40,26 +73,33 @@ public class Disaggregate
     PrintStream stdout = new PrintStream(multiOut);
     System.setOut(stdout);
 
+    // Creating the data sets under investigation.
     PowerDatasets data = new PowerDatasets(filename);
 
+    // Initialize the auxiliary variables
     EventDetector ed = new EventDetector();
-    ApplianceIdentified ai = new ApplianceIdentified();
+    ApplianceIdentifier ai = new ApplianceIdentifier();
 
+    // Run the event detector in order to find the possible events in the data
     events = ed.detectEvents(data.getActivePower(), data.getReactivePower());
 
+    // The Isolated Appliance Extractor helps the procedure of finding the
+    // refrigerator and washing machine amongst others.
     IsolatedApplianceExtractor iso = new IsolatedApplianceExtractor(events);
 
     ai.refrigeratorIdentification(events, iso);
 
     ai.washingMachineIdentification(events);
 
+    // For each event an analysis is at hand helping to separate the different
+    // consumption models and identify their results
     for (Event event: events) {
       if (event.getWashingMachineFlag() == false) {
         event.detectMatchingPoints();
         event.detectSwitchingPoints();
         event.detectClusters();
         event.detectBasicShapes();
-        event.createCombinations();
+        event.findCombinations();
         // event.status2();
         event.calculateFinalPairs();
         event.status2();
@@ -68,14 +108,18 @@ public class Disaggregate
       }
     }
 
-    for (Appliance appliance: ai.getApplianceList())
-      appliance.status();
+    ai.createDisaggregationFiles(outputAppliance, outputActivity, events);
+    // // The extracted appliances are printed to see the results of the
+    // procedure
+    // for (Appliance appliance: ai.getApplianceList())
+    // appliance.status();
 
   }
 
   public static void main (String[] args) throws Exception
   {
-    Disaggregate dis = new Disaggregate("Demo/measurements.csv");
-
+    Disaggregate.initDisaggregation("Demo/measurements.csv",
+                                    "Demo/applianceList.csv",
+                                    "Demo/activityList.csv");
   }
 }

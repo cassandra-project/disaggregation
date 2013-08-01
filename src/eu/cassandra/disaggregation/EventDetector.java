@@ -20,37 +20,74 @@ package eu.cassandra.disaggregation;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * This is an of the most important classes of the Disaggregation Module. Event
+ * Detector is response for taking the consumption measurements and identifying
+ * the underlying consumption events from all the appliances that are installed
+ * in the installation.
+ * 
+ * @author Antonios Chrysopoulos
+ * @version 0.7, Date: 29.07.2013
+ */
 public class EventDetector
 {
 
+  /**
+   * This is the threshold which must be passed for considering summary of the
+   * power consumption normal.
+   */
+  double eventThreshold = 0;
+
+  /**
+   * Simple empty constructor of the Event Detector object
+   */
   public EventDetector ()
   {
-
   }
 
+  /**
+   * This is the main function that takes the two power measurement arrays and
+   * extracts the events detected within them.
+   * 
+   * @param activePower
+   *          The array of active power measurements.
+   * @param reactivePower
+   *          The array of reactive power measurements.
+   * @return
+   */
   public ArrayList<Event> detectEvents (double[] activePower,
                                         double[] reactivePower)
   {
-    double eventThreshold = 0;
+    // Initializing the auxiliary variables.
     ArrayList<Event> events = new ArrayList<Event>();
-
-    eventThreshold = findMin(activePower) + estimateThreshold();
     boolean started = false;
     boolean check = true;
     int start = -1;
     int end = -1;
 
+    // Defining the threshold as the minimum value plus the estimated threshold
+    // of the installation type.
+    eventThreshold = findMin(activePower) + estimateThreshold();
+
+    // For each minute of measurements
     for (int i = 0; i < activePower.length; i++) {
 
+      // If the active power surpasses the threshold and an event hasn't started
+      // yet, then flag the start of an event.
       if (activePower[i] >= eventThreshold && started == false) {
         start = i - 1;
         started = true;
       }
 
+      // If the active power goes below the threshold and an event has started
+      // yet, then this may be the end of an event.
       if (activePower[i] < eventThreshold && started == true) {
 
         boolean flag = true;
 
+        // Checking if the measurements do not pass the event threshold after a
+        // small period of time, which would mean that the event has actually
+        // not finished.
         int endingIndex =
           Math.min(i + Constants.EVENT_TIME_LIMIT, activePower.length);
         for (int j = i + 1; j < endingIndex; j++) {
@@ -64,17 +101,22 @@ public class EventDetector
           }
         }
 
+        // If the event is over
         if (flag) {
           end = i;
 
           // System.out.println("Start: " + start + " End: " + end);
 
+          // If the event has not began before the start of the measurements
           if (start != -1) {
+
+            // Doing the check with the summary of active power.
             check =
-              checkMeanConsumption(eventThreshold,
-                                   Arrays.copyOfRange(activePower, start,
+              checkMeanConsumption(Arrays.copyOfRange(activePower, start,
                                                       end + 1));
 
+            // If the check is passed then an event is created and added to the
+            // event list.
             if (check) {
               Event temp =
                 new Event(start, end, Arrays.copyOfRange(activePower, start,
@@ -99,6 +141,14 @@ public class EventDetector
 
   }
 
+  /**
+   * This is an auxiliary function used for searching over an array of active
+   * power measurements for the smallest value available.
+   * 
+   * @param activePower
+   *          The array of active power measurements.
+   * @return the smallest value found.
+   */
   private double findMin (double[] activePower)
   {
 
@@ -112,14 +162,27 @@ public class EventDetector
 
   }
 
+  /**
+   * This is an auxiliary function helping to threshold of the event detection
+   * algorithm and is depending on the installation type (Household, Commercial,
+   * Factory etc.).
+   * 
+   * @return the threshold above which a consumption event has started.
+   */
   private double estimateThreshold ()
   {
-
     return Constants.HOUSEHOLD_BACKGROUND_THRESHOLD;
-
   }
 
-  private boolean checkMeanConsumption (double eventThreshold, double[] active)
+  /**
+   * This is an auxiliary function checking if the active power consumption
+   * array of an event is large enough to suggest an actual event or not.
+   * 
+   * @param active
+   *          The array of active power consumption under consideration.
+   * @return true if the check is passed, false otherwise.
+   */
+  private boolean checkMeanConsumption (double[] active)
   {
 
     boolean result = true;

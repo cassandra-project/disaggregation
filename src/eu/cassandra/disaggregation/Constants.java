@@ -110,7 +110,7 @@ public class Constants
 
   // CLUSTER LARGE EVENTS CONSTANTS
 
-  public static final int DISTURBANCE_THRESHOLD = 50;
+  public static final int CONCENTRATION_THRESHOLD = 50;
   public static final int CLUSTER_THRESHOLD = 10;
 
   // SHAPES MATCHING CONSTANTS

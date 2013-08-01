@@ -24,20 +24,74 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+/**
+ * This class is used for implementing the Appliance Models in the Training
+ * Module of Cassandra Project. The models created here are compatible with the
+ * Appliance Models used in the main Cassandra Platform and can be easily
+ * exported to the User's Library.
+ * 
+ * @author Antonios Chrysopoulos
+ * @version 0.9, Date: 29.07.2013
+ */
+
 public class Appliance
 {
+  /**
+   * This variable is the name of the appliance.
+   */
   private String name = "";
+
+  /**
+   * This variable is the activity that the appliance is participating to.
+   */
   private String activity = "";
+
+  /**
+   * This variable is a map of the event id number and a list of the detected
+   * rising points (points that the active power is increasing).
+   */
   private Map<Integer, ArrayList<PointOfInterest>> risingPoints =
     new TreeMap<Integer, ArrayList<PointOfInterest>>();
+
+  /**
+   * This variable is a map of the event id number and a list of the detected
+   * reduction points (points that the active power is increasing).
+   */
   private Map<Integer, ArrayList<PointOfInterest>> reductionPoints =
     new TreeMap<Integer, ArrayList<PointOfInterest>>();
+
+  /**
+   * This variable is a map of the event id number and a list of the detected
+   * matching pairs of points of interest.
+   */
   private Map<Integer, ArrayList<PointOfInterest[]>> matchingPoints =
     new TreeMap<Integer, ArrayList<PointOfInterest[]>>();
+
+  /**
+   * This variable represents the summary of the values of the active and
+   * reactive power from the matching number of matching pairs.
+   */
   private double[] meanValuesSum = new double[2];
+
+  /**
+   * This variable represents the number of matching points detected as part of
+   * this appliance.
+   */
   private int numberOfMatchingPoints = 0;
+
+  /**
+   * This variable represents the mean duration of the appliance end-use.
+   */
   private double meanDuration = 0;
 
+  /**
+   * The constructor of an Appliance Model.
+   * 
+   * @param name
+   *          The name of the Appliance Model
+   * @param activity
+   *          The name of the activity the appliance participates in.
+   */
   public Appliance (String name, String activity)
   {
     this.name = name;
@@ -47,6 +101,18 @@ public class Appliance
     matchingPoints.clear();
   }
 
+  /**
+   * The constructor of an Appliance Model.
+   * 
+   * @param name
+   *          The name of the Appliance Model
+   * @param activity
+   *          The name of the activity the appliance participates in.
+   * @param rising
+   *          The map of rising points per event.
+   * @param reduction
+   *          The map of reduction points per event.
+   */
   public Appliance (String name, String activity,
                     Map<Integer, ArrayList<PointOfInterest>> rising,
                     Map<Integer, ArrayList<PointOfInterest>> reduction)
@@ -60,52 +126,70 @@ public class Appliance
 
   }
 
-  public Map<Integer, ArrayList<PointOfInterest>> getRisingPoints ()
-  {
-    return risingPoints;
-  }
-
-  public ArrayList<PointOfInterest> getRisingPoints (int index)
-  {
-    return risingPoints.get(index);
-  }
-
-  public Map<Integer, ArrayList<PointOfInterest>> getReductionPoints ()
-  {
-    return reductionPoints;
-  }
-
-  public ArrayList<PointOfInterest> getReductionPoints (int index)
-  {
-    return reductionPoints.get(index);
-  }
-
+  /**
+   * This function is used as a getter for the matching points of the appliance.
+   * 
+   * @return the map of the matching points of the appliance.
+   */
   public Map<Integer, ArrayList<PointOfInterest[]>> getMatchingPoints ()
   {
     return matchingPoints;
   }
 
+  /**
+   * This function is used as a getter for the matching points of the appliance
+   * for a certain event.
+   * 
+   * @return the list of the matching points of the appliance for a certain
+   *         event.
+   */
   public ArrayList<PointOfInterest[]> getMatchingPoints (int index)
   {
     return matchingPoints.get(index);
   }
 
+  /**
+   * This function is used as a getter for mean value of the active power
+   * measurements.
+   * 
+   * @return the mean active power.
+   */
   public double getMeanActive ()
   {
     return meanValuesSum[0] / numberOfMatchingPoints;
   }
 
+  /**
+   * This function is used as a getter for mean value of the reactive power
+   * measurements.
+   * 
+   * @return the mean reactive power.
+   */
   public double getMeanReactive ()
   {
     return meanValuesSum[1] / numberOfMatchingPoints;
   }
 
-  public double[] getMeanValues ()
+  /**
+   * This function is used as a getter for mean value of the active and the
+   * reactive power measurements.
+   * 
+   * @return the mean active and reactive power.
+   */
+  double[] getMeanValues ()
   {
     double[] temp = { getMeanActive(), getMeanReactive() };
     return temp;
   }
 
+  /**
+   * This function adds a certain point of interest to the rising points' list.
+   * 
+   * @param event
+   *          The event the point of interest is originated.
+   * @param rising
+   *          The rising point of interest.
+   */
   public void addRisingPoint (int event, PointOfInterest rising)
   {
     if (risingPoints.containsKey(event))
@@ -117,6 +201,15 @@ public class Appliance
     }
   }
 
+  /**
+   * This function adds a certain point of interest to the reduction points'
+   * list.
+   * 
+   * @param event
+   *          The event the point of interest is originated.
+   * @param rising
+   *          The reduction point of interest.
+   */
   public void addReductionPoint (int event, PointOfInterest reduction)
   {
     if (reductionPoints.containsKey(event))
@@ -128,43 +221,24 @@ public class Appliance
     }
   }
 
-  public void status ()
-  {
-    System.out.println("Name:" + name);
-
-    Set<Integer> keys = new TreeSet<Integer>();
-    keys.addAll(risingPoints.keySet());
-    keys.addAll(reductionPoints.keySet());
-    keys.addAll(matchingPoints.keySet());
-
-    for (Integer key: keys) {
-      System.out.println("Event: " + key);
-      if (risingPoints.containsKey(key))
-        System.out
-                .println("Rising Points: " + risingPoints.get(key).toString());
-      if (reductionPoints.containsKey(key))
-        System.out.println("Reduction Points: "
-                           + reductionPoints.get(key).toString());
-      if (matchingPoints.containsKey(key)) {
-        System.out.print("Matching Points: ");
-        for (PointOfInterest[] pois: matchingPoints.get(key))
-          System.out.println(Arrays.toString(pois));
-      }
-    }
-    if (activity.equalsIgnoreCase("Refrigeration"))
-      System.out.println("Mean Duration: " + meanDuration);
-    System.out.println("Mean Power: " + getMeanActive());
-    System.out.println("Mean Reactive: " + getMeanReactive());
-  }
-
+  /**
+   * This is an auxiliary function used in case of the refrigerator in order to
+   * estimate some metrics useful for the successful detection of its end-use in
+   * more complex events.
+   */
   private void calculateMetrics ()
   {
+    // Initializing auxiliary variables.
     int counter = 0;
 
+    // Create a collection of the events in the rising and reduction
+    // maps' keysets.
     Set<Integer> keys = new TreeSet<Integer>();
     keys.addAll(risingPoints.keySet());
     keys.addAll(reductionPoints.keySet());
 
+    // For each event present, a search for a clean one to one identification of
+    // rising and reduction points is at hand.
     for (Integer key: keys) {
 
       if (risingPoints.containsKey(key) && reductionPoints.containsKey(key)
@@ -194,12 +268,14 @@ public class Appliance
 
       }
     }
-
+    // From those the mean duration is calculated.
     meanDuration /= counter;
 
     keys.clear();
     int duration = 0;
 
+    // The same procedure is done for the remaining points of interest, using
+    // the duration as another criterion of success and matching.
     for (Integer key: risingPoints.keySet()) {
 
       if (reductionPoints.containsKey(key)) {
@@ -248,6 +324,15 @@ public class Appliance
 
   }
 
+  /**
+   * This function adds a certain point of interest to the reduction points'
+   * list.
+   * 
+   * @param eventIndex
+   *          The index of the event the point of interest is originated.
+   * @param pois
+   *          The pair of matching points of interest.
+   */
   public void addMatchingPoints (int eventIndex, PointOfInterest[] pois)
   {
 
@@ -259,6 +344,13 @@ public class Appliance
 
   }
 
+  /**
+   * This auxiliary function is used for the re-estimation of the mean values
+   * when a new matching pair of points of interest is added to the appliance.
+   * 
+   * @param pois
+   *          The new matching pair of points of interest
+   */
   public void addMeanValues (PointOfInterest[] pois)
   {
     meanValuesSum[0] += pois[0].getPDiff() - pois[1].getPDiff();
@@ -266,6 +358,14 @@ public class Appliance
     numberOfMatchingPoints += 2;
   }
 
+  /**
+   * This function is used for the printing of the matching pairs to the
+   * console.
+   * 
+   * @param events
+   *          The list of events
+   * @return a list of string arrays containing the information needed.
+   */
   public ArrayList<String[]> matchingPairsToString (ArrayList<Event> events)
   {
 
@@ -290,6 +390,37 @@ public class Appliance
     return result;
   }
 
+  /**
+   * This function is used for the printing of the appliance attributes to the
+   * console.
+   * 
+   * @return a string array containing the appliance information needed.
+   */
+  public String[] applianceToString ()
+  {
+
+    String[] result = new String[5];
+
+    result[0] = Double.toString(getMeanActive());
+    result[1] = Double.toString(getMeanReactive());
+    result[2] = Integer.toString(numberOfMatchingPoints / 2);
+    result[3] = activity;
+    result[4] = name;
+
+    return result;
+  }
+
+  /**
+   * This is an auxiliary function used to check if the distance in time and
+   * space of a pair is close to this appliance, meaning that it belongs to this
+   * appliance.
+   * 
+   * @param mean
+   *          The mean active and reactive power measurements.
+   * @param duration
+   *          The duration of the end-use.
+   * @return true if it is close, false otherwise.
+   */
   public boolean isClose (double[] mean, int duration)
   {
 
@@ -305,5 +436,38 @@ public class Appliance
       return (Utils.percentageEuclideanDistance(mean, meanValues) < Constants.PERCENTAGE_CLOSENESS_THRESHOLD || Utils
               .absoluteEuclideanDistance(mean, meanValues) < Constants.ABSOLUTE_CLOSENESS_THRESHOLD);
 
+  }
+
+  /**
+   * This function is used to present the basic information of the Appliance
+   * Model on the console.
+   */
+  public void status ()
+  {
+    System.out.println("Name:" + name);
+
+    Set<Integer> keys = new TreeSet<Integer>();
+    keys.addAll(risingPoints.keySet());
+    keys.addAll(reductionPoints.keySet());
+    keys.addAll(matchingPoints.keySet());
+
+    for (Integer key: keys) {
+      System.out.println("Event: " + key);
+      if (risingPoints.containsKey(key))
+        System.out
+                .println("Rising Points: " + risingPoints.get(key).toString());
+      if (reductionPoints.containsKey(key))
+        System.out.println("Reduction Points: "
+                           + reductionPoints.get(key).toString());
+      if (matchingPoints.containsKey(key)) {
+        System.out.print("Matching Points: ");
+        for (PointOfInterest[] pois: matchingPoints.get(key))
+          System.out.println(Arrays.toString(pois));
+      }
+    }
+    if (activity.equalsIgnoreCase("Refrigeration"))
+      System.out.println("Mean Duration: " + meanDuration);
+    System.out.println("Mean Power: " + getMeanActive());
+    System.out.println("Mean Reactive: " + getMeanReactive());
   }
 }

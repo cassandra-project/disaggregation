@@ -30,21 +30,60 @@ import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.AddCluster;
 
+/**
+ * This class is responsible for finding events that contain isolated appliances
+ * end-uses. An analysis is made in order to find out base loads (such as
+ * refrigerator, freezer etc.) coming from those events and have make the
+ * identification of these loads easire on the more complex events.
+ * 
+ * @author Antonios Chrysopoulos
+ * @version 0.7, Date: 29.07.2013
+ */
+
 public class IsolatedApplianceExtractor
 {
+  /**
+   * This is a list containing the events that are comprised of an isolated
+   * appliance.
+   */
   private ArrayList<Event> isolated = new ArrayList<Event>();
+
+  /**
+   * This is a map of the events contained in each cluster estimated later.
+   */
   private Map<String, ArrayList<Integer>> clusters =
     new TreeMap<String, ArrayList<Integer>>();
+
+  /**
+   * The name of the cluster that is corresponding to the refrigerator.
+   */
   private String refrigeratorCluster = "";
+
+  /**
+   * This is a list containing pairs of points of interest that correspond to
+   * the refrigerator.
+   */
   private ArrayList<Double[]> refConsumptionMeans = new ArrayList<Double[]>();
 
+  /**
+   * This is the constructor of the isolated appliance extractor class. It
+   * created the clusters of the isolated events and detects which of them
+   * corresponds to the refrigerator.
+   * 
+   * @param events
+   *          The list of all the events detected by the Event Detector.
+   * @throws Exception
+   */
   public IsolatedApplianceExtractor (ArrayList<Event> events) throws Exception
   {
-
+    // Initializing auxiliary variables
     boolean q1 = false;
     boolean q3 = false;
     boolean pDiff = false;
 
+    // Checking each event. The ones that contain one rising and one reduction
+    // points or two reduction points with the second musch larger than the
+    // first are selected and added to the array
     for (Event event: events) {
 
       // System.out.println("Event:" + event.getId() + " Rising Points: "
@@ -76,29 +115,48 @@ public class IsolatedApplianceExtractor
       }
     }
 
+    // The instances for the cluster procedure are created
     Instances inst = createInstances(isolated);
 
     // System.out.println(inst.toString());
 
+    // The cluster is taking place
     fillClusters(inst);
 
     // System.out.println("Clusters:" + clusters.toString());
 
+    // The refrigerator cluster is found
     findRefrigerator();
 
     System.out.println("Fridge Cluster:" + refrigeratorCluster);
 
   }
 
+  /**
+   * This function is used as a getter for consumption mean values of the
+   * refrigerator cluster.
+   * 
+   * @return a list with mean values of active and reactive power measurements.
+   */
   public ArrayList<Double[]> getRefConsumptionMeans ()
   {
     return refConsumptionMeans;
   }
 
+  /**
+   * This is an auxiliary function that prepares the clustering data set. The
+   * events must be translated to instances of the data set that can be used for
+   * clustering.
+   * 
+   * @param isolated
+   *          The list of the events containing an isolated appliance.
+   * @return The instances of the data
+   * @throws Exception
+   */
   private Instances createInstances (ArrayList<Event> isolated)
     throws Exception
   {
-
+    // Initializing auxiliary variables namely the attributes of the data set
     Attribute id = new Attribute("id");
     Attribute pDiffRise = new Attribute("pDiffRise");
     Attribute qDiffRise = new Attribute("qDiffRise");
@@ -114,6 +172,7 @@ public class IsolatedApplianceExtractor
 
     Instances instances = new Instances("Isolated", attr, 0);
 
+    // Each event is translated to an instance with the above attributes
     for (Event event: isolated) {
 
       Instance inst = new DenseInstance(5);
@@ -127,6 +186,8 @@ public class IsolatedApplianceExtractor
 
     }
 
+    // Create the addcluster filter of Weka and the set up the hierarchical
+    // clusterer.
     AddCluster addcluster = new AddCluster();
 
     HierarchicalClusterer clusterer = new HierarchicalClusterer();
@@ -147,15 +208,26 @@ public class IsolatedApplianceExtractor
     addcluster.setInputFormat(instances);
     addcluster.setIgnoredAttributeIndices("1");
 
+    // Cluster data set
     Instances newInst = Filter.useFilter(instances, addcluster);
 
     return newInst;
   }
 
+  /**
+   * This function is taking the instances coming out from clustering and put
+   * each event to each respective cluster.
+   * 
+   * @param inst
+   *          The clustered instances
+   */
   private void fillClusters (Instances inst)
   {
+    // Initializing auxiliary variables
     ArrayList<Integer> temp;
 
+    // For each instance check the cluster value and put it to the correct
+    // cluster
     for (int i = 0; i < inst.size(); i++) {
 
       String cluster = inst.get(i).stringValue(inst.attribute(5));
@@ -173,8 +245,13 @@ public class IsolatedApplianceExtractor
 
   }
 
+  /**
+   * This function is responsible for finding the larger cluster in size which
+   * is going to be the refrigerator cluster.
+   */
   private void findRefrigerator ()
   {
+    // Initializing auxiliary variables
     int maxSize = 0;
 
     for (String cluster: clusters.keySet()) {
@@ -188,22 +265,13 @@ public class IsolatedApplianceExtractor
 
   }
 
-  public double refClusterMeanValues (int eventIndex)
-  {
-    boolean flag = clusters.get(refrigeratorCluster).contains(eventIndex);
-
-    if (flag == false) {
-      System.out.println("NOPE!");
-      return 0.0;
-    }
-    else {
-      int index = clusters.get(refrigeratorCluster).indexOf(eventIndex);
-      return refConsumptionMeans.get(index)[1];
-    }
-  }
-
+  /**
+   * This function is used for filling an array with the mean values of active
+   * and reactive power of the refrigerator cluster events.
+   */
   private void clusterRefMeans ()
   {
+    // Initializing auxiliary variables
     ArrayList<Integer> clusterEvents = clusters.get(refrigeratorCluster);
 
     for (Integer index: clusterEvents) {

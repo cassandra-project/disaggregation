@@ -1,0 +1,87 @@
+Fridge Cluster:cluster2
+Input: 1
+Event: 0
+Final Pairs:
+[POI 0 Minute: 0 Rising: true PDiff: 105.39999999999999 QDiff: 61.06, POI 2 Minute: 16 Rising: false PDiff: -92.8 QDiff: -61.81]
+Event: 1
+Event: 2
+Event: 3
+Input: 21
+
+Solutions: 8
+Failures: 17
+Branches: 43
+Wall time: 0ms
+Solution:
+[0, 0, 1, 0, 1, 1] Similarity: 0.08362540964692307 Distance: 11.95808790919082
+[1, 1, 0, 0, 0, 0] Similarity: 0.09761248552145647 Distance: 10.244591095676865
+Event: 4
+Final Pairs:
+[POI 11 Minute: 0 Rising: true PDiff: 2252.7000000000003 QDiff: -278.51, POI 13 Minute: 3 Rising: false PDiff: -2020.3 QDiff: 270.53000000000003]
+[POI 135 Minute: 12 Rising: true PDiff: 985.3000000000002 QDiff: 304.11, POI 20 Minute: 16 Rising: false PDiff: -985.3000000000002 QDiff: -304.11]
+[POI 136 Minute: 12 Rising: true PDiff: 1968.5 QDiff: -266.06, POI 25 Minute: 22 Rising: false PDiff: -1968.5 QDiff: 266.06]
+[POI 44 Minute: 63 Rising: true PDiff: 342.0 QDiff: 63.83, POI 137 Minute: 68 Rising: false PDiff: -342.0 QDiff: -63.83]
+[POI 43 Minute: 65 Rising: true PDiff: 342.5 QDiff: 106.79, POI 138 Minute: 68 Rising: false PDiff: -342.5 QDiff: -106.79]
+Event: 6
+Event: 7
+Event: 8
+Event: 9
+Event: 10
+Input: 111
+
+Solutions: 14
+Failures: 439
+Branches: 902
+Wall time: 0ms
+Solution:
+[1, 1, 1, 0, 0, 0, 0, 0, 0] Similarity: 0.024406913268876295 Distance: 40.97199793286439
+[0, 0, 0, 1, 0, 1, 0, 0, 0] Similarity: 0.04122186974779204 Distance: 24.25896753636613
+[0, 0, 0, 0, 1, 0, 1, 0, 1] Similarity: 0.07687555805489524 Distance: 13.008035652709289
+Event: 11
+Final Pairs:
+[POI 72 Minute: 12 Rising: true PDiff: 129.49999999999997 QDiff: -29.25, POI 139 Minute: 17 Rising: false PDiff: -129.49999999999997 QDiff: 29.25]
+[POI 73 Minute: 14 Rising: true PDiff: 101.49999999999997 QDiff: -15.559999999999999, POI 140 Minute: 17 Rising: false PDiff: -101.49999999999997 QDiff: 15.559999999999999]
+[POI 75 Minute: 31 Rising: true PDiff: 101.1 QDiff: -15.669999999999995, POI 77 Minute: 40 Rising: false PDiff: -77.20000000000002 QDiff: 8.980000000000004]
+[POI 76 Minute: 38 Rising: true PDiff: 88.79999999999998 QDiff: 70.93, POI 141 Minute: 97 Rising: false PDiff: -88.79999999999998 QDiff: -70.93]
+[POI 68 Minute: 54 Rising: true PDiff: 40.99999999999997 QDiff: -10.899999999999999, POI 142 Minute: 97 Rising: false PDiff: -40.99999999999997 QDiff: 10.899999999999999]
+Event: 12
+Event: 13
+Input: 12
+
+Solutions: 4
+Failures: 9
+Branches: 18
+Wall time: 0ms
+Solution:
+[0, 0, 1, 1, 0] Similarity: 0.023032843575871747 Distance: 43.41626324626103
+[1, 1, 0, 0, 1] Similarity: 0.2795457320541659 Distance: 3.577232221188897
+Event: 14
+Final Pairs:
+[POI 143 Minute: 0 Rising: true PDiff: 14.299999999999983 QDiff: -0.9399999999999977, POI 88 Minute: 1 Rising: false PDiff: -14.299999999999983 QDiff: 0.9399999999999977]
+[POI 144 Minute: 0 Rising: true PDiff: 86.39999999999999 QDiff: 57.64, POI 90 Minute: 16 Rising: false PDiff: -86.39999999999999 QDiff: -57.64]
+[POI 87 Minute: 2 Rising: true PDiff: 20.399999999999977 QDiff: -7.1299999999999955, POI 89 Minute: 3 Rising: false PDiff: -11.099999999999994 QDiff: 8.370000000000005]
+Event: 15
+Event: 16
+Event: 17
+Event: 18
+Event: 19
+Event: 20
+Event: 21
+Final Pairs:
+[POI 106 Minute: 0 Rising: true PDiff: 100.5 QDiff: 57.05, POI 109 Minute: 16 Rising: false PDiff: -89.19999999999999 QDiff: -58.51]
+Event: 22
+Final Pairs:
+[POI 111 Minute: 15 Rising: true PDiff: 98.80000000000001 QDiff: -16.60000000000001, POI 113 Minute: 25 Rising: false PDiff: -99.5 QDiff: 15.39]
+Event: 23
+Event: 24
+Event: 25
+Event: 26
+Event: 27
+Input: 1
+Event: 28
+Final Pairs:
+[POI 128 Minute: 0 Rising: true PDiff: 114.5 QDiff: 64.28999999999999, POI 130 Minute: 40 Rising: false PDiff: -119.9 QDiff: 17.45]
+Input: 1
+Event: 29
+Final Pairs:
+[POI 131 Minute: 0 Rising: true PDiff: 136.7 QDiff: 62.12, POI 132 Minute: 38 Rising: false PDiff: -111.50000000000001 QDiff: -62.85]

@@ -20,10 +20,24 @@ package eu.cassandra.disaggregation;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ * This is an auxiliary class used for storing the results appearing in the
+ * console in one or more addition outputs. They can be either other console, or
+ * they maybe files.
+ * 
+ * @author Antonios Chrysopoulos
+ * @version 0.9, Date: 29.07.2013
+ */
 public class MultiOutputStream extends OutputStream
 {
   OutputStream[] outputStreams;
 
+  /**
+   * This is the constructor of the class
+   * 
+   * @param outputStreams
+   *          The output streams that the messages will be printed at.
+   */
   public MultiOutputStream (OutputStream... outputStreams)
   {
     this.outputStreams = outputStreams;
