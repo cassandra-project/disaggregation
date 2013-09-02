@@ -22,6 +22,14 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
+import eu.cassandra.appliance.ApplianceIdentifier;
+import eu.cassandra.appliance.IsolatedApplianceExtractor;
+import eu.cassandra.event.Event;
+import eu.cassandra.event.EventDetector;
+import eu.cassandra.utils.MultiOutputStream;
+import eu.cassandra.utils.PowerDatasets;
+import eu.cassandra.utils.Utils;
+
 /**
  * This is the main class that is used for implementing the Disaggregation
  * procedure which is incorporated in the Training Module. The procedure
@@ -44,6 +52,22 @@ public class Disaggregate
   static ArrayList<Event> events = new ArrayList<Event>();
 
   /**
+   * This is the constructor function of the Disaggregation class.
+   * 
+   * @param input
+   *          The filename of the input
+   * @throws Exception
+   */
+  public Disaggregate (String input) throws Exception
+  {
+
+    String inputPrefix = Utils.getFileName(input);
+
+    initDisaggregation(input, inputPrefix + "ApplianceList.csv",
+                       inputPrefix + "ActivityList.csv");
+  }
+
+  /**
    * This is the disaggregation function of the Disaggregation class.
    * 
    * @param filename
@@ -54,10 +78,8 @@ public class Disaggregate
    *          The file name of the output file containing the activities.
    * @throws Exception
    */
-  public static void initDisaggregation (String filename,
-                                         String outputAppliance,
-                                         String outputActivity)
-    throws Exception
+  public void initDisaggregation (String filename, String outputAppliance,
+                                  String outputActivity) throws Exception
   {
     // Adding a file as a second output that will help keep track of the
     // procedure.
@@ -80,7 +102,8 @@ public class Disaggregate
     EventDetector ed = new EventDetector();
     ApplianceIdentifier ai = new ApplianceIdentifier();
 
-    // Run the event detector in order to find the possible events in the data
+    // Run the event detector in order to find the possible events in the
+    // data
     events = ed.detectEvents(data.getActivePower(), data.getReactivePower());
 
     // The Isolated Appliance Extractor helps the procedure of finding the
@@ -100,7 +123,7 @@ public class Disaggregate
         event.detectClusters();
         event.detectBasicShapes();
         event.findCombinations();
-        // event.status2();
+        event.status2();
         event.calculateFinalPairs();
         event.status2();
         if (event.getFinalPairs().size() > 0)
@@ -109,8 +132,8 @@ public class Disaggregate
     }
 
     ai.createDisaggregationFiles(outputAppliance, outputActivity, events);
-    // // The extracted appliances are printed to see the results of the
-    // procedure
+
+    // The extracted appliances are printed to see the results of the procedure
     // for (Appliance appliance: ai.getApplianceList())
     // appliance.status();
 
@@ -118,8 +141,8 @@ public class Disaggregate
 
   public static void main (String[] args) throws Exception
   {
-    Disaggregate.initDisaggregation("Demo/measurements.csv",
-                                    "Demo/applianceList.csv",
-                                    "Demo/activityList.csv");
+    String input = "Demo/Milioudis.csv";
+
+    Disaggregate dis = new Disaggregate(input);
   }
 }
