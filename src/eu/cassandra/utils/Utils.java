@@ -509,6 +509,6 @@ public class Utils
 
   public static String getFileName (String filename)
   {
-    return filename.replace(".", ",").split(",")[0];
+    return filename.substring(0, filename.length() - 4);
   }
 }

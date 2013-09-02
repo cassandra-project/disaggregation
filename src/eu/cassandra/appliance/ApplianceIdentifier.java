@@ -620,8 +620,6 @@ public class ApplianceIdentifier
     throws FileNotFoundException
   {
 
-    PrintStream realSystemOut = System.out;
-
     OutputStream output = new FileOutputStream(outputAppliance);
     PrintStream printOut = new PrintStream(output);
     System.setOut(printOut);
@@ -652,5 +650,6 @@ public class ApplianceIdentifier
           System.out.println(activity[i]);
       }
     }
+
   }
 }

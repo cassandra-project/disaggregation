@@ -19,6 +19,7 @@ package eu.cassandra.disaggregation;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
@@ -26,7 +27,6 @@ import eu.cassandra.appliance.ApplianceIdentifier;
 import eu.cassandra.appliance.IsolatedApplianceExtractor;
 import eu.cassandra.event.Event;
 import eu.cassandra.event.EventDetector;
-import eu.cassandra.utils.MultiOutputStream;
 import eu.cassandra.utils.PowerDatasets;
 import eu.cassandra.utils.Utils;
 
@@ -83,17 +83,19 @@ public class Disaggregate
   {
     // Adding a file as a second output that will help keep track of the
     // procedure.
-    FileOutputStream fout = null;
+    PrintStream realSystemOut = System.out;
     try {
-      fout = new FileOutputStream("Demo/test.txt");
+      OutputStream output = new FileOutputStream("Demo/test.txt");
+      PrintStream printOut = new PrintStream(output);
+      System.setOut(printOut);
     }
     catch (FileNotFoundException e) {
       e.printStackTrace();
     }
 
-    MultiOutputStream multiOut = new MultiOutputStream(System.out, fout);
-    PrintStream stdout = new PrintStream(multiOut);
-    System.setOut(stdout);
+    // MultiOutputStream multiOut = new MultiOutputStream(System.out, fout);
+    // PrintStream stdout = new PrintStream(multiOut);
+    // System.setOut(stdout);
 
     // Creating the data sets under investigation.
     PowerDatasets data = new PowerDatasets(filename);
@@ -132,6 +134,8 @@ public class Disaggregate
     }
 
     ai.createDisaggregationFiles(outputAppliance, outputActivity, events);
+
+    System.setOut(realSystemOut);
 
     // The extracted appliances are printed to see the results of the procedure
     // for (Appliance appliance: ai.getApplianceList())
