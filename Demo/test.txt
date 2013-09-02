@@ -1642,11 +1642,12 @@ OUT 2
 Input for event 12: 3
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 177
-Selected alternatives: 3 
-Solutions: 2
-Failures: 2
-Branches: 5
+Selected alternatives: z: 113
+Selected alternatives: 3 z: 177
+Selected alternatives: 2 
+Solutions: 3
+Failures: 1
+Branches: 6
 Wall time: 0ms
 Solution:
 [1, 0, 1] Similarity: 0.017778996269959647 Distance: 56.24614487881153
@@ -1695,40 +1696,48 @@ OUT 16
 Input for event 13: 135
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 138
-Selected alternatives: 135 z: 245
-Selected alternatives: 134 z: 294
-Selected alternatives: 132 135 z: 356
-Selected alternatives: 131 134 z: 430
-Selected alternatives: 126 134 z: 489
-Selected alternatives: 124 131 132 z: 563
-Selected alternatives: 124 126 132 z: 593
-Selected alternatives: 122 z: 749
-Selected alternatives: 122 132 z: 838
-Selected alternatives: 120 122 z: 1128
-Selected alternatives: 110 z: 1296
-Selected alternatives: 110 128 z: 1297
-Selected alternatives: 110 115 z: 1548
-Selected alternatives: 110 114 z: 1717
-Selected alternatives: 110 114 115 z: 2191
-Selected alternatives: 90 
+Selected alternatives: z: 80
+Selected alternatives: 135 z: 132
+Selected alternatives: 133 z: 206
+Selected alternatives: 132 z: 245
+Selected alternatives: 131 z: 377
+Selected alternatives: 131 133 z: 451
+Selected alternatives: 131 132 z: 457
+Selected alternatives: 129 132 z: 524
+Selected alternatives: 124 126 129 z: 704
+Selected alternatives: 118 131 z: 710
+Selected alternatives: 118 129 z: 1386
+Selected alternatives: 117 z: 1637
+Selected alternatives: 117 129 z: 1877
+Selected alternatives: 95 118 131 z: 1883
+Selected alternatives: 95 118 129 z: 1919
+Selected alternatives: 95 116 118 119 z: 2052
+Selected alternatives: 84 95 118 
 Solutions: 17
-Failures: 46
-Branches: 220
-Wall time: 15ms
+Failures: 70
+Branches: 258
+Wall time: 16ms
 Solution:
-[0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0] Similarity: 0.219115210411598 Distance: 4.563809140048038
+[0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1] Similarity: 0.04204515888005678 Distance: 23.78395103352383
+[1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0] Similarity: 0.11736790446766707 Distance: 8.520216873050533
+[0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0] Similarity: 0.04597624618050304 Distance: 21.750362047262264
 Event: 13
 Final Pairs:
-[POI 1354 Minute: 15 Rising: true PDiff: 78.80000000000001 QDiff: -6.98, POI 41 Minute: 17 Rising: false PDiff: -78.80000000000001 QDiff: 6.98]
-[POI 1355 Minute: 15 Rising: true PDiff: 100.80000000000001 QDiff: -16.44, POI 43 Minute: 33 Rising: false PDiff: -100.80000000000001 QDiff: 16.44]
-[POI 1356 Minute: 15 Rising: true PDiff: 50.40000000000002 QDiff: -13.620000000000005, POI 59 Minute: 148 Rising: false PDiff: -50.40000000000002 QDiff: 13.620000000000005]
+[POI 55 Minute: 144 Rising: true PDiff: 63.60000000000001 QDiff: 91.58, POI 1354 Minute: 162 Rising: false PDiff: -63.60000000000001 QDiff: -91.58]
+[POI 58 Minute: 149 Rising: true PDiff: 101.8 QDiff: -15.370000000000005, POI 1355 Minute: 162 Rising: false PDiff: -101.8 QDiff: 15.370000000000005]
+[POI 1356 Minute: 0 Rising: true PDiff: 113.5 QDiff: 64.65, POI 44 Minute: 41 Rising: false PDiff: -113.5 QDiff: -64.65]
+[POI 1357 Minute: 0 Rising: true PDiff: 50.40000000000002 QDiff: -13.620000000000005, POI 59 Minute: 148 Rising: false PDiff: -50.40000000000002 QDiff: 13.620000000000005]
+[POI 1358 Minute: 15 Rising: true PDiff: 78.80000000000001 QDiff: -6.98, POI 41 Minute: 17 Rising: false PDiff: -78.80000000000001 QDiff: 6.98]
+[POI 1359 Minute: 15 Rising: true PDiff: 100.80000000000001 QDiff: -16.44, POI 43 Minute: 33 Rising: false PDiff: -100.80000000000001 QDiff: 16.44]
 Event: 13
 Final Pairs:
-[POI 1354 Minute: 15 Rising: true PDiff: 78.80000000000001 QDiff: -6.98, POI 41 Minute: 17 Rising: false PDiff: -78.80000000000001 QDiff: 6.98]
-[POI 1355 Minute: 15 Rising: true PDiff: 100.80000000000001 QDiff: -16.44, POI 43 Minute: 33 Rising: false PDiff: -100.80000000000001 QDiff: 16.44]
-[POI 1356 Minute: 15 Rising: true PDiff: 50.40000000000002 QDiff: -13.620000000000005, POI 59 Minute: 148 Rising: false PDiff: -50.40000000000002 QDiff: 13.620000000000005]
+[POI 1356 Minute: 0 Rising: true PDiff: 113.5 QDiff: 64.65, POI 44 Minute: 41 Rising: false PDiff: -113.5 QDiff: -64.65]
+[POI 1357 Minute: 0 Rising: true PDiff: 50.40000000000002 QDiff: -13.620000000000005, POI 59 Minute: 148 Rising: false PDiff: -50.40000000000002 QDiff: 13.620000000000005]
+[POI 1358 Minute: 15 Rising: true PDiff: 78.80000000000001 QDiff: -6.98, POI 41 Minute: 17 Rising: false PDiff: -78.80000000000001 QDiff: 6.98]
+[POI 1359 Minute: 15 Rising: true PDiff: 100.80000000000001 QDiff: -16.44, POI 43 Minute: 33 Rising: false PDiff: -100.80000000000001 QDiff: 16.44]
 [POI 42 Minute: 34 Rising: true PDiff: 97.60000000000002 QDiff: -15.18, POI 45 Minute: 43 Rising: false PDiff: -100.40000000000002 QDiff: 15.039999999999996]
+[POI 55 Minute: 144 Rising: true PDiff: 63.60000000000001 QDiff: 91.58, POI 1354 Minute: 162 Rising: false PDiff: -63.60000000000001 QDiff: -91.58]
+[POI 58 Minute: 149 Rising: true PDiff: 101.8 QDiff: -15.370000000000005, POI 1355 Minute: 162 Rising: false PDiff: -101.8 QDiff: 15.370000000000005]
 Points Of Interest: 0
 Rising Points: []
 Reduction Points: []
@@ -1763,7 +1772,7 @@ Selected alternatives: z: 332
 Selected alternatives: 4 
 Solutions: 2
 Failures: 3
-Branches: 6
+Branches: 7
 Wall time: 0ms
 Solution:
 [1, 1, 0, 0] Similarity: 0.03326976549686931 Distance: 30.057320364764823
@@ -1861,10 +1870,10 @@ OUT 4
 Input for event 28: 5
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 53
-Selected alternatives: 5 z: 291
-Selected alternatives: 4 z: 787
-Selected alternatives: 3 
+Selected alternatives: z: 291
+Selected alternatives: 5 z: 460
+Selected alternatives: 4 5 z: 787
+Selected alternatives: 2 
 Solutions: 4
 Failures: 2
 Branches: 8
@@ -1873,12 +1882,12 @@ Solution:
 [1, 1, 0, 1] Similarity: 0.07877688233584748 Distance: 12.694079409448134
 Event: 28
 Final Pairs:
-[POI 104 Minute: 0 Rising: true PDiff: 53.300000000000004 QDiff: -17.3, POI 1357 Minute: 25 Rising: false PDiff: -53.300000000000004 QDiff: 17.3]
-[POI 105 Minute: 8 Rising: true PDiff: 76.69999999999999 QDiff: 79.12, POI 1358 Minute: 25 Rising: false PDiff: -76.69999999999999 QDiff: -79.12]
+[POI 104 Minute: 0 Rising: true PDiff: 53.300000000000004 QDiff: -17.3, POI 1360 Minute: 25 Rising: false PDiff: -53.300000000000004 QDiff: 17.3]
+[POI 105 Minute: 8 Rising: true PDiff: 76.69999999999999 QDiff: 79.12, POI 1361 Minute: 25 Rising: false PDiff: -76.69999999999999 QDiff: -79.12]
 Event: 28
 Final Pairs:
-[POI 104 Minute: 0 Rising: true PDiff: 53.300000000000004 QDiff: -17.3, POI 1357 Minute: 25 Rising: false PDiff: -53.300000000000004 QDiff: 17.3]
-[POI 105 Minute: 8 Rising: true PDiff: 76.69999999999999 QDiff: 79.12, POI 1358 Minute: 25 Rising: false PDiff: -76.69999999999999 QDiff: -79.12]
+[POI 104 Minute: 0 Rising: true PDiff: 53.300000000000004 QDiff: -17.3, POI 1360 Minute: 25 Rising: false PDiff: -53.300000000000004 QDiff: 17.3]
+[POI 105 Minute: 8 Rising: true PDiff: 76.69999999999999 QDiff: 79.12, POI 1361 Minute: 25 Rising: false PDiff: -76.69999999999999 QDiff: -79.12]
 Points Of Interest: 0
 Rising Points: []
 Reduction Points: []
@@ -1979,13 +1988,12 @@ OUT 2
 Input for event 38: 4
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 278
-Selected alternatives: 4 z: 284
-Selected alternatives: 3 z: 299
+Selected alternatives: z: 284
+Selected alternatives: 4 z: 299
 Selected alternatives: 2 
-Solutions: 4
-Failures: 1
-Branches: 8
+Solutions: 3
+Failures: 2
+Branches: 7
 Wall time: 0ms
 Solution:
 [0, 0, 0, 0, 0, 1, 0, 0, 0, 1] Similarity: 0.029933884013292784 Distance: 33.40695779925948
@@ -2043,27 +2051,26 @@ OUT 1
 Input for event 43: 14
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 61
-Selected alternatives: 14 z: 851
-Selected alternatives: 13 z: 984
-Selected alternatives: 6 13 z: 2647
-Selected alternatives: 4 
-Solutions: 5
-Failures: 7
-Branches: 22
+Selected alternatives: z: 851
+Selected alternatives: 14 z: 984
+Selected alternatives: 12 14 z: 2647
+Selected alternatives: 10 
+Solutions: 4
+Failures: 2
+Branches: 18
 Wall time: 0ms
 Solution:
 [0, 1, 0, 1, 1] Similarity: 0.2647367306609473 Distance: 3.777337574213367
 Event: 43
 Final Pairs:
-[POI 1359 Minute: 2 Rising: true PDiff: 114.0 QDiff: 66.41999999999999, POI 207 Minute: 20 Rising: false PDiff: -114.0 QDiff: -66.41999999999999]
-[POI 1360 Minute: 2 Rising: true PDiff: 55.400000000000006 QDiff: -18.45000000000001, POI 226 Minute: 93 Rising: false PDiff: -55.400000000000006 QDiff: 18.45000000000001]
+[POI 1362 Minute: 2 Rising: true PDiff: 114.0 QDiff: 66.41999999999999, POI 207 Minute: 20 Rising: false PDiff: -114.0 QDiff: -66.41999999999999]
+[POI 1363 Minute: 2 Rising: true PDiff: 55.400000000000006 QDiff: -18.45000000000001, POI 226 Minute: 93 Rising: false PDiff: -55.400000000000006 QDiff: 18.45000000000001]
 Event: 43
 Final Pairs:
-[POI 1359 Minute: 2 Rising: true PDiff: 114.0 QDiff: 66.41999999999999, POI 207 Minute: 20 Rising: false PDiff: -114.0 QDiff: -66.41999999999999]
-[POI 1360 Minute: 2 Rising: true PDiff: 55.400000000000006 QDiff: -18.45000000000001, POI 226 Minute: 93 Rising: false PDiff: -55.400000000000006 QDiff: 18.45000000000001]
-[POI 216 Minute: 42 Rising: true PDiff: 67.69999999999999 QDiff: 27.78, POI 1361 Minute: 61 Rising: false PDiff: -67.69999999999999 QDiff: -27.78]
-[POI 215 Minute: 44 Rising: true PDiff: 54.099999999999994 QDiff: 39.720000000000006, POI 1362 Minute: 61 Rising: false PDiff: -54.099999999999994 QDiff: -39.720000000000006]
+[POI 1362 Minute: 2 Rising: true PDiff: 114.0 QDiff: 66.41999999999999, POI 207 Minute: 20 Rising: false PDiff: -114.0 QDiff: -66.41999999999999]
+[POI 1363 Minute: 2 Rising: true PDiff: 55.400000000000006 QDiff: -18.45000000000001, POI 226 Minute: 93 Rising: false PDiff: -55.400000000000006 QDiff: 18.45000000000001]
+[POI 216 Minute: 42 Rising: true PDiff: 67.69999999999999 QDiff: 27.78, POI 1364 Minute: 61 Rising: false PDiff: -67.69999999999999 QDiff: -27.78]
+[POI 215 Minute: 44 Rising: true PDiff: 54.099999999999994 QDiff: 39.720000000000006, POI 1365 Minute: 61 Rising: false PDiff: -54.099999999999994 QDiff: -39.720000000000006]
 Points Of Interest: 0
 Rising Points: []
 Reduction Points: []
@@ -2124,13 +2131,13 @@ OUT 2
 Input for event 51: 3
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 51
+Selected alternatives: z: 49
 Selected alternatives: 3 z: 1618
-Selected alternatives: 1 
+Selected alternatives: 2 
 Solutions: 3
 Failures: 1
 Branches: 5
-Wall time: 15ms
+Wall time: 0ms
 Solution:
 [1, 0, 1, 0] Similarity: 0.1618551684678927 Distance: 6.178363097489658
 Event: 51
@@ -2157,22 +2164,24 @@ OUT 4
 Input for event 52: 5
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 793
-Selected alternatives: 5 
-Solutions: 2
-Failures: 4
-Branches: 6
+Selected alternatives: z: 81
+Selected alternatives: 5 z: 131
+Selected alternatives: 4 z: 793
+Selected alternatives: 3 
+Solutions: 4
+Failures: 2
+Branches: 8
 Wall time: 0ms
 Solution:
 [1, 0, 1, 1] Similarity: 0.07932010475721751 Distance: 12.607144217229589
 Event: 52
 Final Pairs:
-[POI 260 Minute: 0 Rising: true PDiff: 98.89999999999999 QDiff: 57.129999999999995, POI 1363 Minute: 38 Rising: false PDiff: -98.89999999999999 QDiff: -57.129999999999995]
-[POI 258 Minute: 14 Rising: true PDiff: 11.5 QDiff: -80.96000000000001, POI 1364 Minute: 38 Rising: false PDiff: -11.5 QDiff: 80.96000000000001]
+[POI 260 Minute: 0 Rising: true PDiff: 98.89999999999999 QDiff: 57.129999999999995, POI 1366 Minute: 38 Rising: false PDiff: -98.89999999999999 QDiff: -57.129999999999995]
+[POI 258 Minute: 14 Rising: true PDiff: 11.5 QDiff: -80.96000000000001, POI 1367 Minute: 38 Rising: false PDiff: -11.5 QDiff: 80.96000000000001]
 Event: 52
 Final Pairs:
-[POI 260 Minute: 0 Rising: true PDiff: 98.89999999999999 QDiff: 57.129999999999995, POI 1363 Minute: 38 Rising: false PDiff: -98.89999999999999 QDiff: -57.129999999999995]
-[POI 258 Minute: 14 Rising: true PDiff: 11.5 QDiff: -80.96000000000001, POI 1364 Minute: 38 Rising: false PDiff: -11.5 QDiff: 80.96000000000001]
+[POI 260 Minute: 0 Rising: true PDiff: 98.89999999999999 QDiff: 57.129999999999995, POI 1366 Minute: 38 Rising: false PDiff: -98.89999999999999 QDiff: -57.129999999999995]
+[POI 258 Minute: 14 Rising: true PDiff: 11.5 QDiff: -80.96000000000001, POI 1367 Minute: 38 Rising: false PDiff: -11.5 QDiff: 80.96000000000001]
 Points Of Interest: 2
 Rising Points: []
 Reduction Points: [POI 263 Minute: 2 Rising: false PDiff: -11.400000000000034 QDiff: 0.1700000000000017, POI 266 Minute: 40 Rising: false PDiff: -112.49999999999999 QDiff: -65.07]
@@ -2285,28 +2294,36 @@ OUT 8
 Input for event 67: 25
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 182
-Selected alternatives: 25 z: 350
-Selected alternatives: 24 25 z: 871
-Selected alternatives: 20 z: 1121
-Selected alternatives: 19 20 z: 1137
-Selected alternatives: 10 20 z: 1251
-Selected alternatives: 7 20 z: 1621
-Selected alternatives: 4 20 z: 1887
-Selected alternatives: 4 10 20 
-Solutions: 9
-Failures: 20
-Branches: 54
-Wall time: 16ms
+Selected alternatives: z: 172
+Selected alternatives: 25 z: 182
+Selected alternatives: 20 z: 310
+Selected alternatives: 20 24 z: 334
+Selected alternatives: 20 23 z: 350
+Selected alternatives: 16 20 z: 382
+Selected alternatives: 16 17 20 z: 548
+Selected alternatives: 12 16 z: 719
+Selected alternatives: 10 12 z: 750
+Selected alternatives: 8 z: 800
+Selected alternatives: 8 19 z: 918
+Selected alternatives: 8 16 z: 968
+Selected alternatives: 8 16 19 z: 1089
+Selected alternatives: 8 10 z: 1251
+Selected alternatives: 7 12 z: 1621
+Selected alternatives: 7 8 z: 1887
+Selected alternatives: 5 7 8 
+Solutions: 17
+Failures: 22
+Branches: 73
+Wall time: 15ms
 Solution:
-[0, 1, 0, 0, 0, 1] Similarity: 0.07503686973754818 Distance: 13.32678193396977
 [0, 0, 1, 1, 0, 0] Similarity: 0.026677721040229172 Distance: 37.484461228604616
 [1, 0, 0, 0, 1, 0] Similarity: 0.08711981188619666 Distance: 11.478445354155326
+[0, 1, 0, 0, 0, 1] Similarity: 0.07503686973754818 Distance: 13.32678193396977
 Event: 67
 Final Pairs:
-[POI 301 Minute: 3 Rising: true PDiff: 111.1 QDiff: 49.72, POI 306 Minute: 21 Rising: false PDiff: -111.70000000000002 QDiff: -65.93]
 [POI 303 Minute: 8 Rising: true PDiff: 34.19999999999996 QDiff: -5.390000000000001, POI 305 Minute: 10 Rising: false PDiff: -47.09999999999994 QDiff: 6.810000000000002]
 [POI 302 Minute: 0 Rising: true PDiff: 115.0 QDiff: -20.310000000000002, POI 304 Minute: 11 Rising: false PDiff: -102.20000000000002 QDiff: 16.33]
+[POI 301 Minute: 3 Rising: true PDiff: 111.1 QDiff: 49.72, POI 306 Minute: 21 Rising: false PDiff: -111.70000000000002 QDiff: -65.93]
 Event: 67
 Final Pairs:
 [POI 302 Minute: 0 Rising: true PDiff: 115.0 QDiff: -20.310000000000002, POI 304 Minute: 11 Rising: false PDiff: -102.20000000000002 QDiff: 16.33]
@@ -2348,27 +2365,22 @@ OUT 1
 Input for event 70: 14
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 254
-Selected alternatives: 14 z: 270
-Selected alternatives: 12 13 z: 554
-Selected alternatives: 11 z: 669
-Selected alternatives: 11 12 z: 1052
-Selected alternatives: 8 11 z: 6499
-Selected alternatives: 5 
-Solutions: 7
-Failures: 5
-Branches: 27
+Selected alternatives: z: 6499
+Selected alternatives: 14 
+Solutions: 2
+Failures: 0
+Branches: 15
 Wall time: 0ms
 Solution:
 [0, 1, 0, 1, 1, 0] Similarity: 0.6499429266858636 Distance: 1.538596635090898
 Event: 70
 Final Pairs:
-[POI 319 Minute: 4 Rising: true PDiff: 82.69999999999999 QDiff: -12.04, POI 1365 Minute: 140 Rising: false PDiff: -82.69999999999999 QDiff: 12.04]
-[POI 317 Minute: 123 Rising: true PDiff: 115.60000000000002 QDiff: 58.55, POI 1366 Minute: 140 Rising: false PDiff: -115.60000000000002 QDiff: -58.55]
+[POI 319 Minute: 4 Rising: true PDiff: 82.69999999999999 QDiff: -12.04, POI 1368 Minute: 140 Rising: false PDiff: -82.69999999999999 QDiff: 12.04]
+[POI 317 Minute: 123 Rising: true PDiff: 115.60000000000002 QDiff: 58.55, POI 1369 Minute: 140 Rising: false PDiff: -115.60000000000002 QDiff: -58.55]
 Event: 70
 Final Pairs:
-[POI 319 Minute: 4 Rising: true PDiff: 82.69999999999999 QDiff: -12.04, POI 1365 Minute: 140 Rising: false PDiff: -82.69999999999999 QDiff: 12.04]
-[POI 317 Minute: 123 Rising: true PDiff: 115.60000000000002 QDiff: 58.55, POI 1366 Minute: 140 Rising: false PDiff: -115.60000000000002 QDiff: -58.55]
+[POI 319 Minute: 4 Rising: true PDiff: 82.69999999999999 QDiff: -12.04, POI 1368 Minute: 140 Rising: false PDiff: -82.69999999999999 QDiff: 12.04]
+[POI 317 Minute: 123 Rising: true PDiff: 115.60000000000002 QDiff: 58.55, POI 1369 Minute: 140 Rising: false PDiff: -115.60000000000002 QDiff: -58.55]
 Points Of Interest: 0
 Rising Points: []
 Reduction Points: []
@@ -2414,8 +2426,8 @@ Inversed Chairs:
 [POI 354 Minute: 0 Rising: true PDiff: 114.0 QDiff: 67.94999999999999, POI 355 Minute: 4 Rising: true PDiff: 12.699999999999989 QDiff: -83.86, POI 356 Minute: 27 Rising: false PDiff: -123.4 QDiff: 17.32]
 Event: 77
 Final Pairs:
-[POI 354 Minute: 0 Rising: true PDiff: 114.0 QDiff: 67.94999999999999, POI 1367 Minute: 27 Rising: false PDiff: -114.0 QDiff: -67.94999999999999]
-[POI 355 Minute: 4 Rising: true PDiff: 12.699999999999989 QDiff: -83.86, POI 1368 Minute: 27 Rising: false PDiff: -12.699999999999989 QDiff: 83.86]
+[POI 354 Minute: 0 Rising: true PDiff: 114.0 QDiff: 67.94999999999999, POI 1370 Minute: 27 Rising: false PDiff: -114.0 QDiff: -67.94999999999999]
+[POI 355 Minute: 4 Rising: true PDiff: 12.699999999999989 QDiff: -83.86, POI 1371 Minute: 27 Rising: false PDiff: -12.699999999999989 QDiff: 83.86]
 Points Of Interest: 2
 Rising Points: [POI 357 Minute: 0 Rising: true PDiff: 152.5 QDiff: 64.25]
 Reduction Points: [POI 359 Minute: 40 Rising: false PDiff: -112.1 QDiff: -65.25999999999999]
@@ -2644,30 +2656,22 @@ OUT 2
 Input for event 105: 74
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 122
-Selected alternatives: 74 z: 646
-Selected alternatives: 73 z: 1544
-Selected alternatives: 67 z: 1613
-Selected alternatives: 66 67 z: 2809
-Selected alternatives: 59 
-Solutions: 6
-Failures: 11
-Branches: 91
-Wall time: 16ms
+Selected alternatives: z: 4279
+Selected alternatives: 74 
+Solutions: 2
+Failures: 0
+Branches: 75
+Wall time: 0ms
 Solution:
-[1, 1, 0, 1, 1, 1, 0, 0, 0, 0] Similarity: 0.2809798071580696 Distance: 3.5589746114297616
+[1, 0, 0, 1, 0, 0, 0, 0, 0, 1] Similarity: 0.427952201014174 Distance: 2.3367095615589073
 Event: 105
 Final Pairs:
-[POI 1369 Minute: 0 Rising: true PDiff: 12.5 QDiff: -9.439999999999998, POI 476 Minute: 1 Rising: false PDiff: -12.5 QDiff: 9.439999999999998]
-[POI 1370 Minute: 0 Rising: true PDiff: 102.89999999999999 QDiff: 69.8, POI 479 Minute: 39 Rising: false PDiff: -102.89999999999999 QDiff: -69.8]
-[POI 1371 Minute: 0 Rising: true PDiff: 10.200000000000003 QDiff: -7.590000000000003, POI 470 Minute: 43 Rising: false PDiff: -10.200000000000003 QDiff: 7.590000000000003]
-[POI 1372 Minute: 0 Rising: true PDiff: 18.0 QDiff: 0.75, POI 481 Minute: 60 Rising: false PDiff: -18.0 QDiff: -0.75]
+[POI 1372 Minute: 0 Rising: true PDiff: 102.89999999999999 QDiff: 69.8, POI 479 Minute: 39 Rising: false PDiff: -102.89999999999999 QDiff: -69.8]
+[POI 1373 Minute: 0 Rising: true PDiff: 46.5 QDiff: -18.67, POI 489 Minute: 118 Rising: false PDiff: -46.5 QDiff: 18.67]
 Event: 105
 Final Pairs:
-[POI 1369 Minute: 0 Rising: true PDiff: 12.5 QDiff: -9.439999999999998, POI 476 Minute: 1 Rising: false PDiff: -12.5 QDiff: 9.439999999999998]
-[POI 1370 Minute: 0 Rising: true PDiff: 102.89999999999999 QDiff: 69.8, POI 479 Minute: 39 Rising: false PDiff: -102.89999999999999 QDiff: -69.8]
-[POI 1371 Minute: 0 Rising: true PDiff: 10.200000000000003 QDiff: -7.590000000000003, POI 470 Minute: 43 Rising: false PDiff: -10.200000000000003 QDiff: 7.590000000000003]
-[POI 1372 Minute: 0 Rising: true PDiff: 18.0 QDiff: 0.75, POI 481 Minute: 60 Rising: false PDiff: -18.0 QDiff: -0.75]
+[POI 1372 Minute: 0 Rising: true PDiff: 102.89999999999999 QDiff: 69.8, POI 479 Minute: 39 Rising: false PDiff: -102.89999999999999 QDiff: -69.8]
+[POI 1373 Minute: 0 Rising: true PDiff: 46.5 QDiff: -18.67, POI 489 Minute: 118 Rising: false PDiff: -46.5 QDiff: 18.67]
 Points Of Interest: 0
 Rising Points: []
 Reduction Points: []
@@ -2743,30 +2747,32 @@ OUT 2
 Input for event 114: 32
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 390
-Selected alternatives: 32 z: 605
-Selected alternatives: 23 32 z: 630
-Selected alternatives: 8 23 
-Solutions: 4
-Failures: 40
-Branches: 84
-Wall time: 15ms
+Selected alternatives: z: 168
+Selected alternatives: 32 z: 390
+Selected alternatives: 31 z: 429
+Selected alternatives: 21 z: 605
+Selected alternatives: 12 31 z: 630
+Selected alternatives: 12 18 
+Solutions: 6
+Failures: 45
+Branches: 99
+Wall time: 0ms
 Solution:
-[1, 1, 1, 1, 0, 1, 0] Similarity: 0.04151745113028354 Distance: 24.086257050365575
 [0, 0, 0, 0, 1, 0, 1] Similarity: 0.02152002127277919 Distance: 46.46835555245971
+[1, 1, 1, 1, 0, 1, 0] Similarity: 0.04151745113028354 Distance: 24.086257050365575
 Event: 114
 Final Pairs:
-[POI 1373 Minute: 0 Rising: true PDiff: 11.400000000000006 QDiff: -8.700000000000003, POI 516 Minute: 2 Rising: false PDiff: -11.400000000000006 QDiff: 8.700000000000003]
-[POI 1374 Minute: 0 Rising: true PDiff: 102.60000000000001 QDiff: 68.2, POI 517 Minute: 17 Rising: false PDiff: -102.60000000000001 QDiff: -68.2]
-[POI 1375 Minute: 0 Rising: true PDiff: 9.400000000000006 QDiff: -2.75, POI 514 Minute: 37 Rising: false PDiff: -9.400000000000006 QDiff: 2.75]
-[POI 1376 Minute: 0 Rising: true PDiff: 16.900000000000006 QDiff: -43.67999999999999, POI 519 Minute: 41 Rising: false PDiff: -16.900000000000006 QDiff: 43.67999999999999]
 [POI 518 Minute: 40 Rising: true PDiff: 77.3 QDiff: 39.47, POI 520 Minute: 56 Rising: false PDiff: -98.9 QDiff: -73.53]
+[POI 1374 Minute: 0 Rising: true PDiff: 11.400000000000006 QDiff: -8.700000000000003, POI 516 Minute: 2 Rising: false PDiff: -11.400000000000006 QDiff: 8.700000000000003]
+[POI 1375 Minute: 0 Rising: true PDiff: 102.60000000000001 QDiff: 68.2, POI 517 Minute: 17 Rising: false PDiff: -102.60000000000001 QDiff: -68.2]
+[POI 1376 Minute: 0 Rising: true PDiff: 9.400000000000006 QDiff: -2.75, POI 514 Minute: 37 Rising: false PDiff: -9.400000000000006 QDiff: 2.75]
+[POI 1377 Minute: 0 Rising: true PDiff: 16.900000000000006 QDiff: -43.67999999999999, POI 519 Minute: 41 Rising: false PDiff: -16.900000000000006 QDiff: 43.67999999999999]
 Event: 114
 Final Pairs:
-[POI 1373 Minute: 0 Rising: true PDiff: 11.400000000000006 QDiff: -8.700000000000003, POI 516 Minute: 2 Rising: false PDiff: -11.400000000000006 QDiff: 8.700000000000003]
-[POI 1374 Minute: 0 Rising: true PDiff: 102.60000000000001 QDiff: 68.2, POI 517 Minute: 17 Rising: false PDiff: -102.60000000000001 QDiff: -68.2]
-[POI 1375 Minute: 0 Rising: true PDiff: 9.400000000000006 QDiff: -2.75, POI 514 Minute: 37 Rising: false PDiff: -9.400000000000006 QDiff: 2.75]
-[POI 1376 Minute: 0 Rising: true PDiff: 16.900000000000006 QDiff: -43.67999999999999, POI 519 Minute: 41 Rising: false PDiff: -16.900000000000006 QDiff: 43.67999999999999]
+[POI 1374 Minute: 0 Rising: true PDiff: 11.400000000000006 QDiff: -8.700000000000003, POI 516 Minute: 2 Rising: false PDiff: -11.400000000000006 QDiff: 8.700000000000003]
+[POI 1375 Minute: 0 Rising: true PDiff: 102.60000000000001 QDiff: 68.2, POI 517 Minute: 17 Rising: false PDiff: -102.60000000000001 QDiff: -68.2]
+[POI 1376 Minute: 0 Rising: true PDiff: 9.400000000000006 QDiff: -2.75, POI 514 Minute: 37 Rising: false PDiff: -9.400000000000006 QDiff: 2.75]
+[POI 1377 Minute: 0 Rising: true PDiff: 16.900000000000006 QDiff: -43.67999999999999, POI 519 Minute: 41 Rising: false PDiff: -16.900000000000006 QDiff: 43.67999999999999]
 [POI 518 Minute: 40 Rising: true PDiff: 77.3 QDiff: 39.47, POI 520 Minute: 56 Rising: false PDiff: -98.9 QDiff: -73.53]
 Points Of Interest: 0
 Rising Points: []
@@ -2886,36 +2892,29 @@ OUT 4
 Input for event 129: 13
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 157
-Selected alternatives: 13 z: 295
-Selected alternatives: 12 z: 364
-Selected alternatives: 11 z: 797
-Selected alternatives: 10 z: 954
-Selected alternatives: 10 13 z: 976
-Selected alternatives: 8 z: 1133
-Selected alternatives: 8 13 z: 1340
-Selected alternatives: 8 11 z: 1377
-Selected alternatives: 5 8 11 z: 1812
-Selected alternatives: 4 8 
-Solutions: 11
-Failures: 6
-Branches: 31
+Selected alternatives: z: 278
+Selected alternatives: 13 z: 976
+Selected alternatives: 12 z: 1812
+Selected alternatives: 9 12 
+Solutions: 4
+Failures: 10
+Branches: 23
 Wall time: 0ms
 Solution:
 [0, 0, 1, 0, 1, 1] Similarity: 0.08362540964692307 Distance: 11.95808790919082
 [1, 1, 0, 0, 0, 0] Similarity: 0.09761248552145647 Distance: 10.244591095676865
 Event: 129
 Final Pairs:
-[POI 1377 Minute: 12 Rising: true PDiff: 985.3000000000002 QDiff: 304.11, POI 570 Minute: 16 Rising: false PDiff: -985.3000000000002 QDiff: -304.11]
-[POI 1378 Minute: 12 Rising: true PDiff: 1968.5 QDiff: -266.06, POI 575 Minute: 22 Rising: false PDiff: -1968.5 QDiff: 266.06]
+[POI 1378 Minute: 12 Rising: true PDiff: 985.3000000000002 QDiff: 304.11, POI 570 Minute: 16 Rising: false PDiff: -985.3000000000002 QDiff: -304.11]
+[POI 1379 Minute: 12 Rising: true PDiff: 1968.5 QDiff: -266.06, POI 575 Minute: 22 Rising: false PDiff: -1968.5 QDiff: 266.06]
 [POI 561 Minute: 0 Rising: true PDiff: 2252.7000000000003 QDiff: -278.51, POI 563 Minute: 3 Rising: false PDiff: -2020.3 QDiff: 270.53000000000003]
 Event: 129
 Final Pairs:
 [POI 561 Minute: 0 Rising: true PDiff: 2252.7000000000003 QDiff: -278.51, POI 563 Minute: 3 Rising: false PDiff: -2020.3 QDiff: 270.53000000000003]
-[POI 1377 Minute: 12 Rising: true PDiff: 985.3000000000002 QDiff: 304.11, POI 570 Minute: 16 Rising: false PDiff: -985.3000000000002 QDiff: -304.11]
-[POI 1378 Minute: 12 Rising: true PDiff: 1968.5 QDiff: -266.06, POI 575 Minute: 22 Rising: false PDiff: -1968.5 QDiff: 266.06]
-[POI 594 Minute: 63 Rising: true PDiff: 342.0 QDiff: 63.83, POI 1379 Minute: 68 Rising: false PDiff: -342.0 QDiff: -63.83]
-[POI 593 Minute: 65 Rising: true PDiff: 342.5 QDiff: 106.79, POI 1380 Minute: 68 Rising: false PDiff: -342.5 QDiff: -106.79]
+[POI 1378 Minute: 12 Rising: true PDiff: 985.3000000000002 QDiff: 304.11, POI 570 Minute: 16 Rising: false PDiff: -985.3000000000002 QDiff: -304.11]
+[POI 1379 Minute: 12 Rising: true PDiff: 1968.5 QDiff: -266.06, POI 575 Minute: 22 Rising: false PDiff: -1968.5 QDiff: 266.06]
+[POI 594 Minute: 63 Rising: true PDiff: 342.0 QDiff: 63.83, POI 1380 Minute: 68 Rising: false PDiff: -342.0 QDiff: -63.83]
+[POI 593 Minute: 65 Rising: true PDiff: 342.5 QDiff: 106.79, POI 1381 Minute: 68 Rising: false PDiff: -342.5 QDiff: -106.79]
 Points Of Interest: 0
 Rising Points: []
 Reduction Points: []
@@ -2979,44 +2978,47 @@ OUT 16
 Input for event 136: 73
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 145
-Selected alternatives: 73 z: 289
-Selected alternatives: 72 73 z: 330
-Selected alternatives: 64 68 z: 369
-Selected alternatives: 64 68 69 z: 405
-Selected alternatives: 57 68 69 z: 407
-Selected alternatives: 32 41 68 z: 552
-Selected alternatives: 27 73 z: 591
-Selected alternatives: 27 69 73 z: 661
-Selected alternatives: 27 49 57 z: 675
-Selected alternatives: 27 41 54 z: 700
-Selected alternatives: 20 27 69 z: 708
-Selected alternatives: 16 27 32 z: 805
-Selected alternatives: 13 20 27 z: 816
-Selected alternatives: 3 16 27 z: 821
-Selected alternatives: 1 16 19 
-Solutions: 16
-Failures: 351
-Branches: 728
-Wall time: 15ms
+Selected alternatives: z: 87
+Selected alternatives: 73 z: 145
+Selected alternatives: 72 z: 232
+Selected alternatives: 72 73 z: 289
+Selected alternatives: 70 72 z: 341
+Selected alternatives: 64 73 z: 398
+Selected alternatives: 64 70 z: 415
+Selected alternatives: 43 61 64 z: 473
+Selected alternatives: 43 53 64 z: 475
+Selected alternatives: 40 53 67 z: 502
+Selected alternatives: 40 48 70 z: 503
+Selected alternatives: 40 46 53 z: 507
+Selected alternatives: 30 40 41 z: 508
+Selected alternatives: 21 29 40 z: 552
+Selected alternatives: 17 72 z: 661
+Selected alternatives: 17 64 z: 805
+Selected alternatives: 17 53 64 z: 816
+Selected alternatives: 17 21 49 z: 821
+Selected alternatives: 3 30 49 
+Solutions: 19
+Failures: 411
+Branches: 855
+Wall time: 0ms
 Solution:
 [0, 0, 0, 1, 1, 0, 0, 0, 0] Similarity: 0.04122186974779204 Distance: 24.25896753636613
-[1, 0, 0, 0, 0, 0, 0, 1, 1] Similarity: 0.0262641054571163 Distance: 38.0747785845129
 [0, 1, 0, 0, 0, 1, 1, 0, 0] Similarity: 0.014747945183649802 Distance: 67.80605620291038
+[1, 0, 0, 0, 0, 0, 0, 1, 1] Similarity: 0.0262641054571163 Distance: 38.0747785845129
 Event: 136
 Final Pairs:
 [POI 625 Minute: 31 Rising: true PDiff: 101.1 QDiff: -15.669999999999995, POI 627 Minute: 40 Rising: false PDiff: -77.20000000000002 QDiff: 8.980000000000004]
-[POI 1381 Minute: 12 Rising: true PDiff: 63.20000000000002 QDiff: -116.06, POI 620 Minute: 79 Rising: false PDiff: -63.20000000000002 QDiff: 116.06]
-[POI 1382 Minute: 12 Rising: true PDiff: 113.80000000000001 QDiff: 69.52000000000001, POI 629 Minute: 97 Rising: false PDiff: -113.80000000000001 QDiff: -69.52000000000001]
-[POI 623 Minute: 14 Rising: true PDiff: 101.49999999999997 QDiff: -15.559999999999999, POI 1383 Minute: 58 Rising: false PDiff: -101.49999999999997 QDiff: 15.559999999999999]
-[POI 618 Minute: 54 Rising: true PDiff: 40.99999999999997 QDiff: -10.899999999999999, POI 1384 Minute: 58 Rising: false PDiff: -40.99999999999997 QDiff: 10.899999999999999]
+[POI 623 Minute: 14 Rising: true PDiff: 101.49999999999997 QDiff: -15.559999999999999, POI 1382 Minute: 58 Rising: false PDiff: -101.49999999999997 QDiff: 15.559999999999999]
+[POI 618 Minute: 54 Rising: true PDiff: 40.99999999999997 QDiff: -10.899999999999999, POI 1383 Minute: 58 Rising: false PDiff: -40.99999999999997 QDiff: 10.899999999999999]
+[POI 1384 Minute: 12 Rising: true PDiff: 63.20000000000002 QDiff: -116.06, POI 620 Minute: 79 Rising: false PDiff: -63.20000000000002 QDiff: 116.06]
+[POI 1385 Minute: 12 Rising: true PDiff: 113.80000000000001 QDiff: 69.52000000000001, POI 629 Minute: 97 Rising: false PDiff: -113.80000000000001 QDiff: -69.52000000000001]
 Event: 136
 Final Pairs:
-[POI 1381 Minute: 12 Rising: true PDiff: 63.20000000000002 QDiff: -116.06, POI 620 Minute: 79 Rising: false PDiff: -63.20000000000002 QDiff: 116.06]
-[POI 1382 Minute: 12 Rising: true PDiff: 113.80000000000001 QDiff: 69.52000000000001, POI 629 Minute: 97 Rising: false PDiff: -113.80000000000001 QDiff: -69.52000000000001]
-[POI 623 Minute: 14 Rising: true PDiff: 101.49999999999997 QDiff: -15.559999999999999, POI 1383 Minute: 58 Rising: false PDiff: -101.49999999999997 QDiff: 15.559999999999999]
+[POI 1384 Minute: 12 Rising: true PDiff: 63.20000000000002 QDiff: -116.06, POI 620 Minute: 79 Rising: false PDiff: -63.20000000000002 QDiff: 116.06]
+[POI 1385 Minute: 12 Rising: true PDiff: 113.80000000000001 QDiff: 69.52000000000001, POI 629 Minute: 97 Rising: false PDiff: -113.80000000000001 QDiff: -69.52000000000001]
+[POI 623 Minute: 14 Rising: true PDiff: 101.49999999999997 QDiff: -15.559999999999999, POI 1382 Minute: 58 Rising: false PDiff: -101.49999999999997 QDiff: 15.559999999999999]
 [POI 625 Minute: 31 Rising: true PDiff: 101.1 QDiff: -15.669999999999995, POI 627 Minute: 40 Rising: false PDiff: -77.20000000000002 QDiff: 8.980000000000004]
-[POI 618 Minute: 54 Rising: true PDiff: 40.99999999999997 QDiff: -10.899999999999999, POI 1384 Minute: 58 Rising: false PDiff: -40.99999999999997 QDiff: 10.899999999999999]
+[POI 618 Minute: 54 Rising: true PDiff: 40.99999999999997 QDiff: -10.899999999999999, POI 1383 Minute: 58 Rising: false PDiff: -40.99999999999997 QDiff: 10.899999999999999]
 Points Of Interest: 0
 Rising Points: []
 Reduction Points: []
@@ -3050,25 +3052,23 @@ OUT 4
 Input for event 139: 10
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 115
-Selected alternatives: 10 z: 393
-Selected alternatives: 9 z: 1792
-Selected alternatives: 6 z: 2795
-Selected alternatives: 5 
-Solutions: 5
-Failures: 2
-Branches: 16
+Selected alternatives: z: 675
+Selected alternatives: 10 z: 2795
+Selected alternatives: 9 
+Solutions: 3
+Failures: 0
+Branches: 12
 Wall time: 0ms
 Solution:
 [1, 1, 0, 0, 1] Similarity: 0.2795457320541659 Distance: 3.577232221188897
 Event: 139
 Final Pairs:
-[POI 1385 Minute: 0 Rising: true PDiff: 14.299999999999983 QDiff: -0.9399999999999977, POI 638 Minute: 1 Rising: false PDiff: -14.299999999999983 QDiff: 0.9399999999999977]
-[POI 1386 Minute: 0 Rising: true PDiff: 86.39999999999999 QDiff: 57.64, POI 640 Minute: 16 Rising: false PDiff: -86.39999999999999 QDiff: -57.64]
+[POI 1386 Minute: 0 Rising: true PDiff: 14.299999999999983 QDiff: -0.9399999999999977, POI 638 Minute: 1 Rising: false PDiff: -14.299999999999983 QDiff: 0.9399999999999977]
+[POI 1387 Minute: 0 Rising: true PDiff: 86.39999999999999 QDiff: 57.64, POI 640 Minute: 16 Rising: false PDiff: -86.39999999999999 QDiff: -57.64]
 Event: 139
 Final Pairs:
-[POI 1385 Minute: 0 Rising: true PDiff: 14.299999999999983 QDiff: -0.9399999999999977, POI 638 Minute: 1 Rising: false PDiff: -14.299999999999983 QDiff: 0.9399999999999977]
-[POI 1386 Minute: 0 Rising: true PDiff: 86.39999999999999 QDiff: 57.64, POI 640 Minute: 16 Rising: false PDiff: -86.39999999999999 QDiff: -57.64]
+[POI 1386 Minute: 0 Rising: true PDiff: 14.299999999999983 QDiff: -0.9399999999999977, POI 638 Minute: 1 Rising: false PDiff: -14.299999999999983 QDiff: 0.9399999999999977]
+[POI 1387 Minute: 0 Rising: true PDiff: 86.39999999999999 QDiff: 57.64, POI 640 Minute: 16 Rising: false PDiff: -86.39999999999999 QDiff: -57.64]
 Points Of Interest: 0
 Rising Points: []
 Reduction Points: []
@@ -3248,11 +3248,12 @@ OUT 2
 Input for event 164: 2
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 43
-Selected alternatives: 2 
-Solutions: 2
-Failures: 1
-Branches: 3
+Selected alternatives: z: 34
+Selected alternatives: 2 z: 43
+Selected alternatives: 1 
+Solutions: 3
+Failures: 0
+Branches: 4
 Wall time: 0ms
 Solution:
 [0, 0, 1, 1, 0] Similarity: 0.0043152180786370144 Distance: 231.7379983529953
@@ -3328,35 +3329,26 @@ OUT 1
 Input for event 167: 1940
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 41
-Selected alternatives: 1940 z: 129
-Selected alternatives: 1939 z: 140
-Selected alternatives: 1932 z: 141
-Selected alternatives: 1921 z: 146
-Selected alternatives: 1919 z: 147
-Selected alternatives: 1867 z: 163
-Selected alternatives: 1812 z: 164
-Selected alternatives: 1793 z: 184
-Selected alternatives: 1785 z: 185
-Selected alternatives: 1754 z: 186
-Selected alternatives: 1665 z: 437
-Selected alternatives: 1540 z: 751
-Selected alternatives: 891 z: 4277
-Selected alternatives: 843 
-Solutions: 15
-Failures: 1084
-Branches: 3038
-Wall time: 312ms
+Selected alternatives: z: 89
+Selected alternatives: 1940 z: 131
+Selected alternatives: 1920 z: 185
+Selected alternatives: 1916 z: 190
+Selected alternatives: 1904 z: 4277
+Selected alternatives: 1686 
+Solutions: 6
+Failures: 250
+Branches: 2194
+Wall time: 109ms
 Solution:
 [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1] Similarity: 0.4277763162399461 Distance: 2.33767032450456
 Event: 167
 Final Pairs:
-[POI 1387 Minute: 0 Rising: true PDiff: 111.90000000000003 QDiff: -18.77, POI 754 Minute: 90 Rising: false PDiff: -111.90000000000003 QDiff: 18.77]
-[POI 1388 Minute: 0 Rising: true PDiff: 54.3 QDiff: -19.759999999999998, POI 743 Minute: 444 Rising: false PDiff: -54.3 QDiff: 19.759999999999998]
+[POI 1388 Minute: 0 Rising: true PDiff: 111.90000000000003 QDiff: -18.77, POI 754 Minute: 90 Rising: false PDiff: -111.90000000000003 QDiff: 18.77]
+[POI 1389 Minute: 0 Rising: true PDiff: 54.3 QDiff: -19.759999999999998, POI 743 Minute: 444 Rising: false PDiff: -54.3 QDiff: 19.759999999999998]
 Event: 167
 Final Pairs:
-[POI 1387 Minute: 0 Rising: true PDiff: 111.90000000000003 QDiff: -18.77, POI 754 Minute: 90 Rising: false PDiff: -111.90000000000003 QDiff: 18.77]
-[POI 1388 Minute: 0 Rising: true PDiff: 54.3 QDiff: -19.759999999999998, POI 743 Minute: 444 Rising: false PDiff: -54.3 QDiff: 19.759999999999998]
+[POI 1388 Minute: 0 Rising: true PDiff: 111.90000000000003 QDiff: -18.77, POI 754 Minute: 90 Rising: false PDiff: -111.90000000000003 QDiff: 18.77]
+[POI 1389 Minute: 0 Rising: true PDiff: 54.3 QDiff: -19.759999999999998, POI 743 Minute: 444 Rising: false PDiff: -54.3 QDiff: 19.759999999999998]
 Points Of Interest: 0
 Rising Points: []
 Reduction Points: []
@@ -3608,45 +3600,43 @@ OUT 32
 Input for event 189: 1876
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 66
-Selected alternatives: 1876 z: 143
-Selected alternatives: 1875 z: 147
-Selected alternatives: 1871 z: 273
-Selected alternatives: 1870 z: 405
-Selected alternatives: 1868 z: 458
-Selected alternatives: 1867 z: 482
-Selected alternatives: 1838 1867 z: 494
-Selected alternatives: 1819 1875 z: 624
-Selected alternatives: 1819 1870 z: 756
-Selected alternatives: 1819 1868 z: 809
-Selected alternatives: 1819 1867 z: 833
-Selected alternatives: 1819 1838 1867 z: 868
-Selected alternatives: 1794 1819 1867 z: 1078
-Selected alternatives: 1773 1819 z: 1102
-Selected alternatives: 1773 1819 1838 z: 1137
-Selected alternatives: 1773 1794 1819 z: 1243
-Selected alternatives: 1753 1773 z: 1267
-Selected alternatives: 1753 1773 1838 z: 1321
-Selected alternatives: 1753 1773 1802 z: 1345
-Selected alternatives: 1753 1773 1802 1838 z: 1412
-Selected alternatives: 1746 1753 1773 z: 1490
-Selected alternatives: 1746 1753 1773 1802 z: 1531
-Selected alternatives: 1644 1746 1773 1819 z: 4508
-Selected alternatives: 1586 
-Solutions: 25
-Failures: 13604
-Branches: 29032
-Wall time: 1123ms
+Selected alternatives: z: 74
+Selected alternatives: 1876 z: 236
+Selected alternatives: 1873 z: 599
+Selected alternatives: 1863 z: 608
+Selected alternatives: 1860 1863 z: 869
+Selected alternatives: 1849 1863 z: 1145
+Selected alternatives: 1839 1863 z: 1154
+Selected alternatives: 1839 1860 1863 z: 1415
+Selected alternatives: 1839 1849 1863 z: 1487
+Selected alternatives: 1814 1849 1872 z: 1514
+Selected alternatives: 1814 1849 1871 z: 1747
+Selected alternatives: 1814 1842 1849 z: 1785
+Selected alternatives: 1753 1814 z: 1794
+Selected alternatives: 1753 1814 1860 z: 2055
+Selected alternatives: 1753 1814 1849 
+Solutions: 15
+Failures: 942
+Branches: 3667
+Wall time: 189ms
 Solution:
-[0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0] Similarity: 0.4508793821442308 Distance: 2.2178880640856455
+[0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0] Similarity: 0.0729875151141835 Distance: 13.700973357369064
+[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0] Similarity: 0.10561134312864828 Distance: 9.468679882064094
+[0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0] Similarity: 0.02706778284119437 Distance: 36.944289300197255
 Event: 189
 Final Pairs:
-[POI 1389 Minute: 13 Rising: true PDiff: 10.900000000000006 QDiff: -3.8800000000000026, POI 885 Minute: 57 Rising: false PDiff: -10.900000000000006 QDiff: 3.8800000000000026]
-[POI 1390 Minute: 13 Rising: true PDiff: 40.0 QDiff: -13.670000000000002, POI 927 Minute: 411 Rising: false PDiff: -40.0 QDiff: 13.670000000000002]
+[POI 878 Minute: 77 Rising: true PDiff: 111.00000000000001 QDiff: 50.589999999999996, POI 917 Minute: 247 Rising: false PDiff: -112.2 QDiff: -67.25999999999999]
+[POI 891 Minute: 13 Rising: true PDiff: 51.999999999999986 QDiff: -18.07999999999999, POI 1390 Minute: 413 Rising: false PDiff: -51.999999999999986 QDiff: 18.07999999999999]
+[POI 882 Minute: 172 Rising: true PDiff: 11.699999999999989 QDiff: -3.1699999999999946, POI 1391 Minute: 413 Rising: false PDiff: -11.699999999999989 QDiff: 3.1699999999999946]
+[POI 876 Minute: 51 Rising: true PDiff: 10.0 QDiff: -7.369999999999997, POI 1392 Minute: 386 Rising: false PDiff: -10.0 QDiff: 7.369999999999997]
+[POI 881 Minute: 149 Rising: true PDiff: 15.299999999999983 QDiff: -3.8799999999999955, POI 1393 Minute: 386 Rising: false PDiff: -15.299999999999983 QDiff: 3.8799999999999955]
 Event: 189
 Final Pairs:
-[POI 1389 Minute: 13 Rising: true PDiff: 10.900000000000006 QDiff: -3.8800000000000026, POI 885 Minute: 57 Rising: false PDiff: -10.900000000000006 QDiff: 3.8800000000000026]
-[POI 1390 Minute: 13 Rising: true PDiff: 40.0 QDiff: -13.670000000000002, POI 927 Minute: 411 Rising: false PDiff: -40.0 QDiff: 13.670000000000002]
+[POI 891 Minute: 13 Rising: true PDiff: 51.999999999999986 QDiff: -18.07999999999999, POI 1390 Minute: 413 Rising: false PDiff: -51.999999999999986 QDiff: 18.07999999999999]
+[POI 876 Minute: 51 Rising: true PDiff: 10.0 QDiff: -7.369999999999997, POI 1392 Minute: 386 Rising: false PDiff: -10.0 QDiff: 7.369999999999997]
+[POI 878 Minute: 77 Rising: true PDiff: 111.00000000000001 QDiff: 50.589999999999996, POI 917 Minute: 247 Rising: false PDiff: -112.2 QDiff: -67.25999999999999]
+[POI 881 Minute: 149 Rising: true PDiff: 15.299999999999983 QDiff: -3.8799999999999955, POI 1393 Minute: 386 Rising: false PDiff: -15.299999999999983 QDiff: 3.8799999999999955]
+[POI 882 Minute: 172 Rising: true PDiff: 11.699999999999989 QDiff: -3.1699999999999946, POI 1391 Minute: 413 Rising: false PDiff: -11.699999999999989 QDiff: 3.1699999999999946]
 Points Of Interest: 2
 Rising Points: [POI 930 Minute: 0 Rising: true PDiff: 146.0 QDiff: 53.66]
 Reduction Points: [POI 932 Minute: 38 Rising: false PDiff: -112.5 QDiff: -64.78]
@@ -3723,26 +3713,33 @@ OUT 8
 Input for event 196: 20
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 58
-Selected alternatives: 20 z: 102
-Selected alternatives: 19 z: 160
-Selected alternatives: 19 20 z: 174
-Selected alternatives: 18 19 z: 2740
-Selected alternatives: 17 
-Solutions: 6
-Failures: 0
-Branches: 26
+Selected alternatives: z: 11
+Selected alternatives: 20 z: 58
+Selected alternatives: 19 z: 72
+Selected alternatives: 18 z: 102
+Selected alternatives: 17 z: 113
+Selected alternatives: 17 20 z: 160
+Selected alternatives: 17 19 z: 174
+Selected alternatives: 17 18 z: 231
+Selected alternatives: 15 z: 289
+Selected alternatives: 15 19 z: 333
+Selected alternatives: 15 17 z: 391
+Selected alternatives: 15 17 19 z: 2740
+Selected alternatives: 11 
+Solutions: 13
+Failures: 4
+Branches: 44
 Wall time: 0ms
 Solution:
 [1, 0, 0, 1, 0, 0, 1, 0] Similarity: 0.2740338900496467 Distance: 3.6491836824227475
 Event: 196
 Final Pairs:
-[POI 955 Minute: 0 Rising: true PDiff: 55.1 QDiff: -18.029999999999998, POI 1391 Minute: 54 Rising: false PDiff: -55.1 QDiff: 18.029999999999998]
-[POI 958 Minute: 29 Rising: true PDiff: 58.00000000000001 QDiff: -16.849999999999994, POI 1392 Minute: 54 Rising: false PDiff: -58.00000000000001 QDiff: 16.849999999999994]
+[POI 955 Minute: 0 Rising: true PDiff: 55.1 QDiff: -18.029999999999998, POI 1394 Minute: 54 Rising: false PDiff: -55.1 QDiff: 18.029999999999998]
+[POI 958 Minute: 29 Rising: true PDiff: 58.00000000000001 QDiff: -16.849999999999994, POI 1395 Minute: 54 Rising: false PDiff: -58.00000000000001 QDiff: 16.849999999999994]
 Event: 196
 Final Pairs:
-[POI 955 Minute: 0 Rising: true PDiff: 55.1 QDiff: -18.029999999999998, POI 1391 Minute: 54 Rising: false PDiff: -55.1 QDiff: 18.029999999999998]
-[POI 958 Minute: 29 Rising: true PDiff: 58.00000000000001 QDiff: -16.849999999999994, POI 1392 Minute: 54 Rising: false PDiff: -58.00000000000001 QDiff: 16.849999999999994]
+[POI 955 Minute: 0 Rising: true PDiff: 55.1 QDiff: -18.029999999999998, POI 1394 Minute: 54 Rising: false PDiff: -55.1 QDiff: 18.029999999999998]
+[POI 958 Minute: 29 Rising: true PDiff: 58.00000000000001 QDiff: -16.849999999999994, POI 1395 Minute: 54 Rising: false PDiff: -58.00000000000001 QDiff: 16.849999999999994]
 Points Of Interest: 0
 Rising Points: []
 Reduction Points: []
@@ -3770,19 +3767,15 @@ OUT 8
 Input for event 198: 12
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 79
-Selected alternatives: 12 z: 110
-Selected alternatives: 11 z: 121
-Selected alternatives: 10 11 z: 182
-Selected alternatives: 9 z: 304
-Selected alternatives: 6 z: 656
-Selected alternatives: 4 z: 735
-Selected alternatives: 4 12 z: 1437
-Selected alternatives: 3 z: 1516
-Selected alternatives: 3 12 z: 1619
-Selected alternatives: 3 9 
-Solutions: 11
-Failures: 5
+Selected alternatives: z: 182
+Selected alternatives: 12 z: 209
+Selected alternatives: 11 z: 656
+Selected alternatives: 9 z: 735
+Selected alternatives: 9 10 z: 1437
+Selected alternatives: 1 z: 1619
+Selected alternatives: 1 12 
+Solutions: 7
+Failures: 10
 Branches: 30
 Wall time: 0ms
 Solution:
@@ -3791,15 +3784,15 @@ Solution:
 Event: 198
 Final Pairs:
 [POI 980 Minute: 52 Rising: true PDiff: 94.4 QDiff: 77.09, POI 985 Minute: 70 Rising: false PDiff: -86.50000000000001 QDiff: -74.02]
-[POI 965 Minute: 0 Rising: true PDiff: 26.900000000000006 QDiff: -9.020000000000003, POI 1393 Minute: 64 Rising: false PDiff: -26.900000000000006 QDiff: 9.020000000000003]
-[POI 968 Minute: 55 Rising: true PDiff: 10.300000000000011 QDiff: -8.659999999999997, POI 1394 Minute: 64 Rising: false PDiff: -10.300000000000011 QDiff: 8.659999999999997]
+[POI 965 Minute: 0 Rising: true PDiff: 26.900000000000006 QDiff: -9.020000000000003, POI 1396 Minute: 64 Rising: false PDiff: -26.900000000000006 QDiff: 9.020000000000003]
+[POI 968 Minute: 55 Rising: true PDiff: 10.300000000000011 QDiff: -8.659999999999997, POI 1397 Minute: 64 Rising: false PDiff: -10.300000000000011 QDiff: 8.659999999999997]
 Event: 198
 Final Pairs:
-[POI 965 Minute: 0 Rising: true PDiff: 26.900000000000006 QDiff: -9.020000000000003, POI 1393 Minute: 64 Rising: false PDiff: -26.900000000000006 QDiff: 9.020000000000003]
-[POI 1395 Minute: 7 Rising: true PDiff: 63.099999999999966 QDiff: -22.030000000000005, POI 979 Minute: 20 Rising: false PDiff: -63.099999999999966 QDiff: 22.030000000000005]
-[POI 1396 Minute: 7 Rising: true PDiff: 10.100000000000023 QDiff: -9.910000000000004, POI 969 Minute: 26 Rising: false PDiff: -10.100000000000023 QDiff: 9.910000000000004]
+[POI 965 Minute: 0 Rising: true PDiff: 26.900000000000006 QDiff: -9.020000000000003, POI 1396 Minute: 64 Rising: false PDiff: -26.900000000000006 QDiff: 9.020000000000003]
+[POI 1398 Minute: 7 Rising: true PDiff: 63.099999999999966 QDiff: -22.030000000000005, POI 979 Minute: 20 Rising: false PDiff: -63.099999999999966 QDiff: 22.030000000000005]
+[POI 1399 Minute: 7 Rising: true PDiff: 10.100000000000023 QDiff: -9.910000000000004, POI 969 Minute: 26 Rising: false PDiff: -10.100000000000023 QDiff: 9.910000000000004]
 [POI 980 Minute: 52 Rising: true PDiff: 94.4 QDiff: 77.09, POI 985 Minute: 70 Rising: false PDiff: -86.50000000000001 QDiff: -74.02]
-[POI 968 Minute: 55 Rising: true PDiff: 10.300000000000011 QDiff: -8.659999999999997, POI 1394 Minute: 64 Rising: false PDiff: -10.300000000000011 QDiff: 8.659999999999997]
+[POI 968 Minute: 55 Rising: true PDiff: 10.300000000000011 QDiff: -8.659999999999997, POI 1397 Minute: 64 Rising: false PDiff: -10.300000000000011 QDiff: 8.659999999999997]
 Points Of Interest: 0
 Rising Points: []
 Reduction Points: []
@@ -3916,40 +3909,31 @@ OUT 64
 Input for event 202: 1440
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 112
-Selected alternatives: 1440 z: 213
-Selected alternatives: 1439 z: 325
-Selected alternatives: 1439 1440 z: 429
-Selected alternatives: 1436 1439 1440 z: 437
-Selected alternatives: 1432 1439 1440 z: 1923
-Selected alternatives: 1431 z: 2035
-Selected alternatives: 1431 1440 
-Solutions: 8
-Failures: 5
-Branches: 1452
+Selected alternatives: z: 205
+Selected alternatives: 1440 z: 373
+Selected alternatives: 1437 1440 z: 416
+Selected alternatives: 1433 1438 z: 417
+Selected alternatives: 1433 1434 1438 z: 2459
+Selected alternatives: 1432 
+Solutions: 6
+Failures: 6
+Branches: 1454
 Wall time: 46ms
 Solution:
-[0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0] Similarity: 0.19233616545447238 Distance: 5.199230200087921
-[0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1] Similarity: 0.011207115467756044 Distance: 89.22902622687317
+[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1] Similarity: 0.2459671197603779 Distance: 4.065584054381755
 Event: 202
 Final Pairs:
-[POI 1397 Minute: 27 Rising: true PDiff: -22.0 QDiff: 13.360000000000014, POI 1023 Minute: 40 Rising: false PDiff: 22.0 QDiff: -13.360000000000014]
-[POI 1398 Minute: 27 Rising: true PDiff: 1798.6000000000001 QDiff: -248.02, POI 1025 Minute: 46 Rising: false PDiff: -1798.6000000000001 QDiff: 248.02]
-[POI 1399 Minute: 27 Rising: true PDiff: 11.399999999999977 QDiff: -3.8300000000000054, POI 1009 Minute: 71 Rising: false PDiff: -11.399999999999977 QDiff: 3.8300000000000054]
-[POI 1400 Minute: 27 Rising: true PDiff: 12.100000000000023 QDiff: -1.2999999999999972, POI 1083 Minute: 293 Rising: false PDiff: -12.100000000000023 QDiff: 1.2999999999999972]
-[POI 1401 Minute: 41 Rising: true PDiff: 13.199999999999989 QDiff: -7.769999999999996, POI 1039 Minute: 96 Rising: false PDiff: -13.199999999999989 QDiff: 7.769999999999996]
-[POI 1402 Minute: 41 Rising: true PDiff: 36.2 QDiff: -12.260000000000002, POI 1084 Minute: 310 Rising: false PDiff: -36.2 QDiff: 12.260000000000002]
+[POI 1400 Minute: 76 Rising: true PDiff: 13.199999999999989 QDiff: -7.769999999999996, POI 1039 Minute: 96 Rising: false PDiff: -13.199999999999989 QDiff: 7.769999999999996]
+[POI 1401 Minute: 76 Rising: true PDiff: 12.100000000000023 QDiff: -1.2999999999999972, POI 1083 Minute: 293 Rising: false PDiff: -12.100000000000023 QDiff: 1.2999999999999972]
+[POI 1402 Minute: 76 Rising: true PDiff: 36.2 QDiff: -12.260000000000002, POI 1084 Minute: 310 Rising: false PDiff: -36.2 QDiff: 12.260000000000002]
 Event: 202
 Final Pairs:
-[POI 1397 Minute: 27 Rising: true PDiff: -22.0 QDiff: 13.360000000000014, POI 1023 Minute: 40 Rising: false PDiff: 22.0 QDiff: -13.360000000000014]
-[POI 1398 Minute: 27 Rising: true PDiff: 1798.6000000000001 QDiff: -248.02, POI 1025 Minute: 46 Rising: false PDiff: -1798.6000000000001 QDiff: 248.02]
-[POI 1399 Minute: 27 Rising: true PDiff: 11.399999999999977 QDiff: -3.8300000000000054, POI 1009 Minute: 71 Rising: false PDiff: -11.399999999999977 QDiff: 3.8300000000000054]
-[POI 1400 Minute: 27 Rising: true PDiff: 12.100000000000023 QDiff: -1.2999999999999972, POI 1083 Minute: 293 Rising: false PDiff: -12.100000000000023 QDiff: 1.2999999999999972]
-[POI 1401 Minute: 41 Rising: true PDiff: 13.199999999999989 QDiff: -7.769999999999996, POI 1039 Minute: 96 Rising: false PDiff: -13.199999999999989 QDiff: 7.769999999999996]
-[POI 1402 Minute: 41 Rising: true PDiff: 36.2 QDiff: -12.260000000000002, POI 1084 Minute: 310 Rising: false PDiff: -36.2 QDiff: 12.260000000000002]
 [POI 1024 Minute: 47 Rising: true PDiff: 1770.9 QDiff: -231.05, POI 1027 Minute: 50 Rising: false PDiff: -1751.0 QDiff: 238.59]
 [POI 1026 Minute: 51 Rising: true PDiff: 1816.5 QDiff: -260.51000000000005, POI 1031 Minute: 60 Rising: false PDiff: -1801.7000000000003 QDiff: 247.78000000000003]
 [POI 1028 Minute: 56 Rising: true PDiff: 1820.1000000000001 QDiff: -238.46, POI 1031 Minute: 60 Rising: false PDiff: -1801.7000000000003 QDiff: 247.78000000000003]
+[POI 1400 Minute: 76 Rising: true PDiff: 13.199999999999989 QDiff: -7.769999999999996, POI 1039 Minute: 96 Rising: false PDiff: -13.199999999999989 QDiff: 7.769999999999996]
+[POI 1401 Minute: 76 Rising: true PDiff: 12.100000000000023 QDiff: -1.2999999999999972, POI 1083 Minute: 293 Rising: false PDiff: -12.100000000000023 QDiff: 1.2999999999999972]
+[POI 1402 Minute: 76 Rising: true PDiff: 36.2 QDiff: -12.260000000000002, POI 1084 Minute: 310 Rising: false PDiff: -36.2 QDiff: 12.260000000000002]
 [POI 1077 Minute: 251 Rising: true PDiff: 77.9 QDiff: 25.799999999999997, POI 1403 Minute: 270 Rising: false PDiff: -77.9 QDiff: -25.799999999999997]
 [POI 1076 Minute: 253 Rising: true PDiff: 38.29999999999997 QDiff: 42.12, POI 1404 Minute: 270 Rising: false PDiff: -38.29999999999997 QDiff: -42.12]
 Points Of Interest: 3
@@ -3967,11 +3951,12 @@ OUT 2
 Input for event 203: 2
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 197
-Selected alternatives: 2 
-Solutions: 2
-Failures: 1
-Branches: 3
+Selected alternatives: z: 15
+Selected alternatives: 2 z: 197
+Selected alternatives: 1 
+Solutions: 3
+Failures: 0
+Branches: 4
 Wall time: 0ms
 Solution:
 [1, 1, 0] Similarity: 0.019724302590772215 Distance: 50.69887745830052
@@ -4024,13 +4009,11 @@ OUT 2
 Input for event 207: 3
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 104
-Selected alternatives: 3 z: 157
-Selected alternatives: 2 z: 176
-Selected alternatives: 1 
-Solutions: 4
-Failures: 0
-Branches: 6
+Selected alternatives: z: 176
+Selected alternatives: 3 
+Solutions: 2
+Failures: 2
+Branches: 5
 Wall time: 0ms
 Solution:
 [1, 0, 1] Similarity: 0.017626156845423145 Distance: 56.73386483336909
@@ -4178,7 +4161,7 @@ OUT 4
 Input for event 225: 3
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 180
+Selected alternatives: z: 252
 Selected alternatives: 3 z: 289
 Selected alternatives: 2 
 Solutions: 3
@@ -4238,27 +4221,27 @@ OUT 8
 Input for event 226: 137
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 5
-Selected alternatives: 137 z: 425
-Selected alternatives: 136 z: 441
-Selected alternatives: 126 z: 549
-Selected alternatives: 126 132 z: 1077
-Selected alternatives: 124 z: 2243
-Selected alternatives: 115 
-Solutions: 7
-Failures: 18
-Branches: 174
-Wall time: 0ms
+Selected alternatives: z: 363
+Selected alternatives: 137 z: 2181
+Selected alternatives: 132 
+Solutions: 3
+Failures: 4
+Branches: 139
+Wall time: 16ms
 Solution:
-[0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1] Similarity: 0.22435523992918 Distance: 4.457217047017311
+[1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0] Similarity: 0.21814161570769838 Distance: 4.584178020116815
 Event: 226
 Final Pairs:
-[POI 1229 Minute: 78 Rising: true PDiff: 127.0 QDiff: 66.16999999999999, POI 1407 Minute: 178 Rising: false PDiff: -127.0 QDiff: -66.16999999999999]
-[POI 1233 Minute: 171 Rising: true PDiff: 1291.9 QDiff: 30.800000000000004, POI 1408 Minute: 178 Rising: false PDiff: -1291.9 QDiff: -30.800000000000004]
+[POI 1407 Minute: 4 Rising: true PDiff: 17.19999999999999 QDiff: -4.3600000000000065, POI 1228 Minute: 59 Rising: false PDiff: -17.19999999999999 QDiff: 4.3600000000000065]
+[POI 1408 Minute: 4 Rising: true PDiff: 11.799999999999997 QDiff: -1.2199999999999989, POI 1208 Minute: 66 Rising: false PDiff: -11.799999999999997 QDiff: 1.2199999999999989]
+[POI 1409 Minute: 4 Rising: true PDiff: 12.900000000000006 QDiff: -0.8000000000000043, POI 1230 Minute: 80 Rising: false PDiff: -12.900000000000006 QDiff: 0.8000000000000043]
+[POI 1410 Minute: 4 Rising: true PDiff: 49.6 QDiff: -16.36, POI 1235 Minute: 169 Rising: false PDiff: -49.6 QDiff: 16.36]
 Event: 226
 Final Pairs:
-[POI 1229 Minute: 78 Rising: true PDiff: 127.0 QDiff: 66.16999999999999, POI 1407 Minute: 178 Rising: false PDiff: -127.0 QDiff: -66.16999999999999]
-[POI 1233 Minute: 171 Rising: true PDiff: 1291.9 QDiff: 30.800000000000004, POI 1408 Minute: 178 Rising: false PDiff: -1291.9 QDiff: -30.800000000000004]
+[POI 1407 Minute: 4 Rising: true PDiff: 17.19999999999999 QDiff: -4.3600000000000065, POI 1228 Minute: 59 Rising: false PDiff: -17.19999999999999 QDiff: 4.3600000000000065]
+[POI 1408 Minute: 4 Rising: true PDiff: 11.799999999999997 QDiff: -1.2199999999999989, POI 1208 Minute: 66 Rising: false PDiff: -11.799999999999997 QDiff: 1.2199999999999989]
+[POI 1409 Minute: 4 Rising: true PDiff: 12.900000000000006 QDiff: -0.8000000000000043, POI 1230 Minute: 80 Rising: false PDiff: -12.900000000000006 QDiff: 0.8000000000000043]
+[POI 1410 Minute: 4 Rising: true PDiff: 49.6 QDiff: -16.36, POI 1235 Minute: 169 Rising: false PDiff: -49.6 QDiff: 16.36]
 Points Of Interest: 0
 Rising Points: []
 Reduction Points: []
@@ -4352,36 +4335,25 @@ OUT 4
 Input for event 236: 174
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 31
-Selected alternatives: 174 z: 44
-Selected alternatives: 172 z: 46
-Selected alternatives: 169 z: 72
-Selected alternatives: 167 z: 77
-Selected alternatives: 153 z: 108
-Selected alternatives: 153 174 z: 121
-Selected alternatives: 153 171 z: 149
-Selected alternatives: 153 167 z: 152
-Selected alternatives: 141 153 z: 160
-Selected alternatives: 139 147 z: 212
-Selected alternatives: 132 153 z: 343
-Selected alternatives: 105 z: 409
-Selected alternatives: 105 139 z: 412
-Selected alternatives: 105 111 z: 1257
-Selected alternatives: 66 z: 1323
-Selected alternatives: 66 139 z: 1326
-Selected alternatives: 66 111 z: 1445
-Selected alternatives: 66 82 
-Solutions: 19
-Failures: 472
-Branches: 977
+Selected alternatives: z: 68
+Selected alternatives: 174 z: 72
+Selected alternatives: 173 z: 144
+Selected alternatives: 163 z: 1257
+Selected alternatives: 151 z: 1323
+Selected alternatives: 119 151 z: 1326
+Selected alternatives: 97 151 z: 1445
+Selected alternatives: 33 151 
+Solutions: 8
+Failures: 455
+Branches: 919
 Wall time: 15ms
 Solution:
-[0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0] Similarity: 0.125763834806367 Distance: 7.951411481207262
 [0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0] Similarity: 0.018889447489079874 Distance: 52.939610890054205
+[0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0] Similarity: 0.125763834806367 Distance: 7.951411481207262
 Event: 236
 Final Pairs:
-[POI 1266 Minute: 12 Rising: true PDiff: 132.0 QDiff: -34.120000000000005, POI 1277 Minute: 200 Rising: false PDiff: -142.40000000000003 QDiff: 31.06]
 [POI 1267 Minute: 14 Rising: true PDiff: 61.10000000000002 QDiff: -17.82, POI 1276 Minute: 201 Rising: false PDiff: -29.0 QDiff: 7.580000000000005]
+[POI 1266 Minute: 12 Rising: true PDiff: 132.0 QDiff: -34.120000000000005, POI 1277 Minute: 200 Rising: false PDiff: -142.40000000000003 QDiff: 31.06]
 Event: 236
 Final Pairs:
 [POI 1266 Minute: 12 Rising: true PDiff: 132.0 QDiff: -34.120000000000005, POI 1277 Minute: 200 Rising: false PDiff: -142.40000000000003 QDiff: 31.06]
@@ -4401,12 +4373,11 @@ OUT 2
 Input for event 237: 2
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 15
-Selected alternatives: 2 z: 614
-Selected alternatives: 1 
-Solutions: 3
-Failures: 0
-Branches: 4
+Selected alternatives: z: 614
+Selected alternatives: 2 
+Solutions: 2
+Failures: 1
+Branches: 3
 Wall time: 0ms
 Solution:
 [1, 1, 0] Similarity: 0.06142956989068761 Distance: 16.278805171181812
@@ -4470,8 +4441,8 @@ Chairs:
 [POI 1295 Minute: 0 Rising: true PDiff: 201.3 QDiff: 29.95, POI 1296 Minute: 3 Rising: false PDiff: -87.8 QDiff: 40.11999999999999, POI 1294 Minute: 18 Rising: false PDiff: -111.89999999999999 QDiff: -68.00999999999999]
 Event: 241
 Final Pairs:
-[POI 1409 Minute: 0 Rising: true PDiff: 87.8 QDiff: -40.11999999999999, POI 1296 Minute: 3 Rising: false PDiff: -87.8 QDiff: 40.11999999999999]
-[POI 1410 Minute: 0 Rising: true PDiff: 111.89999999999999 QDiff: 68.00999999999999, POI 1294 Minute: 18 Rising: false PDiff: -111.89999999999999 QDiff: -68.00999999999999]
+[POI 1411 Minute: 0 Rising: true PDiff: 87.8 QDiff: -40.11999999999999, POI 1296 Minute: 3 Rising: false PDiff: -87.8 QDiff: 40.11999999999999]
+[POI 1412 Minute: 0 Rising: true PDiff: 111.89999999999999 QDiff: 68.00999999999999, POI 1294 Minute: 18 Rising: false PDiff: -111.89999999999999 QDiff: -68.00999999999999]
 Points Of Interest: 0
 Rising Points: []
 Reduction Points: []
@@ -4505,23 +4476,25 @@ OUT 4
 Input for event 244: 3
 INTEGER PROGRAMMING
 z: 0
-Selected alternatives: z: 185
-Selected alternatives: 3 
-Solutions: 2
-Failures: 2
-Branches: 5
+Selected alternatives: z: 86
+Selected alternatives: 3 z: 126
+Selected alternatives: 2 z: 185
+Selected alternatives: 1 
+Solutions: 4
+Failures: 0
+Branches: 6
 Wall time: 0ms
 Solution:
 [0, 0, 1, 1, 1] Similarity: 0.018543182499721172 Distance: 53.92817549064389
 Event: 244
 Final Pairs:
-[POI 1318 Minute: 49 Rising: true PDiff: 51.099999999999994 QDiff: 17.5, POI 1411 Minute: 88 Rising: false PDiff: -51.099999999999994 QDiff: -17.5]
-[POI 1317 Minute: 51 Rising: true PDiff: 70.4 QDiff: 47.19, POI 1412 Minute: 88 Rising: false PDiff: -70.4 QDiff: -47.19]
+[POI 1318 Minute: 49 Rising: true PDiff: 51.099999999999994 QDiff: 17.5, POI 1413 Minute: 88 Rising: false PDiff: -51.099999999999994 QDiff: -17.5]
+[POI 1317 Minute: 51 Rising: true PDiff: 70.4 QDiff: 47.19, POI 1414 Minute: 88 Rising: false PDiff: -70.4 QDiff: -47.19]
 Event: 244
 Final Pairs:
 [POI 1302 Minute: 0 Rising: true PDiff: 48.5 QDiff: -15.86, POI 1321 Minute: 63 Rising: false PDiff: -49.900000000000006 QDiff: 14.950000000000003]
-[POI 1318 Minute: 49 Rising: true PDiff: 51.099999999999994 QDiff: 17.5, POI 1411 Minute: 88 Rising: false PDiff: -51.099999999999994 QDiff: -17.5]
-[POI 1317 Minute: 51 Rising: true PDiff: 70.4 QDiff: 47.19, POI 1412 Minute: 88 Rising: false PDiff: -70.4 QDiff: -47.19]
+[POI 1318 Minute: 49 Rising: true PDiff: 51.099999999999994 QDiff: 17.5, POI 1413 Minute: 88 Rising: false PDiff: -51.099999999999994 QDiff: -17.5]
+[POI 1317 Minute: 51 Rising: true PDiff: 70.4 QDiff: 47.19, POI 1414 Minute: 88 Rising: false PDiff: -70.4 QDiff: -47.19]
 Points Of Interest: 2
 Rising Points: [POI 1324 Minute: 0 Rising: true PDiff: 156.29999999999998 QDiff: 56.989999999999995]
 Reduction Points: [POI 1326 Minute: 42 Rising: false PDiff: -111.6 QDiff: -62.3]

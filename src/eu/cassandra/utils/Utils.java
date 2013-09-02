@@ -17,13 +17,17 @@ limitations under the License.
 
 package eu.cassandra.utils;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 
 import com.google.ortools.constraintsolver.DecisionBuilder;
 import com.google.ortools.constraintsolver.IntVar;
 import com.google.ortools.constraintsolver.OptimizeVar;
 import com.google.ortools.constraintsolver.Solver;
-
 
 /**
  * This class contains static functions that are used for general purposes
@@ -38,6 +42,26 @@ public class Utils
 
   /** Loading a library for integer programming. */
   static {
+
+    char SEP = File.separatorChar;
+    File dir = new File(System.getProperty("java.home") + SEP + "bin");
+    File dirSource = new File("extLib");
+    File file1 = new File(dir, "jnilinearsolver.dll");
+    File file2 = new File(dir, "jniconstraintsolver.dll");
+    File file1Source = new File(dirSource, "jnilinearsolver.dll");
+    File file2Source = new File(dirSource, "jniconstraintsolver.dll");
+    try {
+      if (file1.isFile() == false)
+        Files.copy(file1Source.toPath(), file1.toPath(), REPLACE_EXISTING);
+
+      if (file2.isFile() == false)
+        Files.copy(file2Source.toPath(), file2.toPath(), REPLACE_EXISTING);
+    }
+    catch (IOException e) {
+
+      e.printStackTrace();
+    }
+
     System.loadLibrary("jniconstraintsolver");
   }
 
