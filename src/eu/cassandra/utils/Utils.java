@@ -23,6 +23,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.paukov.combinatorics.Factory;
+import org.paukov.combinatorics.Generator;
+import org.paukov.combinatorics.ICombinatoricsVector;
 
 import com.google.ortools.constraintsolver.DecisionBuilder;
 import com.google.ortools.constraintsolver.IntVar;
@@ -43,9 +51,17 @@ public class Utils
   /** Loading a library for integer programming. */
   static {
 
+    String systemArch = System.getProperty("os.arch");
+
+    String bits =
+      systemArch.substring(systemArch.length() - 2, systemArch.length());
+
     char SEP = File.separatorChar;
     File dir = new File(System.getProperty("java.home") + SEP + "bin");
-    File dirSource = new File("extLib");
+    File dirSource = new File("extLib" + SEP + bits);
+
+    // System.out.println(dirSource);
+
     File file1 = new File(dir, "jnilinearsolver.dll");
     File file2 = new File(dir, "jniconstraintsolver.dll");
     File file1Source = new File(dirSource, "jnilinearsolver.dll");
@@ -510,5 +526,309 @@ public class Utils
   public static String getFileName (String filename)
   {
     return filename.substring(0, filename.length() - 4);
+  }
+
+  public static Map<int[], Double>
+    findCombinations (ArrayList<PointOfInterest> temp)
+  {
+
+    // Initializing the auxiliary variables
+    Map<int[], Double> input = new HashMap<int[], Double>();
+    Integer[] points = null;
+    int[] pointsArray = null;
+    List<Integer> subset = new ArrayList<Integer>();
+    double distance = 0;
+
+    // For each point
+    for (int i = 0; i < temp.size(); i++) {
+      // If rising point then we find the reduction points after that point,
+      // create all the possible subsets from them and estimate the distance
+      // of the active and reactive power measurements.If the distance is
+      // under a certain threshold, the combination is accepted.
+      if (temp.get(i).getRising()) {
+
+        points = Utils.findRedPoints(i, temp);
+
+        ICombinatoricsVector<Integer> initialSet = Factory.createVector(points);
+        System.out.println("Initial Set for point " + temp.get(i).toString()
+                           + ": " + initialSet.toString());
+        // System.out.println("Reduction Points for rising point " + i + ": "
+        // + initialSet.toString());
+        System.out.println("IN");
+        Generator<Integer> gen = Factory.createSubSetGenerator(initialSet);
+        System.out.println("OUT " + gen.getNumberOfGeneratedObjects());
+        for (ICombinatoricsVector<Integer> subSet: gen) {
+          // System.out.println(subSet.toString());
+          if (subSet.getSize() > 0
+              && subSet.getSize() <= Constants.MAX_POINTS_LIMIT) {
+            double sumP = 0, sumQ = 0;
+
+            subset = subSet.getVector();
+
+            for (Integer index: subset) {
+              sumP += temp.get(index).getPDiff();
+              sumQ += temp.get(index).getQDiff();
+            }
+
+            double[] tempValues = { -sumP, -sumQ };
+
+            distance =
+              1 / (temp.get(i).percentageEuclideanDistance(tempValues) + Constants.NEAR_ZERO);
+
+            // System.out.println("Subset: " + subSet.toString() +
+            // " Distance: "
+            // + distance);
+
+            // If accepted then an array is created with 1 in the index of the
+            // points included, 0 otherwise
+            if (distance < Constants.DISTANCE_THRESHOLD)
+              pointsArray = new int[temp.size()];
+            pointsArray[i] = 1;
+            for (Integer index: subset)
+              pointsArray[index] = 1;
+
+            // Check if the array is already included in the alternatives.If
+            // not, it is added to the alternatives.
+            boolean flag = true;
+            for (int[] content: input.keySet()) {
+              if (Arrays.equals(content, pointsArray)) {
+                flag = false;
+                break;
+              }
+            }
+
+            if (flag)
+              input.put(pointsArray, distance);
+          }
+        }
+
+      }
+      // If reduction point then we find the rising points before that point,
+      // create all the possible subsets from them and estimate the distance
+      // of the active and reactive power measurements.If the distance is
+      // under a certain threshold, the combination is accepted.
+      else {
+        points = Utils.findRisPoints(i, temp);
+
+        ICombinatoricsVector<Integer> initialSet = Factory.createVector(points);
+
+        System.out.println("Initial Set for point " + temp.get(i).toString()
+                           + ": " + initialSet.toString());
+        // System.out.println("Reduction Points for rising point " + i + ": "
+        // + initialSet.toString());
+        System.out.println("IN");
+        Generator<Integer> gen = Factory.createSubSetGenerator(initialSet);
+        System.out.println("OUT " + gen.getNumberOfGeneratedObjects());
+
+        for (ICombinatoricsVector<Integer> subSet: gen) {
+
+          if (subSet.getSize() > 0
+              && subSet.getSize() <= Constants.MAX_POINTS_LIMIT) {
+            double sumP = 0, sumQ = 0;
+
+            subset = subSet.getVector();
+
+            for (Integer index: subset) {
+              sumP += temp.get(index).getPDiff();
+              sumQ += temp.get(index).getQDiff();
+            }
+
+            double[] sum = { sumP, sumQ };
+            double[] tempValues =
+              { -temp.get(i).getPDiff(), -temp.get(i).getQDiff() };
+
+            distance =
+              1 / (Utils.percentageEuclideanDistance(sum, tempValues) + Constants.NEAR_ZERO);
+
+            // System.out.println("Subset: " + subSet.toString() +
+            // " Distance: "
+            // + distance);
+
+            // If accepted then an array is created with 1 in the index of the
+            // points included, 0 otherwise
+            if (distance < Constants.DISTANCE_THRESHOLD) {
+              pointsArray = new int[temp.size()];
+              pointsArray[i] = 1;
+              for (Integer index: subset)
+                pointsArray[index] = 1;
+
+              // Check if the array is already included in the alternatives.If
+              // not, it is added to the alternatives.
+              boolean flag = true;
+              for (int[] content: input.keySet()) {
+                if (Arrays.equals(content, pointsArray)) {
+                  flag = false;
+                  break;
+                }
+              }
+              if (flag)
+                input.put(pointsArray, distance);
+            }
+          }
+        }
+      }
+    }
+    return input;
+  }
+
+  public static Map<int[], Double>
+    findCombinations2 (ArrayList<PointOfInterest> temp)
+  {
+
+    // Initializing the auxiliary variables
+    Map<int[], Double> input = new HashMap<int[], Double>();
+    Integer[] points = null;
+    int[] pointsArray = null;
+    List<Integer> subset = new ArrayList<Integer>();
+    double distance = 0;
+
+    // For each point
+    for (int i = 0; i < temp.size(); i++) {
+      // If rising point then we find the reduction points after that point,
+      // create all the possible subsets from them and estimate the distance
+      // of the active and reactive power measurements.If the distance is
+      // under a certain threshold, the combination is accepted.
+      if (temp.get(i).getRising()) {
+
+        points = Utils.findRedPoints(i, temp);
+
+        ICombinatoricsVector<Integer> initialSet = Factory.createVector(points);
+        System.out.println("Initial Set for point " + temp.get(i).toString()
+                           + ": " + initialSet.toString());
+        System.out.println("Reduction Points for rising point " + i + ": "
+                           + initialSet.toString());
+        System.out.println("IN");
+
+        int upperThres = Math.min(4, initialSet.getSize());
+        System.out.println("Upper Threshold:" + upperThres);
+
+        for (int pairing = 1; pairing <= upperThres; pairing++) {
+
+          Generator<Integer> gen =
+            Factory.createSimpleCombinationGenerator(initialSet, pairing);
+
+          for (ICombinatoricsVector<Integer> subSet: gen) {
+            // System.out.println(subSet.toString());
+            if (subSet.getSize() > 0
+                && subSet.getSize() <= Constants.MAX_POINTS_LIMIT) {
+              double sumP = 0, sumQ = 0;
+
+              subset = subSet.getVector();
+
+              for (Integer index: subset) {
+                sumP += temp.get(index).getPDiff();
+                sumQ += temp.get(index).getQDiff();
+              }
+
+              double[] tempValues = { -sumP, -sumQ };
+
+              distance =
+                1 / (temp.get(i).percentageEuclideanDistance(tempValues) + Constants.NEAR_ZERO);
+
+              // System.out.println("Subset: " + subSet.toString() +
+              // " Distance: "
+              // + distance);
+
+              // If accepted then an array is created with 1 in the index of the
+              // points included, 0 otherwise
+              if (distance < Constants.DISTANCE_THRESHOLD)
+                pointsArray = new int[temp.size()];
+              pointsArray[i] = 1;
+              for (Integer index: subset)
+                pointsArray[index] = 1;
+
+              // Check if the array is already included in the alternatives.If
+              // not, it is added to the alternatives.
+              boolean flag = true;
+              for (int[] content: input.keySet()) {
+                if (Arrays.equals(content, pointsArray)) {
+                  flag = false;
+                  break;
+                }
+              }
+
+              if (flag)
+                input.put(pointsArray, distance);
+            }
+          }
+          System.out.println("Input size for pairing of " + pairing + ":"
+                             + input.size());
+        }
+      }
+      // If reduction point then we find the rising points before that point,
+      // create all the possible subsets from them and estimate the distance
+      // of the active and reactive power measurements.If the distance is
+      // under a certain threshold, the combination is accepted.
+      else {
+        points = Utils.findRisPoints(i, temp);
+
+        ICombinatoricsVector<Integer> initialSet = Factory.createVector(points);
+
+        System.out.println("Initial Set for point " + temp.get(i).toString()
+                           + ": " + initialSet.toString());
+        System.out.println("Rising Points for reduction point " + i + ": "
+                           + initialSet.toString());
+        System.out.println("IN");
+
+        int upperThres = Math.min(4, initialSet.getSize());
+        System.out.println("Upper Threshold:" + upperThres);
+
+        for (int pairing = 1; pairing <= upperThres; pairing++) {
+
+          Generator<Integer> gen =
+            Factory.createSimpleCombinationGenerator(initialSet, pairing);
+
+          for (ICombinatoricsVector<Integer> subSet: gen) {
+
+            if (subSet.getSize() > 0
+                && subSet.getSize() <= Constants.MAX_POINTS_LIMIT) {
+              double sumP = 0, sumQ = 0;
+
+              subset = subSet.getVector();
+
+              for (Integer index: subset) {
+                sumP += temp.get(index).getPDiff();
+                sumQ += temp.get(index).getQDiff();
+              }
+
+              double[] sum = { sumP, sumQ };
+              double[] tempValues =
+                { -temp.get(i).getPDiff(), -temp.get(i).getQDiff() };
+
+              distance =
+                1 / (Utils.percentageEuclideanDistance(sum, tempValues) + Constants.NEAR_ZERO);
+
+              // System.out.println("Subset: " + subSet.toString() +
+              // " Distance: "
+              // + distance);
+
+              // If accepted then an array is created with 1 in the index of the
+              // points included, 0 otherwise
+              if (distance < Constants.DISTANCE_THRESHOLD) {
+                pointsArray = new int[temp.size()];
+                pointsArray[i] = 1;
+                for (Integer index: subset)
+                  pointsArray[index] = 1;
+
+                // Check if the array is already included in the alternatives.If
+                // not, it is added to the alternatives.
+                boolean flag = true;
+                for (int[] content: input.keySet()) {
+                  if (Arrays.equals(content, pointsArray)) {
+                    flag = false;
+                    break;
+                  }
+                }
+                if (flag)
+                  input.put(pointsArray, distance);
+              }
+            }
+          }
+          System.out.println("Input size for pairing of " + pairing + ":"
+                             + input.size());
+        }
+      }
+    }
+    return input;
   }
 }

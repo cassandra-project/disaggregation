@@ -21,9 +21,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
-import eu.cassandra.event.Event;
-import eu.cassandra.utils.Constants;
-
 import weka.clusterers.HierarchicalClusterer;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
@@ -32,6 +29,8 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.AddCluster;
+import eu.cassandra.event.Event;
+import eu.cassandra.utils.Constants;
 
 /**
  * This class is responsible for finding events that contain isolated appliances
@@ -123,15 +122,19 @@ public class IsolatedApplianceExtractor
 
     // System.out.println(inst.toString());
 
-    // The cluster is taking place
-    fillClusters(inst);
+    if (inst.size() > 0) {
 
-    // System.out.println("Clusters:" + clusters.toString());
+      // The cluster is taking place
+      fillClusters(inst);
 
-    // The refrigerator cluster is found
-    findRefrigerator();
+      // System.out.println("Clusters:" + clusters.toString());
 
-    System.out.println("Fridge Cluster:" + refrigeratorCluster);
+      // The refrigerator cluster is found
+      findRefrigerator();
+
+      System.out.println("Fridge Cluster:" + refrigeratorCluster);
+
+    }
 
   }
 

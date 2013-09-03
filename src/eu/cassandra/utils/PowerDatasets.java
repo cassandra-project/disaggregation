@@ -67,6 +67,7 @@ public class PowerDatasets
     // respective maps.
     File file = new File(filename);
     Scanner input = new Scanner(file);
+    int counter = 0;
 
     while (input.hasNext()) {
 
@@ -76,10 +77,9 @@ public class PowerDatasets
 
       String[] contents = line.split(",");
 
-      activeMap.put(Integer.parseInt(contents[0]),
-                    Double.parseDouble(contents[1]));
-      reactiveMap.put(Integer.parseInt(contents[0]),
-                      Double.parseDouble(contents[2]));
+      activeMap.put(counter, Double.parseDouble(contents[contents.length - 2]));
+      reactiveMap.put(counter++,
+                      Double.parseDouble(contents[contents.length - 1]));
 
     }
 
@@ -89,7 +89,7 @@ public class PowerDatasets
     activePower = new double[activeMap.size()];
     reactivePower = new double[reactiveMap.size()];
 
-    int counter = 0;
+    counter = 0;
 
     // Adding the values in the arrays, one by one.
     for (Integer timestamp: activeMap.keySet()) {

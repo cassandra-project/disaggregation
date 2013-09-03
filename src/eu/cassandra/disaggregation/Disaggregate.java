@@ -145,7 +145,9 @@ public class Disaggregate
 
   public static void main (String[] args) throws Exception
   {
+    // String input = "Demo/Household1.csv";
     String input = "Demo/Milioudis.csv";
+    // String input = "Demo/Benchmark.csv";
 
     Disaggregate dis = new Disaggregate(input);
   }
