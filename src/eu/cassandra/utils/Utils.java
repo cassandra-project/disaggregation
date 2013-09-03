@@ -51,21 +51,47 @@ public class Utils
   /** Loading a library for integer programming. */
   static {
 
+    String systemOS = System.getProperty("os.name");
+
     String systemArch = System.getProperty("os.arch");
+
+    String os = systemOS.substring(0, 3).toLowerCase();
 
     String bits =
       systemArch.substring(systemArch.length() - 2, systemArch.length());
 
+    System.out.println("OS:" + os);
+
+    String prefix = "";
+    String suffix = "";
+
     char SEP = File.separatorChar;
     File dir = new File(System.getProperty("java.home") + SEP + "bin");
-    File dirSource = new File("extLib" + SEP + bits);
 
-    // System.out.println(dirSource);
+    File dirSource = null;
 
-    File file1 = new File(dir, "jnilinearsolver.dll");
-    File file2 = new File(dir, "jniconstraintsolver.dll");
-    File file1Source = new File(dirSource, "jnilinearsolver.dll");
-    File file2Source = new File(dirSource, "jniconstraintsolver.dll");
+    if (os.equalsIgnoreCase("win")) {
+      dirSource = new File("extLib" + SEP + bits);
+      suffix = "dll";
+    }
+    else if (os.equalsIgnoreCase("mac")) {
+      dirSource = new File("extLib" + SEP + "mac");
+      suffix = "jnilib";
+      prefix = "lib";
+    }
+    else if (os.equalsIgnoreCase("lin")) {
+      dirSource = new File("extLib" + SEP + "linux");
+      suffix = "so";
+      prefix = "lib";
+    }
+    System.out.println(dirSource);
+
+    File file1 = new File(dir, prefix + "jnilinearsolver." + suffix);
+    File file2 = new File(dir, prefix + "jniconstraintsolver." + suffix);
+    File file1Source =
+      new File(dirSource, prefix + "jnilinearsolver." + suffix);
+    File file2Source =
+      new File(dirSource, prefix + "jniconstraintsolver." + suffix);
     try {
       if (file1.isFile() == false)
         Files.copy(file1Source.toPath(), file1.toPath(), REPLACE_EXISTING);
