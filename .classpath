@@ -4,9 +4,15 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="lib" path="lib/weka.jar"/>
 	<classpathentry kind="lib" path="lib/combinatoricslib-2.0.jar"/>
-	<classpathentry kind="lib" path="lib/com.google.ortools.constraintsolver.jar"/>
-	<classpathentry kind="lib" path="lib/com.google.ortools.graph.jar"/>
-	<classpathentry kind="lib" path="lib/com.google.ortools.knapsacksolver.jar"/>
-	<classpathentry kind="lib" path="lib/com.google.ortools.linearsolver.jar"/>
+	<classpathentry kind="lib" path="lib/com.google.ortools.constraintsolver.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="Disaggregation/extLib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/com.google.ortools.linearsolver.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="Disaggregation/extLib"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -17,11 +17,6 @@ limitations under the License.
 
 package eu.cassandra.utils;
 
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -50,60 +45,6 @@ public class Utils
 
   /** Loading a library for integer programming. */
   static {
-
-    String systemOS = System.getProperty("os.name");
-
-    String systemArch = System.getProperty("os.arch");
-
-    String os = systemOS.substring(0, 3).toLowerCase();
-
-    String bits =
-      systemArch.substring(systemArch.length() - 2, systemArch.length());
-
-    System.out.println("OS:" + os);
-
-    String prefix = "";
-    String suffix = "";
-
-    char SEP = File.separatorChar;
-    File dir = new File(System.getProperty("java.home") + SEP + "bin");
-
-    File dirSource = null;
-
-    if (os.equalsIgnoreCase("win")) {
-      dirSource = new File("extLib" + SEP + bits);
-      suffix = "dll";
-    }
-    else if (os.equalsIgnoreCase("mac")) {
-      dirSource = new File("extLib" + SEP + "mac");
-      suffix = "jnilib";
-      prefix = "lib";
-    }
-    else if (os.equalsIgnoreCase("lin")) {
-      dirSource = new File("extLib" + SEP + "linux");
-      suffix = "so";
-      prefix = "lib";
-    }
-    System.out.println(dirSource);
-
-    File file1 = new File(dir, prefix + "jnilinearsolver." + suffix);
-    File file2 = new File(dir, prefix + "jniconstraintsolver." + suffix);
-    File file1Source =
-      new File(dirSource, prefix + "jnilinearsolver." + suffix);
-    File file2Source =
-      new File(dirSource, prefix + "jniconstraintsolver." + suffix);
-    try {
-      if (file1.isFile() == false)
-        Files.copy(file1Source.toPath(), file1.toPath(), REPLACE_EXISTING);
-
-      if (file2.isFile() == false)
-        Files.copy(file2Source.toPath(), file2.toPath(), REPLACE_EXISTING);
-    }
-    catch (IOException e) {
-
-      e.printStackTrace();
-    }
-
     System.loadLibrary("jniconstraintsolver");
   }
 
