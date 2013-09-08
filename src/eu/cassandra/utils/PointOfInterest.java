@@ -17,7 +17,6 @@ limitations under the License.
 
 package eu.cassandra.utils;
 
-
 /**
  * This is class implements the notion of a Point of Interest (as the name
  * suggests). These are the points where there is a significant increase or
@@ -181,8 +180,8 @@ public class PointOfInterest
   @Override
   public String toString ()
   {
-    return "POI " + id + " Minute: " + minute + " Rising: " + rising
-           + " PDiff: " + pDiff + " QDiff: " + qDiff;
+    return " Minute: " + minute + " Rising: " + rising + " PDiff: " + pDiff
+           + " QDiff: " + qDiff;
   }
 
   /**

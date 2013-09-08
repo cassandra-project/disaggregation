@@ -22,11 +22,13 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import eu.cassandra.appliance.ApplianceIdentifier;
 import eu.cassandra.appliance.IsolatedApplianceExtractor;
 import eu.cassandra.event.Event;
 import eu.cassandra.event.EventDetector;
+import eu.cassandra.utils.PointOfInterest;
 import eu.cassandra.utils.PowerDatasets;
 import eu.cassandra.utils.Utils;
 
@@ -120,14 +122,25 @@ public class Disaggregate
     // consumption models and identify their results
     for (Event event: events) {
       if (event.getWashingMachineFlag() == false) {
+        System.out.println();
+        System.out.println("==================================");
+        System.out.println("Event: " + event.getId());
+        System.out.println("==================================");
+        System.out.println();
         event.detectMatchingPoints();
         event.detectSwitchingPoints();
         event.detectClusters();
         event.detectBasicShapes();
         event.findCombinations();
         event.status2();
+        if (ai.getApplianceList().get(0).getMatchingPoints(event.getId()) != null) {
+          System.out.print("Fridge Points: ");
+          for (PointOfInterest[] pois: ai.getApplianceList().get(0)
+                  .getMatchingPoints(event.getId()))
+            System.out.println(Arrays.toString(pois));
+        }
         event.calculateFinalPairs();
-        event.status2();
+        // event.status2();
         if (event.getFinalPairs().size() > 0)
           ai.analyseEvent(event);
       }
@@ -146,9 +159,9 @@ public class Disaggregate
   public static void main (String[] args) throws Exception
   {
     // String input = "Demo/Household1.csv";
-    String input = "Demo/Milioudis.csv";
+    // String input = "Demo/Milioudis.csv";
     // String input = "Demo/Benchmark.csv";
-
+    String input = "Demo/measurements.csv";
     Disaggregate dis = new Disaggregate(input);
   }
 }

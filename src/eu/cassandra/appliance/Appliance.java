@@ -176,6 +176,17 @@ public class Appliance
   }
 
   /**
+   * This function is used as a getter for mean value of the duration of
+   * functioning.
+   * 
+   * @return the mean reactive power.
+   */
+  public double getMeanDuration ()
+  {
+    return meanDuration;
+  }
+
+  /**
    * This function is used as a getter for mean value of the active and the
    * reactive power measurements.
    * 
@@ -185,45 +196,6 @@ public class Appliance
   {
     double[] temp = { getMeanActive(), getMeanReactive() };
     return temp;
-  }
-
-  /**
-   * This function adds a certain point of interest to the rising points' list.
-   * 
-   * @param event
-   *          The event the point of interest is originated.
-   * @param rising
-   *          The rising point of interest.
-   */
-  public void addRisingPoint (int event, PointOfInterest rising)
-  {
-    if (risingPoints.containsKey(event))
-      risingPoints.get(event).add(rising);
-    else {
-      ArrayList<PointOfInterest> temp = new ArrayList<PointOfInterest>();
-      temp.add(rising);
-      risingPoints.put(event, temp);
-    }
-  }
-
-  /**
-   * This function adds a certain point of interest to the reduction points'
-   * list.
-   * 
-   * @param event
-   *          The event the point of interest is originated.
-   * @param rising
-   *          The reduction point of interest.
-   */
-  public void addReductionPoint (int event, PointOfInterest reduction)
-  {
-    if (reductionPoints.containsKey(event))
-      reductionPoints.get(event).add(reduction);
-    else {
-      ArrayList<PointOfInterest> temp = new ArrayList<PointOfInterest>();
-      temp.add(reduction);
-      reductionPoints.put(event, temp);
-    }
   }
 
   /**
@@ -376,9 +348,13 @@ public class Appliance
 
     ArrayList<String[]> result = new ArrayList<String[]>();
     int offset = 0;
+
+    System.out.println("Matching Points: " + matchingPoints.toString());
+
     for (Integer key: matchingPoints.keySet()) {
 
-      offset = events.get(key).getStartMinute();
+      offset = events.get(key - 1).getStartMinute();
+
       for (PointOfInterest[] pois: matchingPoints.get(key)) {
         String[] tempString =
           { Integer.toString(offset + pois[0].getMinute()),

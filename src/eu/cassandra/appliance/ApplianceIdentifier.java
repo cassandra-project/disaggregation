@@ -116,7 +116,7 @@ public class ApplianceIdentifier
         for (Double[] means: tempCompare) {
 
           if (poi.percentageEuclideanDistance(means) < Constants.REF_THRESHOLD) {
-            // System.out.println("Euclidean Distance: "
+            // System.out.println("Euclidean Distance Rising: "
             // + poi.percentageEuclideanDistance(means));
             poiRef.add(poi);
             break;
@@ -136,8 +136,8 @@ public class ApplianceIdentifier
           Double[] tempMeans = { -means[0], -means[1] };
 
           if (poi.percentageEuclideanDistance(tempMeans) < Constants.REF_THRESHOLD) {
-            // System.out.println("Euclidean Distance: "
-            // + poi.percentageEuclideanDistance(means));
+            // System.out.println("Euclidean Distance Reduction: "
+            // + poi.percentageEuclideanDistance(tempMeans));
             poiRef.add(poi);
             break;
           }
@@ -147,7 +147,24 @@ public class ApplianceIdentifier
       }
       // After finding the points of interest similar to the refrigerator's
       // end-use the event is cleaned of them
-      cleanEvent(events, i, risingPoints.get(i), reductionPoints.get(i));
+      // if (risingPoints.get(key) != null)
+      // System.out.println("Rising size:" + risingPoints.get(key).size());
+      // if (reductionPoints.get(key) != null)
+      // System.out.println("Reduction size:" +
+      // reductionPoints.get(key).size());
+
+      if (risingPoints.get(key) != null && reductionPoints.get(key) != null) {
+        // System.out.println("Event " + events.get(i).getId()
+        // + " Before: Rising "
+        // + events.get(i).getRisingPoints() + "  Reduction "
+        // + events.get(i).getReductionPoints());
+        cleanEvent(events.get(i), risingPoints.get(key),
+                   reductionPoints.get(key));
+        // System.out.println("Event " + events.get(i).getId() +
+        // " After: Rising "
+        // + events.get(i).getRisingPoints() + "  Reduction "
+        // + events.get(i).getReductionPoints());
+      }
     }
 
     // Creation of the appliance and insert in the appliance list
@@ -156,6 +173,65 @@ public class ApplianceIdentifier
                     reductionPoints);
 
     applianceList.add(appliance);
+  }
+
+  /**
+   * This is an auxiliary function used for the cleaning of the events from
+   * points of interest that are assigned to appliance.
+   * 
+   * @param events
+   *          The list of events
+   * @param index
+   *          The index of the event under consideration
+   * @param risingPoints
+   *          The list of rising points of interest identified as refrigerator.
+   * @param reductionPoints
+   *          The list of reduction points of interest identified as
+   *          refrigerator.
+   */
+  private void cleanEvent (Event event,
+                           ArrayList<PointOfInterest> risingPoints,
+                           ArrayList<PointOfInterest> reductionPoints)
+  {
+
+    // If there are both rising and reduction points.
+
+    // System.out.println("rising: " + risingPoints.toString());
+    // System.out.println("reduction: " + reductionPoints.toString());
+
+    // In case all the rising and reduction points of the event are found to
+    // be refrigerator then all are removed from the event
+    if (event.getRisingPoints().size() == risingPoints.size()
+        && event.getReductionPoints().size() == reductionPoints.size()) {
+      // System.out.println("1 - 1");
+      event.getReductionPoints().clear();
+      event.getRisingPoints().clear();
+    }
+    // else if the number of rising and reduction points are equal, those
+    // points are removed from the event's points of interest lists
+    else if (risingPoints.size() == reductionPoints.size()) {
+
+      // System.out.println("Same Number");
+      //
+      // System.out.println("Rising Before in event: "
+      // + event.getRisingPoints().size());
+      for (PointOfInterest rise: risingPoints)
+        event.getRisingPoints().remove(rise);
+      // System.out.println("Rising After in event: "
+      // + event.getRisingPoints().size());
+      //
+      // System.out.println("Reduction Before in event: "
+      // + event.getReductionPoints().size());
+      for (PointOfInterest reduction: reductionPoints)
+        event.getReductionPoints().remove(reduction);
+      // System.out.println("Reduction After in event: "
+      // + event.getRisingPoints().size());
+    }
+    // In any other case
+    else {
+      // System.out.println("Other case. Cannot do anything!");
+    }
+
   }
 
   /**
@@ -297,86 +373,6 @@ public class ApplianceIdentifier
     // If a washing machine was found add it to the appliance list.
     if (appliance != null)
       applianceList.add(appliance);
-
-  }
-
-  /**
-   * This is an auxiliary function used for the cleaning of the events from
-   * points of interest that are assigned to appliance.
-   * 
-   * @param events
-   *          The list of events
-   * @param index
-   *          The index of the event under consideration
-   * @param risingPoints
-   *          The list of rising points of interest identified as refrigerator.
-   * @param reductionPoints
-   *          The list of reduction points of interest identified as
-   *          refrigerator.
-   */
-  private void cleanEvent (ArrayList<Event> events, int index,
-                           ArrayList<PointOfInterest> risingPoints,
-                           ArrayList<PointOfInterest> reductionPoints)
-  {
-
-    // If there are both rising and reduction points.
-    if (risingPoints != null && reductionPoints != null) {
-
-      // System.out.println("rising: " + risingPoints.toString());
-      // System.out.println("reduction: " + reductionPoints.toString());
-
-      // In case all the rising and reduction points of the event are found to
-      // be refrigerator then all are removed from the event
-      if (events.get(index).getRisingPoints().size() == risingPoints.size()
-          && events.get(index).getReductionPoints().size() == reductionPoints
-                  .size()) {
-        events.get(index).getReductionPoints().clear();
-        events.get(index).getRisingPoints().clear();
-      }
-      // else if the number of rising and reduction points are equal, those
-      // points are removed from the event's points of interest lists
-      else if (risingPoints.size() == reductionPoints.size()) {
-
-        for (PointOfInterest rise: risingPoints)
-          events.get(index).getRisingPoints().remove(rise);
-
-        for (PointOfInterest reduction: reductionPoints)
-          events.get(index).getRisingPoints().remove(reduction);
-
-      }
-      // In any other case
-      else {
-
-        // Create a collection of the points of interest in chronological order
-        ArrayList<PointOfInterest> temp =
-          new ArrayList<PointOfInterest>(risingPoints);
-        temp.addAll(reductionPoints);
-        Collections.sort(temp, Constants.comp);
-
-        // For all the points available, we search for pairs of rising -
-        // reduction points and remove them from the event.
-        for (int i = temp.size() - 2; i >= 0; i--) {
-
-          if (temp.get(i).getRising() && temp.get(i + 1).getRising() == false) {
-
-            events.get(index).getRisingPoints().remove(temp.get(i));
-            events.get(index).getReductionPoints().remove(temp.get(i + 1));
-            temp.remove(i + 1);
-            temp.remove(i);
-            i--;
-          }
-          // System.out.println(temp.size());
-
-          // check if all the remaining points are of the same type (rising or
-          // reduction).
-          if (allSamePoints(temp))
-            break;
-
-        }
-
-      }
-
-    }
 
   }
 

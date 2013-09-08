@@ -423,6 +423,94 @@ public class Utils
   }
 
   /**
+   * Testing another type of solution.
+   * 
+   * @param input
+   *          The input array of alternatives.
+   * @param cost
+   *          The cost array of the alternatives.
+   * @return a list of the indexes of the solution alternatives.
+   */
+  public static ArrayList<Integer> solve3 (int[][] input, double[] cost)
+  {
+
+    Solver solver = new Solver("Integer Programming");
+
+    int num_alternatives = cost.length;
+    int num_objects = input[0].length;
+
+    int[] costNew = new int[cost.length];
+
+    for (int i = 0; i < costNew.length; i++)
+      costNew[i] = (int) (10000 * cost[i]);
+
+    //
+    // variables
+    //
+    IntVar[] x = solver.makeIntVarArray(num_alternatives, 0, 1, "x");
+
+    // number of assigned senators, to be minimize
+    IntVar z = solver.makeScalProd(x, costNew).var();
+
+    //
+    // constraints
+    //
+
+    for (int j = 0; j < num_objects; j++) {
+      IntVar[] b = new IntVar[num_alternatives];
+      for (int i = 0; i < num_alternatives; i++) {
+        b[i] = solver.makeProd(x[i], input[i][j]).var();
+      }
+
+      solver.addConstraint(solver.makeSumEquality(b, 1));
+
+    }
+
+    //
+    // objective
+    //
+    OptimizeVar objective = solver.makeMaximize(z, 1);
+
+    //
+    // search
+    //
+    DecisionBuilder db =
+      solver.makePhase(x, solver.INT_VAR_DEFAULT, solver.INT_VALUE_DEFAULT);
+    solver.newSearch(db, objective);
+
+    //
+    // output
+    //
+    ArrayList<Integer> temp = new ArrayList<Integer>();
+    while (solver.nextSolution()) {
+      temp.clear();
+      System.out.println("z: " + z.value());
+      System.out.print("Selected alternatives: ");
+      for (int i = 0; i < num_alternatives; i++) {
+        if (x[i].value() == 1) {
+          System.out.print((1 + i) + " ");
+          temp.add(i);
+        }
+      }
+      if (z.value() > Constants.OTHER_SOLUTION_THRESHOLD)
+        break;
+      // System.out.println("\n");
+
+    }
+    solver.endSearch();
+
+    // Statistics
+    System.out.println();
+    System.out.println("Solutions: " + solver.solutions());
+    System.out.println("Failures: " + solver.failures());
+    System.out.println("Branches: " + solver.branches());
+    System.out.println("Wall time: " + solver.wallTime() + "ms");
+
+    return temp;
+
+  }
+
+  /**
    * This function is used for the creation of final matching pairs of points of
    * interest from the solutions that the integer programming solver has
    * provided.
@@ -735,7 +823,6 @@ public class Utils
                            + ": " + initialSet.toString());
         System.out.println("Rising Points for reduction point " + i + ": "
                            + initialSet.toString());
-        System.out.println("IN");
 
         int upperThres = Math.min(4, initialSet.getSize());
         System.out.println("Upper Threshold:" + upperThres);
@@ -793,6 +880,199 @@ public class Utils
           }
           System.out.println("Input size for pairing of " + pairing + ":"
                              + input.size());
+        }
+      }
+    }
+    return input;
+  }
+
+  public static Map<int[], Double>
+    findCombinations3 (ArrayList<PointOfInterest> temp)
+  {
+
+    // Initializing the auxiliary variables
+    Map<int[], Double> input = new HashMap<int[], Double>();
+    Integer[] points = null;
+    int[] pointsArray = null;
+    List<Integer> subset = new ArrayList<Integer>();
+    double distance = 0;
+
+    // For each point
+    for (int i = 0; i < temp.size(); i++) {
+      // If rising point then we find the reduction points after that point,
+      // create all the possible subsets from them and estimate the distance
+      // of the active and reactive power measurements.If the distance is
+      // under a certain threshold, the combination is accepted.
+
+      double previousMaxDistance = Double.NEGATIVE_INFINITY, currentMaxDistance =
+        Double.NEGATIVE_INFINITY;
+
+      if (temp.get(i).getRising()) {
+
+        points = Utils.findRedPoints(i, temp);
+
+        ICombinatoricsVector<Integer> initialSet = Factory.createVector(points);
+        System.out.println("Initial Set for point " + temp.get(i).toString()
+                           + ": " + initialSet.toString());
+        System.out.println("Reduction Points for rising point " + i + ": "
+                           + initialSet.toString());
+
+        int upperThres = Math.min(4, initialSet.getSize());
+        System.out.println("Upper Threshold:" + upperThres);
+
+        for (int pairing = 1; pairing <= upperThres; pairing++) {
+
+          Generator<Integer> gen =
+            Factory.createSimpleCombinationGenerator(initialSet, pairing);
+
+          for (ICombinatoricsVector<Integer> subSet: gen) {
+            // System.out.println(subSet.toString());
+            if (subSet.getSize() > 0
+                && subSet.getSize() <= Constants.MAX_POINTS_LIMIT) {
+              double sumP = 0, sumQ = 0;
+
+              subset = subSet.getVector();
+
+              for (Integer index: subset) {
+                sumP += temp.get(index).getPDiff();
+                sumQ += temp.get(index).getQDiff();
+              }
+
+              double[] tempValues = { -sumP, -sumQ };
+
+              distance =
+                1 / (temp.get(i).percentageEuclideanDistance(tempValues) + Constants.NEAR_ZERO);
+
+              System.out.println("Subset: " + subSet.toString() + " Distance: "
+                                 + 1 / distance);
+
+              // If accepted then an array is created with 1 in the index of the
+              // points included, 0 otherwise
+              if (distance < Constants.DISTANCE_THRESHOLD) {
+                pointsArray = new int[temp.size()];
+                pointsArray[i] = 1;
+                for (Integer index: subset)
+                  pointsArray[index] = 1;
+
+                if (distance > currentMaxDistance) {
+                  System.out.println("Distance: " + distance
+                                     + " Current Max Distance: "
+                                     + currentMaxDistance);
+                  currentMaxDistance = distance;
+                }
+
+              }
+              // Check if the array is already included in the alternatives.If
+              // not, it is added to the alternatives.
+              boolean flag = true;
+              for (int[] content: input.keySet()) {
+                if (Arrays.equals(content, pointsArray)) {
+                  flag = false;
+                  break;
+                }
+              }
+
+              if (flag)
+                input.put(pointsArray, distance);
+            }
+          }
+          System.out.println("Input size for pairing of " + pairing + ":"
+                             + input.size());
+          System.out.println("Current Max Distance: " + currentMaxDistance
+                             + " Previous Max Distance:" + previousMaxDistance);
+          if (previousMaxDistance < currentMaxDistance)
+            previousMaxDistance = currentMaxDistance;
+          else {
+            System.out.println("Breaking for pairing = " + pairing);
+            break;
+          }
+
+        }
+      }
+      // If reduction point then we find the rising points before that point,
+      // create all the possible subsets from them and estimate the distance
+      // of the active and reactive power measurements.If the distance is
+      // under a certain threshold, the combination is accepted.
+      else {
+        points = Utils.findRisPoints(i, temp);
+
+        ICombinatoricsVector<Integer> initialSet = Factory.createVector(points);
+
+        System.out.println("Initial Set for point " + temp.get(i).toString()
+                           + ": " + initialSet.toString());
+        System.out.println("Rising Points for reduction point " + i + ": "
+                           + initialSet.toString());
+
+        int upperThres = Math.min(4, initialSet.getSize());
+        System.out.println("Upper Threshold:" + upperThres);
+
+        for (int pairing = 1; pairing <= upperThres; pairing++) {
+
+          Generator<Integer> gen =
+            Factory.createSimpleCombinationGenerator(initialSet, pairing);
+
+          for (ICombinatoricsVector<Integer> subSet: gen) {
+
+            if (subSet.getSize() > 0
+                && subSet.getSize() <= Constants.MAX_POINTS_LIMIT) {
+              double sumP = 0, sumQ = 0;
+
+              subset = subSet.getVector();
+
+              for (Integer index: subset) {
+                sumP += temp.get(index).getPDiff();
+                sumQ += temp.get(index).getQDiff();
+              }
+
+              double[] sum = { sumP, sumQ };
+              double[] tempValues =
+                { -temp.get(i).getPDiff(), -temp.get(i).getQDiff() };
+
+              distance =
+                1 / (Utils.percentageEuclideanDistance(sum, tempValues) + Constants.NEAR_ZERO);
+
+              System.out.println("Subset: " + subSet.toString() + " Distance: "
+                                 + 1 / distance);
+
+              // If accepted then an array is created with 1 in the index of the
+              // points included, 0 otherwise
+              if (distance < Constants.DISTANCE_THRESHOLD) {
+                pointsArray = new int[temp.size()];
+                pointsArray[i] = 1;
+                for (Integer index: subset)
+                  pointsArray[index] = 1;
+
+                if (distance > currentMaxDistance) {
+                  System.out.println("Distance: " + distance
+                                     + " Current Max Distance: "
+                                     + currentMaxDistance);
+                  currentMaxDistance = distance;
+                }
+
+                // Check if the array is already included in the alternatives.If
+                // not, it is added to the alternatives.
+                boolean flag = true;
+                for (int[] content: input.keySet()) {
+                  if (Arrays.equals(content, pointsArray)) {
+                    flag = false;
+                    break;
+                  }
+                }
+                if (flag)
+                  input.put(pointsArray, distance);
+              }
+            }
+          }
+          System.out.println("Input size for pairing of " + pairing + ":"
+                             + input.size());
+          System.out.println("Current Max Distance: " + currentMaxDistance
+                             + " Previous Max Distance:" + previousMaxDistance);
+          if (previousMaxDistance < currentMaxDistance)
+            previousMaxDistance = currentMaxDistance;
+          else {
+            System.out.println("Breaking for pairing = " + pairing);
+            break;
+          }
         }
       }
     }

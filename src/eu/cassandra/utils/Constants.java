@@ -19,7 +19,6 @@ package eu.cassandra.utils;
 
 import java.util.Comparator;
 
-
 public class Constants
 {
   public static Comparator<PointOfInterest> comp =
@@ -59,15 +58,15 @@ public class Constants
 
   // ID CONSTANTS
 
-  public static int EVENTS_ID = 0;
-  public static int POI_ID = 0;
-  public static int WATERHEATER_ID = 0;
-  public static int LIGHTING_ID = 0;
-  public static int ENTERTAINMENT_ID = 0;
-  public static int COOKING_ID = 0;
-  public static int MICROWAVE_OVEN_ID = 0;
-  public static int EXTRACTOR_ID = 0;
-  public static int VACUUM_CLEANER_ID = 0;
+  public static int EVENTS_ID = 1;
+  public static int POI_ID = 1;
+  public static int WATERHEATER_ID = 1;
+  public static int LIGHTING_ID = 1;
+  public static int ENTERTAINMENT_ID = 1;
+  public static int COOKING_ID = 1;
+  public static int MICROWAVE_OVEN_ID = 1;
+  public static int EXTRACTOR_ID = 1;
+  public static int VACUUM_CLEANER_ID = 1;
 
   // BACKGROUND CONSTANTS
 
@@ -127,7 +126,8 @@ public class Constants
   public static final int PAIR_DISTANCE_THRESHOLD = 20;
   public static final double NEAR_ZERO = 1.0E-6;
   public static final int MAX_POINTS_LIMIT = 4;
-  public static final int SOLUTION_THRESHOLD = 2000;
+  public static final int SOLUTION_THRESHOLD = 20000;
+  public static final int OTHER_SOLUTION_THRESHOLD = 50000;
 
   // APPLIANCES THRESHOLDS
   public static final int WATERHEATER_POWER_THRESHOLD = 3000;

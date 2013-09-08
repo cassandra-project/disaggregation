@@ -205,7 +205,7 @@ public class Event
     cleanPointsOfInterest();
 
     // cleanPointsOfInterest(Constants.MATCHING_THRESHOLD);
-    // status();
+    status();
   }
 
   /**
@@ -1572,7 +1572,8 @@ public class Event
         && reductionPoints.size() > 0) {
 
       // input = Utils.findCombinations(temp);
-      input = Utils.findCombinations2(temp);
+      // input = Utils.findCombinations2(temp);
+      input = Utils.findCombinations3(temp);
       System.out.println("Input for event " + id + ": " + input.size());
 
       // Creating the input for the integer programming solver
@@ -1611,7 +1612,7 @@ public class Event
 
         // Solving the problem and presenting the solution
         ArrayList<Integer> solution = Utils.solve2(tempArray, cost);
-
+        // ArrayList<Integer> solution = Utils.solve3(tempArray, cost);
         // System.out.println("Solutions:");
 
         // for (int i = 0; i < solutions.size(); i++) {
@@ -1750,9 +1751,10 @@ public class Event
    */
   public void status2 ()
   {
-
+    System.out.println();
+    System.out.println("==================================");
     System.out.println("Event: " + getId());
-
+    System.out.println("==================================");
     if (finalPairs.size() > 0) {
       System.out.println("Final Pairs:");
       for (PointOfInterest[] pois: finalPairs)
