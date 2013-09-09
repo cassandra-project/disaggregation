@@ -249,52 +249,6 @@ public class Appliance
     meanDuration /= counter;
 
     keys.clear();
-    int duration = 0;
-
-    // The same procedure is done for the remaining points of interest, using
-    // the duration as another criterion of success and matching.
-    for (Integer key: risingPoints.keySet()) {
-
-      if (reductionPoints.containsKey(key)) {
-
-        for (int i = risingPoints.get(key).size() - 1; i >= 0; i--) {
-
-          for (PointOfInterest red: reductionPoints.get(key)) {
-
-            if (red.getMinute() > risingPoints.get(key).get(i).getMinute()) {
-
-              duration =
-                red.getMinute() - risingPoints.get(key).get(i).getMinute();
-
-              // System.out.println("Start: "
-              // + risingPoints.get(key).get(i).getMinute()
-              // + " Stop: " + red.getMinute() + " Duration: "
-              // + duration);
-
-              if (Utils.checkLimit(duration, meanDuration)) {
-
-                PointOfInterest[] temp = { risingPoints.get(key).get(i), red };
-
-                if (matchingPoints.containsKey(key)) {
-                  matchingPoints.get(key).add(temp);
-                }
-                else {
-                  ArrayList<PointOfInterest[]> tempArray =
-                    new ArrayList<PointOfInterest[]>();
-                  tempArray.add(temp);
-                  matchingPoints.put(key, tempArray);
-                }
-                addMeanValues(temp);
-                numberOfMatchingPoints += 2;
-                reductionPoints.get(key).remove(red);
-                risingPoints.get(key).remove(i);
-                break;
-              }
-            }
-          }
-        }
-      }
-    }
 
     risingPoints.clear();
     reductionPoints.clear();

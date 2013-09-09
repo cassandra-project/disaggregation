@@ -87,7 +87,7 @@ public class Disaggregate
     // procedure.
     PrintStream realSystemOut = System.out;
     try {
-      OutputStream output = new FileOutputStream("Demo/test.txt");
+      OutputStream output = new FileOutputStream("test.txt");
       PrintStream printOut = new PrintStream(output);
       System.setOut(printOut);
     }
@@ -140,7 +140,6 @@ public class Disaggregate
             System.out.println(Arrays.toString(pois));
         }
         event.calculateFinalPairs();
-        // event.status2();
         if (event.getFinalPairs().size() > 0)
           ai.analyseEvent(event);
       }
@@ -159,9 +158,9 @@ public class Disaggregate
   public static void main (String[] args) throws Exception
   {
     // String input = "Demo/Household1.csv";
-    // String input = "Demo/Milioudis.csv";
+    String input = "Demo/Milioudis.csv";
     // String input = "Demo/Benchmark.csv";
-    String input = "Demo/measurements.csv";
+
     Disaggregate dis = new Disaggregate(input);
   }
 }

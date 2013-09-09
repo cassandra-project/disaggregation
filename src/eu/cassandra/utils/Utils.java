@@ -126,6 +126,24 @@ public class Utils
    *          The limit value that is used as threshold
    * @return true if it is within limits, false otherwise
    */
+  public static boolean checkLimitFridge (double trueValue, double limit)
+  {
+
+    double upperLimit = (1 + Constants.ERROR_FRIDGE) * limit;
+
+    return (trueValue < upperLimit);
+  }
+
+  /**
+   * This function is used in order to check if a certain appliance is within
+   * the permitted limits
+   * 
+   * @param trueValue
+   *          The value under examination
+   * @param limit
+   *          The limit value that is used as threshold
+   * @return true if it is within limits, false otherwise
+   */
   public static double pairingLimit (double trueValue)
   {
 
@@ -912,13 +930,13 @@ public class Utils
         points = Utils.findRedPoints(i, temp);
 
         ICombinatoricsVector<Integer> initialSet = Factory.createVector(points);
-        System.out.println("Initial Set for point " + temp.get(i).toString()
-                           + ": " + initialSet.toString());
-        System.out.println("Reduction Points for rising point " + i + ": "
-                           + initialSet.toString());
+        // System.out.println("Initial Set for point " + temp.get(i).toString()
+        // + ": " + initialSet.toString());
+        // System.out.println("Reduction Points for rising point " + i + ": "
+        // + initialSet.toString());
 
         int upperThres = Math.min(4, initialSet.getSize());
-        System.out.println("Upper Threshold:" + upperThres);
+        // System.out.println("Upper Threshold:" + upperThres);
 
         for (int pairing = 1; pairing <= upperThres; pairing++) {
 
@@ -943,8 +961,9 @@ public class Utils
               distance =
                 1 / (temp.get(i).percentageEuclideanDistance(tempValues) + Constants.NEAR_ZERO);
 
-              System.out.println("Subset: " + subSet.toString() + " Distance: "
-                                 + 1 / distance);
+              // System.out.println("Subset: " + subSet.toString() +
+              // " Distance: "
+              // + 1 / distance);
 
               // If accepted then an array is created with 1 in the index of the
               // points included, 0 otherwise
@@ -955,9 +974,9 @@ public class Utils
                   pointsArray[index] = 1;
 
                 if (distance > currentMaxDistance) {
-                  System.out.println("Distance: " + distance
-                                     + " Current Max Distance: "
-                                     + currentMaxDistance);
+                  // System.out.println("Distance: " + distance
+                  // + " Current Max Distance: "
+                  // + currentMaxDistance);
                   currentMaxDistance = distance;
                 }
 
@@ -976,14 +995,14 @@ public class Utils
                 input.put(pointsArray, distance);
             }
           }
-          System.out.println("Input size for pairing of " + pairing + ":"
-                             + input.size());
-          System.out.println("Current Max Distance: " + currentMaxDistance
-                             + " Previous Max Distance:" + previousMaxDistance);
+          // System.out.println("Input size for pairing of " + pairing + ":"
+          // + input.size());
+          // System.out.println("Current Max Distance: " + currentMaxDistance
+          // + " Previous Max Distance:" + previousMaxDistance);
           if (previousMaxDistance < currentMaxDistance)
             previousMaxDistance = currentMaxDistance;
           else {
-            System.out.println("Breaking for pairing = " + pairing);
+            // System.out.println("Breaking for pairing = " + pairing);
             break;
           }
 
@@ -998,13 +1017,13 @@ public class Utils
 
         ICombinatoricsVector<Integer> initialSet = Factory.createVector(points);
 
-        System.out.println("Initial Set for point " + temp.get(i).toString()
-                           + ": " + initialSet.toString());
-        System.out.println("Rising Points for reduction point " + i + ": "
-                           + initialSet.toString());
+        // System.out.println("Initial Set for point " + temp.get(i).toString()
+        // + ": " + initialSet.toString());
+        // System.out.println("Rising Points for reduction point " + i + ": "
+        // + initialSet.toString());
 
         int upperThres = Math.min(4, initialSet.getSize());
-        System.out.println("Upper Threshold:" + upperThres);
+        // System.out.println("Upper Threshold:" + upperThres);
 
         for (int pairing = 1; pairing <= upperThres; pairing++) {
 
@@ -1031,8 +1050,9 @@ public class Utils
               distance =
                 1 / (Utils.percentageEuclideanDistance(sum, tempValues) + Constants.NEAR_ZERO);
 
-              System.out.println("Subset: " + subSet.toString() + " Distance: "
-                                 + 1 / distance);
+              // System.out.println("Subset: " + subSet.toString() +
+              // " Distance: "
+              // + 1 / distance);
 
               // If accepted then an array is created with 1 in the index of the
               // points included, 0 otherwise
@@ -1043,9 +1063,9 @@ public class Utils
                   pointsArray[index] = 1;
 
                 if (distance > currentMaxDistance) {
-                  System.out.println("Distance: " + distance
-                                     + " Current Max Distance: "
-                                     + currentMaxDistance);
+                  // System.out.println("Distance: " + distance
+                  // + " Current Max Distance: "
+                  // + currentMaxDistance);
                   currentMaxDistance = distance;
                 }
 
@@ -1063,14 +1083,14 @@ public class Utils
               }
             }
           }
-          System.out.println("Input size for pairing of " + pairing + ":"
-                             + input.size());
-          System.out.println("Current Max Distance: " + currentMaxDistance
-                             + " Previous Max Distance:" + previousMaxDistance);
+          // System.out.println("Input size for pairing of " + pairing + ":"
+          // + input.size());
+          // System.out.println("Current Max Distance: " + currentMaxDistance
+          // + " Previous Max Distance:" + previousMaxDistance);
           if (previousMaxDistance < currentMaxDistance)
             previousMaxDistance = currentMaxDistance;
           else {
-            System.out.println("Breaking for pairing = " + pairing);
+            // System.out.println("Breaking for pairing = " + pairing);
             break;
           }
         }

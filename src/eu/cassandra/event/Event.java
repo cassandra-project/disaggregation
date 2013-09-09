@@ -1116,6 +1116,9 @@ public class Event
    */
   public void detectSwitchingPoints ()
   {
+    // System.out.println("Before Switching: Rising " + risingPoints.size()
+    // + " Reduction Points: " + reductionPoints.size());
+
     // Create an array of all the points of interest in chronological order.
     ArrayList<PointOfInterest> temp =
       new ArrayList<PointOfInterest>(risingPoints);
@@ -1154,6 +1157,8 @@ public class Event
       }
 
     }
+    // System.out.println("After Switching: Rising " + risingPoints.size()
+    // + " Reduction Points: " + reductionPoints.size());
 
   }
 
@@ -1170,6 +1175,9 @@ public class Event
       new ArrayList<PointOfInterest>(risingPoints);
     temp.addAll(reductionPoints);
     Collections.sort(temp, Constants.comp);
+
+    // System.out.println("Before Matching: Rising " + risingPoints.size()
+    // + " Reduction Points: " + reductionPoints.size());
 
     // Initializing auxiliary variables
     double distance = 0;
@@ -1219,20 +1227,58 @@ public class Event
         // If a combination that was close is found a matching pair is created
         // and added to the matching points array.
         if (minIndex != -1) {
-          PointOfInterest[] tempPOI = { temp.get(i), temp.get(minIndex) };
-          matchingPoints.add(tempPOI);
+
+          // System.out.println("Starting point: " + i + " MinIndex: " +
+          // minIndex);
+          boolean flag = true;
+          // Check previous matching points for double ending points
+          for (PointOfInterest[] previousPoi: matchingPoints) {
+
+            if (previousPoi[1].equals(temp.get(minIndex))) {
+
+              double[] tempValues =
+                { -previousPoi[1].getPDiff(), -previousPoi[1].getQDiff() };
+
+              double previousDistance =
+                previousPoi[0].percentageEuclideanDistance(tempValues);
+
+              // System.out.println("Previous Distance: " + previousDistance
+              // + " New Distance: " + minDistance);
+
+              if (previousDistance > minDistance) {
+                matchingPoints.remove(previousPoi);
+                break;
+              }
+              else {
+                flag = false;
+                break;
+              }
+            }
+
+          }
+
+          if (flag) {
+            // System.out.println("Added");
+            PointOfInterest[] tempPOI = { temp.get(i), temp.get(minIndex) };
+            matchingPoints.add(tempPOI);
+            // System.out
+            // .println("Matching Points Size: " + matchingPoints.size());
+          }
         }
       }
 
     }
 
     // The newly found matching points are removed from their respected arrays.
-    if (matchingPoints.size() > 0)
+    if (matchingPoints.size() > 0) {
       for (PointOfInterest[] pois: matchingPoints) {
         risingPoints.remove(pois[0]);
         reductionPoints.remove(pois[1]);
       }
+    }
 
+    // System.out.println("After Matching: Rising " + risingPoints.size()
+    // + " Reduction Points: " + reductionPoints.size());
   }
 
   /**
@@ -1246,6 +1292,9 @@ public class Event
    */
   public void detectClusters ()
   {
+    // System.out.println("Before Clusters: Rising " + risingPoints.size()
+    // + " Reduction Points: " + reductionPoints.size());
+
     // Making a large collection of points of interest
     ArrayList<PointOfInterest> temp =
       new ArrayList<PointOfInterest>(risingPoints);
@@ -1373,6 +1422,8 @@ public class Event
         }
       }
     }
+    // System.out.println("After Clusters: Rising " + risingPoints.size()
+    // + " Reduction Points: " + reductionPoints.size());
   }
 
   /**
@@ -1383,6 +1434,9 @@ public class Event
    */
   public void detectBasicShapes ()
   {
+    // System.out.println("Before Basic: Rising " + risingPoints.size()
+    // + " Reduction Points: " + reductionPoints.size());
+
     // Creating a chronological collection of points of interest
     ArrayList<PointOfInterest> temp =
       new ArrayList<PointOfInterest>(risingPoints);
@@ -1398,6 +1452,9 @@ public class Event
 
     // System.out.println(temp.toString());
 
+    // System.out.println("After Basic: Rising " + risingPoints.size()
+    // + " Reduction Points: " + reductionPoints.size());
+
   }
 
   /**
@@ -1408,6 +1465,9 @@ public class Event
    */
   private void detectChairs (ArrayList<PointOfInterest> pois)
   {
+
+    // System.out.println("Before Chairs: Rising " + risingPoints.size()
+    // + " Reduction Points: " + reductionPoints.size());
 
     // double distance = 0;
     double[] rise = new double[2];
@@ -1445,7 +1505,8 @@ public class Event
 
       }
     }
-
+    // System.out.println("After Chairs: Rising " + risingPoints.size()
+    // + " Reduction Points: " + reductionPoints.size());
   }
 
   /**
@@ -1456,6 +1517,10 @@ public class Event
    */
   private void detectInversedChairs (ArrayList<PointOfInterest> pois)
   {
+
+    // System.out.println("Before Inversed Chairs: Rising " +
+    // risingPoints.size()
+    // + " Reduction Points: " + reductionPoints.size());
 
     // double distance = 0;
     double[] rise = new double[2];
@@ -1494,6 +1559,8 @@ public class Event
       }
     }
 
+    // System.out.println("After Inversed Chairs: Rising " + risingPoints.size()
+    // + " Reduction Points: " + reductionPoints.size());
   }
 
   /**
@@ -1555,6 +1622,9 @@ public class Event
   public void findCombinations ()
   {
 
+    // System.out.println("Before Combinations: Rising " + risingPoints.size()
+    // + " Reduction Points: " + reductionPoints.size());
+
     Map<int[], Double> input = new HashMap<int[], Double>();
 
     // Creating a collection of the points of interest in chronological order
@@ -1593,8 +1663,13 @@ public class Event
       // System.out.println("Array: " + Arrays.toString(tempArray[i])
       // + " Cost: " + cost[i]);
 
+      if (input.size() == 0) {
+
+        System.out.println("No Available input");
+
+      }
       // If there is only one pair, then this is the solution
-      if (input.size() == 1) {
+      else if (input.size() == 1) {
 
         // TODO Add threshold???
         PointOfInterest[] pair =
@@ -1738,9 +1813,11 @@ public class Event
                        + Arrays.toString(activePowerConsumptions));
     System.out.println("Reactive Load: "
                        + Arrays.toString(reactivePowerConsumptions));
-    if (risingPoints.size() + reductionPoints.size() > 0)
+    if (risingPoints.size() + reductionPoints.size() > 0) {
+      System.out.println("Rising: " + risingPoints.size() + " Reduction: "
+                         + reductionPoints.size());
       showPoints();
-
+    }
     System.out.println();
     System.out.println();
   }
@@ -1760,50 +1837,47 @@ public class Event
       for (PointOfInterest[] pois: finalPairs)
         System.out.println(Arrays.toString(pois));
     }
-    else {
 
-      if (switchingPoints.size() > 0) {
-        System.out.println("Switching Points:");
-        for (PointOfInterest[] pois: switchingPoints)
-          System.out.println(Arrays.toString(pois));
-      }
+    if (switchingPoints.size() > 0) {
+      System.out.println("Switching Points:");
+      for (PointOfInterest[] pois: switchingPoints)
+        System.out.println(Arrays.toString(pois));
+    }
 
-      if (matchingPoints.size() > 0) {
-        System.out.println("Matching Points:");
-        for (PointOfInterest[] pois: matchingPoints)
-          System.out.println(Arrays.toString(pois));
-      }
+    if (matchingPoints.size() > 0) {
+      System.out.println("Matching Points:");
+      for (PointOfInterest[] pois: matchingPoints)
+        System.out.println(Arrays.toString(pois));
+    }
 
-      if (clusters.size() > 0) {
-        System.out.println("Clusters:");
-        for (PointOfInterest[] pois: clusters)
-          System.out.println(Arrays.toString(pois));
-      }
+    if (clusters.size() > 0) {
+      System.out.println("Clusters:");
+      for (PointOfInterest[] pois: clusters)
+        System.out.println(Arrays.toString(pois));
+    }
 
-      if (chairs.size() > 0) {
-        System.out.println("Chairs: ");
-        for (PointOfInterest[] chair: chairs)
-          System.out.println(Arrays.toString(chair));
-      }
+    if (chairs.size() > 0) {
+      System.out.println("Chairs: ");
+      for (PointOfInterest[] chair: chairs)
+        System.out.println(Arrays.toString(chair));
+    }
 
-      if (inversedChairs.size() > 0) {
-        System.out.println("Inversed Chairs: ");
-        for (PointOfInterest[] ichair: inversedChairs)
-          System.out.println(Arrays.toString(ichair));
-      }
+    if (inversedChairs.size() > 0) {
+      System.out.println("Inversed Chairs: ");
+      for (PointOfInterest[] ichair: inversedChairs)
+        System.out.println(Arrays.toString(ichair));
+    }
 
-      if (triangles.size() > 0) {
-        System.out.println("Triangles: ");
-        for (PointOfInterest[] triangle: triangles)
-          System.out.println(Arrays.toString(triangle));
-      }
+    if (triangles.size() > 0) {
+      System.out.println("Triangles: ");
+      for (PointOfInterest[] triangle: triangles)
+        System.out.println(Arrays.toString(triangle));
+    }
 
-      if (rectangles.size() > 0) {
-        System.out.println("Rectangles: ");
-        for (PointOfInterest[] rectangle: rectangles)
-          System.out.println(Arrays.toString(rectangle));
-      }
-
+    if (rectangles.size() > 0) {
+      System.out.println("Rectangles: ");
+      for (PointOfInterest[] rectangle: rectangles)
+        System.out.println(Arrays.toString(rectangle));
     }
 
   }

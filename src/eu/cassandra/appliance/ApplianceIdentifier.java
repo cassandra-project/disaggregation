@@ -58,6 +58,13 @@ public class ApplianceIdentifier
   ArrayList<String[]> activityList = new ArrayList<String[]>();
 
   /**
+   * This variable is a list of the event index that need second pass for the
+   * correct refrigerator identification in the events.
+   */
+  Map<Integer, ArrayList<PointOfInterest>> secondPass =
+    new TreeMap<Integer, ArrayList<PointOfInterest>>();
+
+  /**
    * The simple constructor of the appliance identifier.
    */
   public ApplianceIdentifier ()
@@ -172,6 +179,12 @@ public class ApplianceIdentifier
       new Appliance("Refrigerator", "Refrigeration", risingPoints,
                     reductionPoints);
 
+    // appliance.status();
+
+    cleanSecondPass(events, appliance, secondPass);
+
+    // appliance.status();
+
     applianceList.add(appliance);
   }
 
@@ -201,35 +214,81 @@ public class ApplianceIdentifier
 
     // In case all the rising and reduction points of the event are found to
     // be refrigerator then all are removed from the event
-    if (event.getRisingPoints().size() == risingPoints.size()
-        && event.getReductionPoints().size() == reductionPoints.size()) {
+    if (risingPoints.size() == 1 && reductionPoints.size() == 1) {
       // System.out.println("1 - 1");
       event.getReductionPoints().clear();
       event.getRisingPoints().clear();
     }
-    // else if the number of rising and reduction points are equal, those
-    // points are removed from the event's points of interest lists
-    else if (risingPoints.size() == reductionPoints.size()) {
-
-      // System.out.println("Same Number");
-      //
-      // System.out.println("Rising Before in event: "
-      // + event.getRisingPoints().size());
-      for (PointOfInterest rise: risingPoints)
-        event.getRisingPoints().remove(rise);
-      // System.out.println("Rising After in event: "
-      // + event.getRisingPoints().size());
-      //
-      // System.out.println("Reduction Before in event: "
-      // + event.getReductionPoints().size());
-      for (PointOfInterest reduction: reductionPoints)
-        event.getReductionPoints().remove(reduction);
-      // System.out.println("Reduction After in event: "
-      // + event.getRisingPoints().size());
-    }
-    // In any other case
     else {
       // System.out.println("Other case. Cannot do anything!");
+      ArrayList<PointOfInterest> temp =
+        new ArrayList<PointOfInterest>(risingPoints);
+      temp.addAll(reductionPoints);
+      secondPass.put(event.getId() - 1, temp);
+      risingPoints.clear();
+      reductionPoints.clear();
+    }
+  }
+
+  /**
+   * Finding the refrigeration in some events with second passing
+   * 
+   * @param events
+   *          The list of events.
+   * @param fridge
+   *          The refrigeration appliance as defined by that time.
+   * @param secondPass
+   *          The list of event indices that need a second pass.
+   */
+  private void
+    cleanSecondPass (ArrayList<Event> events, Appliance fridge,
+                     Map<Integer, ArrayList<PointOfInterest>> secondPass)
+  {
+    int duration = -1;
+
+    // For each event in need of second pass
+    for (Integer key: secondPass.keySet()) {
+
+      ArrayList<PointOfInterest> temp = secondPass.get(key);
+      Collections.sort(temp, Constants.comp);
+
+      // System.out.println("Event " + events.get(key).getId());
+      // System.out.println("Before: " + temp.toString());
+
+      // For each point of interest
+      for (int i = temp.size() - 2; i >= 0; i--) {
+
+        if (temp.get(i).getRising()) {
+
+          PointOfInterest rise = temp.get(i);
+
+          for (int j = i; j < temp.size(); j++) {
+
+            if (temp.get(j).getRising() == false
+                && Utils.checkLimit(duration, fridge.getMeanDuration())) {
+
+              PointOfInterest red = temp.get(j);
+
+              PointOfInterest[] pois = { rise, red };
+
+              fridge.addMatchingPoints(events.get(key).getId(), pois);
+
+              events.get(key).getRisingPoints().remove(rise);
+              events.get(key).getReductionPoints().remove(red);
+              temp.remove(j);
+              temp.remove(i);
+              i--;
+              break;
+            }
+
+          }
+        }
+        if (temp.size() == 0 || allSamePoints(temp))
+          break;
+      }
+
+      // System.out.println("After: " + temp.toString());
+      // System.out.println();
     }
 
   }
