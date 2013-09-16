@@ -201,10 +201,10 @@ public class Event
     Collections.sort(risingPoints, Constants.comp);
     Collections.sort(reductionPoints, Constants.comp);
 
-    // Clear the points of interest that are not important to the event.
+    // Clean the points of interest that are not important to the event.
     cleanPointsOfInterest();
-
     // cleanPointsOfInterest(Constants.MATCHING_THRESHOLD);
+
     status();
   }
 
@@ -455,16 +455,16 @@ public class Event
         marker[i] = -1;
     }
 
-    System.out.println("Event " + id);
-    System.out.println(Arrays.toString(derivative));
-    System.out.println(Arrays.toString(marker));
+    // System.out.println("Event " + id);
+    // System.out.println(Arrays.toString(derivative));
+    // System.out.println(Arrays.toString(marker));
 
     // New marker array with 0 in the first and last index
     int[] markerNew = new int[marker.length + 2];
     for (int i = 1; i < markerNew.length - 1; i++)
       markerNew[i] = marker[i - 1];
 
-    System.out.println(Arrays.toString(markerNew));
+    // System.out.println(Arrays.toString(markerNew));
 
     // Parsing through the new marker array we find the points of interest
     // either as individual points or as group of points.
@@ -492,8 +492,8 @@ public class Event
 
     }
 
-    System.out.println("Individuals:" + ind.toString());
-    System.out.println("Groups: " + groups.toString());
+    // System.out.println("Individuals:" + ind.toString());
+    // System.out.println("Groups: " + groups.toString());
 
     // For the individual points
     if (ind.size() > 0)
@@ -1805,7 +1805,7 @@ public class Event
    */
   public void status ()
   {
-    System.out.println("Id: " + id);
+    System.out.println("Event Id: " + id);
     System.out.println("Start Minute: " + startMinute);
     System.out.println("End Minute: " + endMinute);
     System.out.println("Threshold: " + threshold);

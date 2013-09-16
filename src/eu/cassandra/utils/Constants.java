@@ -54,7 +54,7 @@ public class Constants
 
   // GENERAL CONSTANTS
   public static final double ERROR_FRINGE = 0.05;
-  public static final double ERROR_FRIDGE = 0.5;
+  public static final double ERROR_FRIDGE = 0.4;
   public static final double PAIR_ERROR_FRINGE = 0.2;
 
   // ID CONSTANTS
@@ -100,7 +100,7 @@ public class Constants
   // WASHING MACHINE CONSTANTS
 
   public static final int WASHING_MACHINE_POWER_THRESHOLD = 1500;
-  public static final int WASHING_MACHINE_MERGING_MINUTE_LIMIT = 3;
+  public static final int WASHING_MACHINE_MERGING_MINUTE_LIMIT = 4;
   public static final int WASHING_MACHINE_NUMBER_OF_MINUTES_LIMIT = 30;
   public static final int WASHING_MACHINE_DEVIATION_LIMIT = 20;
 

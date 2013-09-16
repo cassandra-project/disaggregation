@@ -121,15 +121,20 @@ public class Disaggregate
     // For each event an analysis is at hand helping to separate the different
     // consumption models and identify their results
     for (Event event: events) {
+
+      System.out.println();
+      System.out.println("==================================");
+      System.out.println("Event: " + event.getId());
+      System.out.println("==================================");
+      System.out.println();
+      System.out.println("Washing Machine Detected: "
+                         + event.getWashingMachineFlag());
       if (event.getWashingMachineFlag() == false) {
-        System.out.println();
-        System.out.println("==================================");
-        System.out.println("Event: " + event.getId());
-        System.out.println("==================================");
-        System.out.println();
+        event.detectClusters();
+        // event.detectSwitchingPoints();
         event.detectMatchingPoints();
         event.detectSwitchingPoints();
-        event.detectClusters();
+        // event.detectClusters();
         event.detectBasicShapes();
         event.findCombinations();
         event.status2();
@@ -159,7 +164,10 @@ public class Disaggregate
   {
     // String input = "Demo/Household1.csv";
     String input = "Demo/Milioudis.csv";
+    // String input = "Demo/measurements.csv";
     // String input = "Demo/Benchmark.csv";
+    // String input = "Demo/Household2.csv";
+    // String input = "Demo/BenchmarkingTest1.csv";
 
     Disaggregate dis = new Disaggregate(input);
   }

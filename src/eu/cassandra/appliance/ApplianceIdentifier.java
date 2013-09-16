@@ -216,8 +216,8 @@ public class ApplianceIdentifier
     // be refrigerator then all are removed from the event
     if (risingPoints.size() == 1 && reductionPoints.size() == 1) {
       // System.out.println("1 - 1");
-      event.getReductionPoints().clear();
-      event.getRisingPoints().clear();
+      event.getRisingPoints().remove(risingPoints.get(0));
+      event.getReductionPoints().remove(reductionPoints.get(0));
     }
     else {
       // System.out.println("Other case. Cannot do anything!");
@@ -265,7 +265,7 @@ public class ApplianceIdentifier
           for (int j = i; j < temp.size(); j++) {
 
             if (temp.get(j).getRising() == false
-                && Utils.checkLimit(duration, fridge.getMeanDuration())) {
+                && Utils.checkLimitFridge(duration, fridge.getMeanDuration())) {
 
               PointOfInterest red = temp.get(j);
 
@@ -331,8 +331,11 @@ public class ApplianceIdentifier
 
         // In case there are such points of interest
         if (risingFlag && reductionFlag) {
-          // System.out.println("Search for Washing Machine in Event " + i);
-
+          // System.out.println();
+          // System.out.println();
+          // System.out.println("Search for Washing Machine in Event "
+          // + events.get(i).getId());
+          // System.out.println();
           // Collect the event's active and reactive power measurements
           double[] tempReactive =
             Arrays.copyOf(events.get(i).getReactivePowerConsumptions(), events
@@ -340,18 +343,19 @@ public class ApplianceIdentifier
           double[] tempActive =
             Arrays.copyOf(events.get(i).getActivePowerConsumptions(), events
                     .get(i).getActivePowerConsumptions().length);
-
+          // System.out.println("Reactive: " + Arrays.toString(tempReactive));
           // Removing refrigerator load from the measurements if it has been
           // detected in the current event.
           Appliance ref = applianceList.get(0);
 
-          if (ref.getMatchingPoints().containsKey(i)) {
+          if (ref.getMatchingPoints().containsKey(events.get(i).getId())) {
 
             double refReactive = ref.getMeanReactive();
             // System.out.println("Refrigerator Reactive: " + refReactive);
             int start = -1, end = -1;
 
-            for (PointOfInterest[] poi: ref.getMatchingPoints(i)) {
+            for (PointOfInterest[] poi: ref.getMatchingPoints(events.get(i)
+                    .getId())) {
 
               start = poi[0].getMinute();
               end = poi[1].getMinute();
@@ -379,11 +383,16 @@ public class ApplianceIdentifier
             }
 
           }
+          // System.out.println("The WINNER IS");
+          // cons.get(maxIndex).status();
+          boolean check =
+            (Utils.checkLimit(cons.get(maxIndex).getDifference(),
+                              Constants.WASHING_MACHINE_DEVIATION_LIMIT) && cons
+                    .get(maxIndex).getNumberOfElements() > Constants.WASHING_MACHINE_NUMBER_OF_MINUTES_LIMIT);
+          // System.out.println("Objectives Met: " + check);
 
           // If all the criteria are met
-          if (Utils.checkLimit(cons.get(maxIndex).getDifference(),
-                               Constants.WASHING_MACHINE_DEVIATION_LIMIT)
-              && cons.get(maxIndex).getNumberOfElements() > Constants.WASHING_MACHINE_NUMBER_OF_MINUTES_LIMIT) {
+          if (check) {
 
             // Switch the event's washing machine flag.
             events.get(i).setWashingMachineFlag();

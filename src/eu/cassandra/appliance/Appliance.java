@@ -364,8 +364,8 @@ public class Appliance
     if (activity.equalsIgnoreCase("Refrigeration"))
       return (Utils.percentageEuclideanDistance(mean, meanValues) < Constants.PERCENTAGE_CLOSENESS_THRESHOLD || Utils
               .absoluteEuclideanDistance(mean, meanValues) < Constants.ABSOLUTE_CLOSENESS_THRESHOLD
-                                                                                                                && Utils.checkLimit(duration,
-                                                                                                                                    meanDuration));
+                                                                                                                && Utils.checkLimitFridge(duration,
+                                                                                                                                          meanDuration));
     else
 
       return (Utils.percentageEuclideanDistance(mean, meanValues) < Constants.PERCENTAGE_CLOSENESS_THRESHOLD || Utils

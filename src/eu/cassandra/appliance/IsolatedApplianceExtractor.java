@@ -84,7 +84,7 @@ public class IsolatedApplianceExtractor
     boolean pDiff = false;
 
     // Checking each event. The ones that contain one rising and one reduction
-    // points or two reduction points with the second musch larger than the
+    // points or two reduction points with the second much larger than the
     // first are selected and added to the array
     for (Event event: events) {
 
@@ -97,24 +97,24 @@ public class IsolatedApplianceExtractor
           && event.getReductionPoints().size() == 1) {
         isolated.add(event);
       }
-      else if (event.getRisingPoints().size() == 1
-               && event.getReductionPoints().size() == 2) {
-
-        q1 = (event.getRisingPoints().get(0).getQDiff() > 0);
-        pDiff =
-          (Math.abs(event.getReductionPoints().get(1).getPDiff()) > Constants.ISOLATED_TIMES_UP
-                                                                    * Math.abs(event
-                                                                            .getReductionPoints()
-                                                                            .get(0)
-                                                                            .getPDiff()));
-        q3 = (event.getReductionPoints().get(1).getQDiff() < 0);
-
-        if (q1 && q3 && pDiff) {
-          event.getReductionPoints().remove(0);
-          isolated.add(event);
-        }
-
-      }
+      // else if (event.getRisingPoints().size() == 1
+      // && event.getReductionPoints().size() == 2) {
+      //
+      // q1 = (event.getRisingPoints().get(0).getQDiff() > 0);
+      // pDiff =
+      // (Math.abs(event.getReductionPoints().get(1).getPDiff()) >
+      // Constants.ISOLATED_TIMES_UP
+      // * Math.abs(event
+      // .getReductionPoints()
+      // .get(0)
+      // .getPDiff()));
+      // q3 = (event.getReductionPoints().get(1).getQDiff() < 0);
+      //
+      // if (q1 && q3 && pDiff) {
+      // event.getReductionPoints().remove(0);
+      // isolated.add(event);
+      // }
+      // }
     }
 
     // The instances for the cluster procedure are created

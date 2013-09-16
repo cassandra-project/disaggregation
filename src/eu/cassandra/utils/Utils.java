@@ -111,9 +111,9 @@ public class Utils
   public static boolean checkLimit (double trueValue, double limit)
   {
 
-    double upperLimit = (1 + Constants.ERROR_FRINGE) * limit;
+    double lowerLimit = (1 - Constants.ERROR_FRINGE) * limit;
 
-    return (trueValue < upperLimit);
+    return (trueValue > lowerLimit);
   }
 
   /**
@@ -129,9 +129,10 @@ public class Utils
   public static boolean checkLimitFridge (double trueValue, double limit)
   {
 
+    double lowerLimit = (1 - Constants.ERROR_FRIDGE) * limit;
     double upperLimit = (1 + Constants.ERROR_FRIDGE) * limit;
 
-    return (trueValue < upperLimit);
+    return (trueValue < upperLimit || trueValue > lowerLimit);
   }
 
   /**
