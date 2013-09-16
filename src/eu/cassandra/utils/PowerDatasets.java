@@ -77,10 +77,22 @@ public class PowerDatasets
 
       String[] contents = line.split(",");
 
-      activeMap.put(counter, Double.parseDouble(contents[contents.length - 2]));
-      reactiveMap.put(counter++,
-                      Double.parseDouble(contents[contents.length - 1]));
-
+      if (contents.length == 3) {
+        activeMap.put(counter,
+                      Double.parseDouble(contents[contents.length - 2]));
+        reactiveMap.put(counter++,
+                        Double.parseDouble(contents[contents.length - 1]));
+      }
+      else if (contents.length == 2) {
+        activeMap.put(counter,
+                      Double.parseDouble(contents[contents.length - 2]));
+        reactiveMap.put(counter++, 0.0);
+      }
+      else {
+        System.out
+                .println("Problem with dataset. Check for erroneous data formulation.");
+        System.exit(0);
+      }
     }
 
     input.close();

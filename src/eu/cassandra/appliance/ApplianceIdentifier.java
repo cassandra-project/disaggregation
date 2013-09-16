@@ -346,25 +346,28 @@ public class ApplianceIdentifier
           // System.out.println("Reactive: " + Arrays.toString(tempReactive));
           // Removing refrigerator load from the measurements if it has been
           // detected in the current event.
-          Appliance ref = applianceList.get(0);
+          if (applianceList.size() == 1) {
+            Appliance ref = applianceList.get(0);
 
-          if (ref.getMatchingPoints().containsKey(events.get(i).getId())) {
+            if (ref.getMatchingPoints().containsKey(events.get(i).getId())) {
 
-            double refReactive = ref.getMeanReactive();
-            // System.out.println("Refrigerator Reactive: " + refReactive);
-            int start = -1, end = -1;
+              double refReactive = ref.getMeanReactive();
+              // System.out.println("Refrigerator Reactive: " + refReactive);
+              int start = -1, end = -1;
 
-            for (PointOfInterest[] poi: ref.getMatchingPoints(events.get(i)
-                    .getId())) {
+              for (PointOfInterest[] poi: ref.getMatchingPoints(events.get(i)
+                      .getId())) {
 
-              start = poi[0].getMinute();
-              end = poi[1].getMinute();
+                start = poi[0].getMinute();
+                end = poi[1].getMinute();
 
-              for (int j = start; j < end; j++)
-                tempReactive[j] -= refReactive;
+                for (int j = start; j < end; j++)
+                  tempReactive[j] -= refReactive;
+              }
+
+              // System.out.println("Reactive: " +
+              // Arrays.toString(tempReactive));
             }
-
-            // System.out.println("Reactive: " + Arrays.toString(tempReactive));
           }
 
           // Find all the groups of consecutive values in the reactive power
@@ -385,33 +388,35 @@ public class ApplianceIdentifier
           }
           // System.out.println("The WINNER IS");
           // cons.get(maxIndex).status();
-          boolean check =
-            (Utils.checkLimit(cons.get(maxIndex).getDifference(),
-                              Constants.WASHING_MACHINE_DEVIATION_LIMIT) && cons
-                    .get(maxIndex).getNumberOfElements() > Constants.WASHING_MACHINE_NUMBER_OF_MINUTES_LIMIT);
-          // System.out.println("Objectives Met: " + check);
+          if (maxIndex != -1) {
+            boolean check =
+              (Utils.checkLimit(cons.get(maxIndex).getDifference(),
+                                Constants.WASHING_MACHINE_DEVIATION_LIMIT) && cons
+                      .get(maxIndex).getNumberOfElements() > Constants.WASHING_MACHINE_NUMBER_OF_MINUTES_LIMIT);
+            // System.out.println("Objectives Met: " + check);
 
-          // If all the criteria are met
-          if (check) {
+            // If all the criteria are met
+            if (check) {
 
-            // Switch the event's washing machine flag.
-            events.get(i).setWashingMachineFlag();
-            // Create points of interest and then add them to the washing
-            // machine appliance (create if not already created).
-            PointOfInterest[] match =
-              {
-               new PointOfInterest(cons.get(maxIndex).getStart(), true, cons
-                       .get(maxIndex).getMaxQ(), cons.get(maxIndex).getMaxQ()),
-               new PointOfInterest(cons.get(maxIndex).getEnd(), false, -cons
-                       .get(maxIndex).getMaxQ(), -cons.get(maxIndex).getMaxQ()) };
+              // Switch the event's washing machine flag.
+              events.get(i).setWashingMachineFlag();
+              // Create points of interest and then add them to the washing
+              // machine appliance (create if not already created).
+              PointOfInterest[] match =
+                {
+                 new PointOfInterest(cons.get(maxIndex).getStart(), true, cons
+                         .get(maxIndex).getMaxQ(), cons.get(maxIndex).getMaxQ()),
+                 new PointOfInterest(cons.get(maxIndex).getEnd(), false, -cons
+                         .get(maxIndex).getMaxQ(), -cons.get(maxIndex)
+                         .getMaxQ()) };
 
-            if (appliance == null)
-              appliance = new Appliance("Washing Machine", "Cleaning");
+              if (appliance == null)
+                appliance = new Appliance("Washing Machine", "Cleaning");
 
-            appliance.addMatchingPoints(i, match);
+              appliance.addMatchingPoints(i, match);
 
+            }
           }
-
           // Not only one at a time
           // for (int j = 0; j < cons.size(); j++) {
           // if (cons.get(j).getDifference() >

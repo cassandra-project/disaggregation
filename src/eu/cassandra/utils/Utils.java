@@ -370,6 +370,20 @@ public class Utils
     int num_alternatives = cost.length;
     int num_objects = input[0].length;
 
+    int solutionThreshold = 0;
+
+    if (input[0].length < 10)
+      solutionThreshold = Constants.SOLUTION_THRESHOLD_UNDER_10;
+    else if (input[0].length < 15)
+      solutionThreshold = Constants.SOLUTION_THRESHOLD_UNDER_15;
+    else if (input[0].length < 20)
+      solutionThreshold = Constants.SOLUTION_THRESHOLD_UNDER_20;
+    else
+      solutionThreshold = Constants.SOLUTION_THRESHOLD_OVER_20;
+
+    System.out.println("Objects: " + num_objects + " Threshold: "
+                       + solutionThreshold);
+
     int[] costNew = new int[cost.length];
 
     for (int i = 0; i < costNew.length; i++)
@@ -423,7 +437,7 @@ public class Utils
           temp.add(i);
         }
       }
-      if (z.value() > Constants.SOLUTION_THRESHOLD)
+      if (z.value() > solutionThreshold)
         break;
       // System.out.println("\n");
 

@@ -114,7 +114,8 @@ public class Disaggregate
     // refrigerator and washing machine amongst others.
     IsolatedApplianceExtractor iso = new IsolatedApplianceExtractor(events);
 
-    ai.refrigeratorIdentification(events, iso);
+    if (iso.getIsolatedEvents().size() != 0)
+      ai.refrigeratorIdentification(events, iso);
 
     ai.washingMachineIdentification(events);
 

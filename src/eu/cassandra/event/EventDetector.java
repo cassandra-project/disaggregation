@@ -71,6 +71,8 @@ public class EventDetector
     // of the installation type.
     eventThreshold = findMin(activePower) + estimateThreshold();
 
+    System.out.println("Event Threshold: " + eventThreshold);
+
     // For each minute of measurements
     for (int i = 0; i < activePower.length; i++) {
 

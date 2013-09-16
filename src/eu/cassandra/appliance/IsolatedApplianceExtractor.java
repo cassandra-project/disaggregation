@@ -150,6 +150,17 @@ public class IsolatedApplianceExtractor
   }
 
   /**
+   * This function is used as a getter for the isolated appliances list of the
+   * events.
+   * 
+   * @return a list with the isolated appliance events.
+   */
+  public ArrayList<Event> getIsolatedEvents ()
+  {
+    return isolated;
+  }
+
+  /**
    * This is an auxiliary function that prepares the clustering data set. The
    * events must be translated to instances of the data set that can be used for
    * clustering.

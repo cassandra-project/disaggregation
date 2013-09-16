@@ -127,7 +127,10 @@ public class Constants
   public static final int PAIR_DISTANCE_THRESHOLD = 20;
   public static final double NEAR_ZERO = 1.0E-6;
   public static final int MAX_POINTS_LIMIT = 4;
-  public static final int SOLUTION_THRESHOLD = 20000;
+  public static final int SOLUTION_THRESHOLD_UNDER_10 = 20000000;
+  public static final int SOLUTION_THRESHOLD_UNDER_15 = 200000;
+  public static final int SOLUTION_THRESHOLD_UNDER_20 = 20000;
+  public static final int SOLUTION_THRESHOLD_OVER_20 = 2000;
   public static final int OTHER_SOLUTION_THRESHOLD = 50000;
 
   // APPLIANCES THRESHOLDS
