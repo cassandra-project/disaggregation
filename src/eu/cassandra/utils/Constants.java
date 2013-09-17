@@ -92,6 +92,7 @@ public class Constants
 
   public static final int ISOLATED_TIMES_UP = 3;
   public static final int MAX_CLUSTERS_NUMBER = 5;
+  public static final int KMEANS_LIMIT_NUMBER = 10;
 
   // REFRIGERATOR CONSTANTS
 
@@ -130,7 +131,8 @@ public class Constants
   public static final int SOLUTION_THRESHOLD_UNDER_10 = 20000000;
   public static final int SOLUTION_THRESHOLD_UNDER_15 = 200000;
   public static final int SOLUTION_THRESHOLD_UNDER_20 = 20000;
-  public static final int SOLUTION_THRESHOLD_OVER_20 = 2000;
+  public static final int SOLUTION_THRESHOLD_UNDER_25 = 10000;
+  public static final int SOLUTION_THRESHOLD_OVER_25 = 2000;
   public static final int OTHER_SOLUTION_THRESHOLD = 50000;
 
   // APPLIANCES THRESHOLDS

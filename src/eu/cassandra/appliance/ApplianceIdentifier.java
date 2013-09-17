@@ -413,7 +413,9 @@ public class ApplianceIdentifier
               if (appliance == null)
                 appliance = new Appliance("Washing Machine", "Cleaning");
 
-              appliance.addMatchingPoints(i, match);
+              int key = events.get(i).getId();
+
+              appliance.addMatchingPoints(key, match);
 
             }
           }

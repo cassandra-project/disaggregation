@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import weka.clusterers.HierarchicalClusterer;
+import weka.clusterers.SimpleKMeans;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.EuclideanDistance;
@@ -31,6 +32,7 @@ import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.AddCluster;
 import eu.cassandra.event.Event;
 import eu.cassandra.utils.Constants;
+import eu.cassandra.utils.Utils;
 
 /**
  * This class is responsible for finding events that contain isolated appliances
@@ -132,7 +134,7 @@ public class IsolatedApplianceExtractor
       // The refrigerator cluster is found
       findRefrigerator();
 
-      System.out.println("Fridge Cluster:" + refrigeratorCluster);
+      // System.out.println("Fridge Cluster:" + refrigeratorCluster);
 
     }
 
@@ -203,32 +205,61 @@ public class IsolatedApplianceExtractor
 
     }
 
+    int n = Constants.MAX_CLUSTERS_NUMBER;
+    Instances newInst = null;
+
+    System.out.println("Instances: " + instances.toSummaryString());
+    System.out.println("Max Clusters: " + n);
+
     // Create the addcluster filter of Weka and the set up the hierarchical
     // clusterer.
     AddCluster addcluster = new AddCluster();
 
-    HierarchicalClusterer clusterer = new HierarchicalClusterer();
+    if (instances.size() > Constants.KMEANS_LIMIT_NUMBER
+        || instances.size() == 0) {
 
-    String[] opt =
-      { "-N", "" + Constants.MAX_CLUSTERS_NUMBER + "", "-P", "-D", "-L",
-       "AVERAGE" };
+      HierarchicalClusterer clusterer = new HierarchicalClusterer();
 
-    clusterer.setDistanceFunction(new EuclideanDistance());
-    clusterer.setNumClusters(Constants.MAX_CLUSTERS_NUMBER);
-    clusterer.setOptions(opt);
-    clusterer.setPrintNewick(true);
-    clusterer.setDebug(true);
+      String[] opt = { "-N", "" + n + "", "-P", "-D", "-L", "AVERAGE" };
 
-    // clusterer.getOptions();
+      clusterer.setDistanceFunction(new EuclideanDistance());
+      clusterer.setNumClusters(n);
+      clusterer.setOptions(opt);
+      clusterer.setPrintNewick(true);
+      clusterer.setDebug(true);
 
-    addcluster.setClusterer(clusterer);
-    addcluster.setInputFormat(instances);
-    addcluster.setIgnoredAttributeIndices("1");
+      // clusterer.getOptions();
 
-    // Cluster data set
-    Instances newInst = Filter.useFilter(instances, addcluster);
+      addcluster.setClusterer(clusterer);
+      addcluster.setInputFormat(instances);
+      addcluster.setIgnoredAttributeIndices("1");
+
+      // Cluster data set
+      newInst = Filter.useFilter(instances, addcluster);
+
+    }
+    else {
+
+      SimpleKMeans kmeans = new SimpleKMeans();
+
+      kmeans.setSeed(10);
+
+      // This is the important parameter to set
+      kmeans.setPreserveInstancesOrder(true);
+      kmeans.setNumClusters(n);
+      kmeans.buildClusterer(instances);
+
+      addcluster.setClusterer(kmeans);
+      addcluster.setInputFormat(instances);
+      addcluster.setIgnoredAttributeIndices("1");
+
+      // Cluster data set
+      newInst = Filter.useFilter(instances, addcluster);
+
+    }
 
     return newInst;
+
   }
 
   /**
@@ -270,11 +301,32 @@ public class IsolatedApplianceExtractor
   {
     // Initializing auxiliary variables
     int maxSize = 0;
+    double distance1 = Double.POSITIVE_INFINITY, distance2 =
+      Double.POSITIVE_INFINITY;
+    // Magic Numbers for now
+    double[] meanRef = { 100, 60 };
 
     for (String cluster: clusters.keySet()) {
       if (maxSize < clusters.get(cluster).size()) {
         maxSize = clusters.get(cluster).size();
         refrigeratorCluster = cluster;
+        distance1 =
+          Utils.percentageEuclideanDistance(meanRef, clusterMeans(cluster));
+        // System.out.println("Mean Ref Distance: " + distance1);
+      }
+      else if (maxSize == clusters.get(cluster).size()) {
+        distance2 =
+          Utils.percentageEuclideanDistance(meanRef, clusterMeans(cluster));
+        // System.out.println("Mean Previous Ref Distance: " + distance1);
+        // System.out.println("New Ref Distance: " + distance2);
+        // System.out.println("Smaller?: " + (distance2 < distance1));
+        if (distance2 < distance1) {
+          maxSize = clusters.get(cluster).size();
+          refrigeratorCluster = cluster;
+          distance1 =
+            Utils.percentageEuclideanDistance(meanRef, clusterMeans(cluster));
+          // System.out.println("Mean Ref Distance: " + distance1);
+        }
       }
     }
 
@@ -297,5 +349,27 @@ public class IsolatedApplianceExtractor
       meanValues[1] = isolated.get(index).getMeanValues()[1];
       refConsumptionMeans.add(meanValues);
     }
+  }
+
+  /**
+   * This function is used for filling an array with the mean values of active
+   * and reactive power of the refrigerator cluster events.
+   */
+  private double[] clusterMeans (String clusterIndex)
+  {
+    // Initializing auxiliary variables
+    ArrayList<Integer> clusterEvents = clusters.get(clusterIndex);
+    double[] meanValues = new double[2];
+
+    for (Integer index: clusterEvents) {
+      meanValues[0] += isolated.get(index).getMeanValues()[0];
+      meanValues[1] += isolated.get(index).getMeanValues()[1];
+    }
+
+    meanValues[0] /= clusterEvents.size();
+    meanValues[1] /= clusterEvents.size();
+
+    return meanValues;
+
   }
 }

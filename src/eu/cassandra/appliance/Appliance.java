@@ -303,8 +303,6 @@ public class Appliance
     ArrayList<String[]> result = new ArrayList<String[]>();
     int offset = 0;
 
-    System.out.println("Matching Points: " + matchingPoints.toString());
-
     for (Integer key: matchingPoints.keySet()) {
 
       offset = events.get(key - 1).getStartMinute();

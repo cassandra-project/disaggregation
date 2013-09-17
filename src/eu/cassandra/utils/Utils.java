@@ -378,8 +378,10 @@ public class Utils
       solutionThreshold = Constants.SOLUTION_THRESHOLD_UNDER_15;
     else if (input[0].length < 20)
       solutionThreshold = Constants.SOLUTION_THRESHOLD_UNDER_20;
+    else if (input[0].length < 25)
+      solutionThreshold = Constants.SOLUTION_THRESHOLD_UNDER_25;
     else
-      solutionThreshold = Constants.SOLUTION_THRESHOLD_OVER_20;
+      solutionThreshold = Constants.SOLUTION_THRESHOLD_OVER_25;
 
     System.out.println("Objects: " + num_objects + " Threshold: "
                        + solutionThreshold);
