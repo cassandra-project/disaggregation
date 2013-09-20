@@ -87,7 +87,8 @@ public class Disaggregate
     // procedure.
     PrintStream realSystemOut = System.out;
     try {
-      OutputStream output = new FileOutputStream("test.txt");
+      OutputStream output =
+        new FileOutputStream(Utils.getFileName(filename) + "test.txt");
       PrintStream printOut = new PrintStream(output);
       System.setOut(printOut);
     }
