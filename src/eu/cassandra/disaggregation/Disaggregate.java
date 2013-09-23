@@ -88,7 +88,7 @@ public class Disaggregate
     PrintStream realSystemOut = System.out;
     try {
       OutputStream output =
-        new FileOutputStream(Utils.getFileName(filename) + "test.txt");
+        new FileOutputStream(Utils.getFileName(filename) + " Analysis.txt");
       PrintStream printOut = new PrintStream(output);
       System.setOut(printOut);
     }
