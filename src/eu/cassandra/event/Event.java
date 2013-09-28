@@ -1625,8 +1625,6 @@ public class Event
     // System.out.println("Before Combinations: Rising " + risingPoints.size()
     // + " Reduction Points: " + reductionPoints.size());
 
-    Map<int[], Double> input = new HashMap<int[], Double>();
-
     // Creating a collection of the points of interest in chronological order
     ArrayList<PointOfInterest> temp =
       new ArrayList<PointOfInterest>(risingPoints);
@@ -1641,73 +1639,10 @@ public class Event
     if (temp.size() > 1 && risingPoints.size() > 0
         && reductionPoints.size() > 0) {
 
-      // input = Utils.findCombinations(temp);
-      // input = Utils.findCombinations2(temp);
-      input = Utils.findCombinations3(temp);
-      System.out.println("Input for event " + id + ": " + input.size());
-
-      // Creating the input for the integer programming solver
-      double[] cost = new double[input.size()];
-      int[][] tempArray = new int[input.size()][temp.size()];
-      int counter = 0;
-      for (int[] in: input.keySet()) {
-        // System.out.println("Array: " + Arrays.toString(index) + " Distance: "
-        // + 1 / input.get(index) + " Similarity: "
-        // + input.get(index));
-        tempArray[counter] = in;
-        cost[counter++] = input.get(in);
-
-      }
-
-      // for (int i = 0; i < input.size(); i++)
-      // System.out.println("Array: " + Arrays.toString(tempArray[i])
-      // + " Cost: " + cost[i]);
-
-      if (input.size() == 0) {
-
-        System.out.println("No Available input");
-
-      }
-      // If there is only one pair, then this is the solution
-      else if (input.size() == 1) {
-
-        // TODO Add threshold???
-        PointOfInterest[] pair =
-          { risingPoints.get(0), reductionPoints.get(0) };
-
-        finalPairs.add(pair);
-
-      }
-      // In case of more solutions the integer solver is called.
-      else {
-
-        // ArrayList<ArrayList<Integer>> solutions = Utils.solve(tempArray,
-        // cost);
-        System.out.println("INTEGER PROGRAMMING");
-
-        // Solving the problem and presenting the solution
-        ArrayList<Integer> solution = Utils.solve2(tempArray, cost);
-        // ArrayList<Integer> solution = Utils.solve3(tempArray, cost);
-        // System.out.println("Solutions:");
-
-        // for (int i = 0; i < solutions.size(); i++) {
-        System.out.println("Solution:");
-
-        // System.out.println("Solution " + (i + 1));
-        for (Integer index: solution) {
-          System.out.println(Arrays.toString(tempArray[index])
-                             + " Similarity: " + input.get(tempArray[index])
-                             + " Distance: "
-                             + (1 / input.get(tempArray[index])));
-
-          // For each part of the solution, the corresponding pairs are created
-          // and added to the final pairs.
-          ArrayList<PointOfInterest[]> newFinalPairs =
-            Utils.createFinalPairs(temp, tempArray[index]);
-          finalPairs.addAll(newFinalPairs);
-        }
-      }
-
+      if (temp.size() < Constants.MAX_POINTS_OF_INTEREST)
+        simpleCombinationMethod(temp);
+      else
+        complexCombinationMethod(temp);
     }
     else {
 
@@ -1722,10 +1657,97 @@ public class Event
 
     // Clearing the variables that will not be used again.
     temp.clear();
-    input.clear();
     risingPoints.clear();
     reductionPoints.clear();
 
+  }
+
+  private void complexCombinationMethod (ArrayList<PointOfInterest> temp)
+  {
+
+  }
+
+  private void simpleCombinationMethod (ArrayList<PointOfInterest> temp)
+  {
+
+    Map<int[], Double> input = new HashMap<int[], Double>();
+
+    input = Utils.findCombinations(temp);
+    System.out.println("Input for event " + id + ": " + input.size());
+
+    // Creating the input for the integer programming solver
+    double[] cost = new double[input.size()];
+    int[][] tempArray = new int[input.size()][temp.size()];
+    int counter = 0;
+    for (int[] in: input.keySet()) {
+      // System.out.println("Array: " + Arrays.toString(index) + " Distance: "
+      // + 1 / input.get(index) + " Similarity: "
+      // + input.get(index));
+      tempArray[counter] = in;
+      cost[counter++] = input.get(in);
+
+    }
+
+    // for (int i = 0; i < input.size(); i++)
+    // System.out.println("Array: " + Arrays.toString(tempArray[i])
+    // + " Cost: " + cost[i]);
+
+    if (input.size() == 0) {
+
+      System.out.println("No Available input");
+
+    }
+    // If there is only one pair, then this is the solution
+    else if (input.size() == 1) {
+
+      double[] rise = new double[2];
+      double[] red = new double[2];
+
+      rise[0] = risingPoints.get(0).getPDiff();
+      rise[1] = risingPoints.get(0).getQDiff();
+
+      red[0] = -reductionPoints.get(0).getPDiff();
+      red[1] = -reductionPoints.get(0).getQDiff();
+
+      double distance = Utils.percentageEuclideanDistance(rise, red);
+      // System.out.println("Distance: " + distance);
+      if (distance < Constants.SECOND_DISTANCE_THRESHOLD) {
+        PointOfInterest[] pair =
+          { risingPoints.get(0), reductionPoints.get(0) };
+
+        finalPairs.add(pair);
+      }
+    }
+    // In case of more solutions the integer solver is called.
+    else {
+
+      // ArrayList<ArrayList<Integer>> solutions = Utils.solve(tempArray,
+      // cost);
+      System.out.println("INTEGER PROGRAMMING");
+
+      // Solving the problem and presenting the solution
+      ArrayList<Integer> solution = Utils.solve2(tempArray, cost);
+      // ArrayList<Integer> solution = Utils.solve3(tempArray, cost);
+      // System.out.println("Solutions:");
+
+      // for (int i = 0; i < solutions.size(); i++) {
+      System.out.println("Solution:");
+
+      // System.out.println("Solution " + (i + 1));
+      for (Integer index: solution) {
+        System.out.println(Arrays.toString(tempArray[index]) + " Similarity: "
+                           + input.get(tempArray[index]) + " Distance: "
+                           + (1 / input.get(tempArray[index])));
+
+        // For each part of the solution, the corresponding pairs are created
+        // and added to the final pairs.
+        ArrayList<PointOfInterest[]> newFinalPairs =
+          Utils.createFinalPairs(temp, tempArray[index]);
+        finalPairs.addAll(newFinalPairs);
+      }
+    }
+
+    input.clear();
   }
 
   /**

@@ -123,17 +123,18 @@ public class Constants
   public static final int RECTANGLE_DISTANCE_THRESHOLD = 10;
 
   // INTEGER PROGRAMMING CONSTANTS
-  public static final int DISTANCE_THRESHOLD = 100;
-  public static final int SECOND_DISTANCE_THRESHOLD = 100;
+  public static final int DISTANCE_THRESHOLD = 60;
+  public static final int SECOND_DISTANCE_THRESHOLD = 50;
   public static final int PAIR_DISTANCE_THRESHOLD = 20;
   public static final double NEAR_ZERO = 1.0E-6;
   public static final int MAX_POINTS_LIMIT = 4;
   public static final int SOLUTION_THRESHOLD_UNDER_10 = 20000000;
-  public static final int SOLUTION_THRESHOLD_UNDER_15 = 200000;
+  public static final int SOLUTION_THRESHOLD_UNDER_15 = 20000000;
   public static final int SOLUTION_THRESHOLD_UNDER_20 = 20000;
   public static final int SOLUTION_THRESHOLD_UNDER_25 = 10000;
   public static final int SOLUTION_THRESHOLD_OVER_25 = 2000;
   public static final int OTHER_SOLUTION_THRESHOLD = 50000;
+  public static final int MAX_POINTS_OF_INTEREST = 20;
 
   // APPLIANCES THRESHOLDS
   public static final int WATERHEATER_POWER_THRESHOLD = 3000;

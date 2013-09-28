@@ -86,9 +86,11 @@ public class Disaggregate
     // Adding a file as a second output that will help keep track of the
     // procedure.
     PrintStream realSystemOut = System.out;
+    OutputStream output = null;
     try {
-      OutputStream output =
-        new FileOutputStream(Utils.getFileName(filename) + " Analysis.txt");
+      output =
+        new FileOutputStream(Utils.getFileName(filename)
+                             + " Event Analysis.txt");
       PrintStream printOut = new PrintStream(output);
       System.setOut(printOut);
     }
@@ -119,6 +121,19 @@ public class Disaggregate
       ai.refrigeratorIdentification(events, iso);
 
     ai.washingMachineIdentification(events);
+
+    output.close();
+
+    try {
+      output =
+        new FileOutputStream(Utils.getFileName(filename)
+                             + " Final Pairs Analysis.txt");
+      PrintStream printOut = new PrintStream(output);
+      System.setOut(printOut);
+    }
+    catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
 
     // For each event an analysis is at hand helping to separate the different
     // consumption models and identify their results
@@ -153,7 +168,7 @@ public class Disaggregate
     }
 
     ai.createDisaggregationFiles(outputAppliance, outputActivity, events);
-
+    output.close();
     System.setOut(realSystemOut);
 
     // The extracted appliances are printed to see the results of the procedure
