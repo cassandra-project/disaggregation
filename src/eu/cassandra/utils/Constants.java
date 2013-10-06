@@ -17,6 +17,7 @@ limitations under the License.
 
 package eu.cassandra.utils;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 
 public class Constants
@@ -51,6 +52,25 @@ public class Constants
                                Integer.parseInt(activity2[1]));
     }
   };
+
+  public static Comparator<PointOfInterest> comp4 =
+    new Comparator<PointOfInterest>() {
+      public int compare (PointOfInterest poi1, PointOfInterest poi2)
+      {
+        return Double.compare(-Math.abs(poi1.getPDiff()),
+                              -Math.abs(poi2.getPDiff()));
+      }
+    };
+
+  public static Comparator<ArrayList<PointOfInterest>> comp5 =
+    new Comparator<ArrayList<PointOfInterest>>() {
+      public int compare (ArrayList<PointOfInterest> poi1,
+                          ArrayList<PointOfInterest> poi2)
+      {
+        return Double.compare(-Math.abs(poi1.get(0).getPDiff()),
+                              -Math.abs(poi2.get(0).getPDiff()));
+      }
+    };
 
   // GENERAL CONSTANTS
   public static final double ERROR_FRINGE = 0.05;
@@ -124,17 +144,18 @@ public class Constants
 
   // INTEGER PROGRAMMING CONSTANTS
   public static final int DISTANCE_THRESHOLD = 60;
-  public static final int SECOND_DISTANCE_THRESHOLD = 50;
-  public static final int PAIR_DISTANCE_THRESHOLD = 20;
+  public static final int SECOND_DISTANCE_THRESHOLD = 60;
   public static final double NEAR_ZERO = 1.0E-6;
   public static final int MAX_POINTS_LIMIT = 4;
+
   public static final int SOLUTION_THRESHOLD_UNDER_10 = 20000000;
   public static final int SOLUTION_THRESHOLD_UNDER_15 = 20000000;
   public static final int SOLUTION_THRESHOLD_UNDER_20 = 20000;
   public static final int SOLUTION_THRESHOLD_UNDER_25 = 10000;
   public static final int SOLUTION_THRESHOLD_OVER_25 = 2000;
   public static final int OTHER_SOLUTION_THRESHOLD = 50000;
-  public static final int MAX_POINTS_OF_INTEREST = 20;
+  public static final int REMOVAL_PERCENTAGE = 20;
+  public static final int MAX_POINTS_OF_INTEREST = 15;
 
   // APPLIANCES THRESHOLDS
   public static final int WATERHEATER_POWER_THRESHOLD = 3000;

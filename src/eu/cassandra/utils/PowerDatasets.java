@@ -78,14 +78,22 @@ public class PowerDatasets
       String[] contents = line.split(",");
 
       if (contents.length == 3) {
-        activeMap.put(counter,
-                      Double.parseDouble(contents[contents.length - 2]));
+        if (Double.parseDouble(contents[contents.length - 2]) > 0)
+          activeMap.put(counter,
+                        Double.parseDouble(contents[contents.length - 2]));
+        else
+          activeMap.put(counter, 0.0);
+
         reactiveMap.put(counter++,
                         Double.parseDouble(contents[contents.length - 1]));
       }
       else if (contents.length == 2) {
-        activeMap.put(counter,
-                      Double.parseDouble(contents[contents.length - 2]));
+        if (Double.parseDouble(contents[contents.length - 2]) > 0)
+          activeMap.put(counter,
+                        Double.parseDouble(contents[contents.length - 2]));
+        else
+          activeMap.put(counter, 0.0);
+
         reactiveMap.put(counter++, 0.0);
       }
       else {

@@ -19,6 +19,7 @@ package eu.cassandra.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,14 @@ import java.util.Map;
 import org.paukov.combinatorics.Factory;
 import org.paukov.combinatorics.Generator;
 import org.paukov.combinatorics.ICombinatoricsVector;
+
+import weka.clusterers.SimpleKMeans;
+import weka.core.Attribute;
+import weka.core.DenseInstance;
+import weka.core.Instance;
+import weka.core.Instances;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.AddCluster;
 
 import com.google.ortools.constraintsolver.DecisionBuilder;
 import com.google.ortools.constraintsolver.IntVar;
@@ -477,7 +486,7 @@ public class Utils
     int[] costNew = new int[cost.length];
 
     for (int i = 0; i < costNew.length; i++)
-      costNew[i] = (int) (100 * cost[i]);
+      costNew[i] = (int) (10000 * cost[i]);
 
     //
     // variables
@@ -618,8 +627,144 @@ public class Utils
     return filename.substring(0, filename.length() - 4);
   }
 
+  public static ArrayList<ArrayList<PointOfInterest>>
+    clusterPoints (ArrayList<PointOfInterest> pois) throws Exception
+  {
+    ArrayList<ArrayList<PointOfInterest>> result =
+      new ArrayList<ArrayList<PointOfInterest>>();
+
+    double numberOfClusters =
+      Math.ceil((double) pois.size()
+                / (double) Constants.MAX_POINTS_OF_INTEREST);
+
+    System.out.println("Clusters: " + pois.size() + " / "
+                       + Constants.MAX_POINTS_OF_INTEREST + " = "
+                       + numberOfClusters);
+
+    for (int i = 0; i < numberOfClusters; i++)
+      result.add(new ArrayList<PointOfInterest>());
+
+    // Initializing auxiliary variables namely the attributes of the data set
+    Attribute id = new Attribute("id");
+    Attribute pDiffRise = new Attribute("pDiff");
+
+    ArrayList<Attribute> attr = new ArrayList<Attribute>();
+    attr.add(id);
+    attr.add(pDiffRise);
+
+    Instances instances = new Instances("Points of Interest", attr, 0);
+
+    // Each event is translated to an instance with the above attributes
+    for (int i = 0; i < pois.size(); i++) {
+
+      Instance inst = new DenseInstance(2);
+      inst.setValue(id, i);
+      inst.setValue(pDiffRise, Math.abs(pois.get(i).getPDiff()));
+
+      instances.add(inst);
+
+    }
+
+    // System.out.println(instances.toString());
+
+    Instances newInst = null;
+
+    System.out.println("Instances: " + instances.toSummaryString());
+
+    // Create the addcluster filter of Weka and the set up the hierarchical
+    // clusterer.
+    AddCluster addcluster = new AddCluster();
+
+    SimpleKMeans kmeans = new SimpleKMeans();
+
+    kmeans.setSeed(10);
+
+    // This is the important parameter to set
+    kmeans.setPreserveInstancesOrder(true);
+    kmeans.setNumClusters((int) numberOfClusters);
+    kmeans.buildClusterer(instances);
+
+    addcluster.setClusterer(kmeans);
+    addcluster.setInputFormat(instances);
+    addcluster.setIgnoredAttributeIndices("1");
+
+    // Cluster data set
+    newInst = Filter.useFilter(instances, addcluster);
+
+    // System.out.println(newInst.toString());
+
+    for (int i = 0; i < newInst.size(); i++) {
+
+      String cluster = newInst.get(i).stringValue(newInst.attribute(2));
+
+      cluster = cluster.substring(cluster.length() - 1, cluster.length());
+
+      System.out.println("Point of Interest: " + i + " Cluster: " + cluster);
+
+      result.get(Integer.parseInt(cluster) - 1).add(pois.get(i));
+    }
+
+    Collections.sort(result, Constants.comp5);
+
+    for (int i = 0; i < result.size(); i++)
+      Collections.sort(result.get(i), Constants.comp);
+
+    return result;
+  }
+
+  public static ArrayList<PointOfInterest>
+    extractRemainingPoints (ArrayList<PointOfInterest> pois,
+                            ArrayList<Integer> solution, int[][] solutionArray)
+  {
+
+    ArrayList<PointOfInterest> result = new ArrayList<PointOfInterest>();
+    int[] tempArray = new int[solutionArray[0].length];
+
+    for (Integer index: solution)
+      for (int i = 0; i < solutionArray[index].length; i++)
+        if (solutionArray[index][i] == 1)
+          tempArray[i] = 1;
+
+    // System.out.println("TempArray:" + Arrays.toString(tempArray));
+
+    for (int i = 0; i < tempArray.length; i++)
+      if (tempArray[i] == 0)
+        result.add(pois.get(i));
+
+    if (result.size() == 0)
+      result = null;
+
+    return result;
+  }
+
+  public static ArrayList<PointOfInterest>
+    removePoints (ArrayList<PointOfInterest> pois)
+  {
+
+    ArrayList<PointOfInterest> result = new ArrayList<PointOfInterest>(pois);
+
+    int number = (int) (result.size() * Constants.REMOVAL_PERCENTAGE / 100);
+
+    System.out.println("Initial Size: " + result.size() + " Removing: "
+                       + number);
+
+    Collections.sort(pois, Constants.comp4);
+
+    System.out.println("Initial POIS: " + pois.toString());
+
+    Collections.sort(result, Constants.comp4);
+
+    for (int i = 0; i < number; i++)
+      result.remove(result.size() - 1);
+
+    System.out.println("Final POIS: " + result.toString());
+
+    return result;
+
+  }
+
   public static Map<int[], Double>
-    findCombinations (ArrayList<PointOfInterest> temp)
+    findCombinations (ArrayList<PointOfInterest> temp, boolean complex)
   {
 
     // Initializing the auxiliary variables
@@ -628,6 +773,13 @@ public class Utils
     int[] pointsArray = null;
     List<Integer> subset = new ArrayList<Integer>();
     double distance = 0;
+
+    int distanceThreshold = 0;
+
+    if (complex)
+      distanceThreshold = Constants.SECOND_DISTANCE_THRESHOLD;
+    else
+      distanceThreshold = Constants.DISTANCE_THRESHOLD;
 
     // For each point
     for (int i = 0; i < temp.size(); i++) {
@@ -649,8 +801,8 @@ public class Utils
         ICombinatoricsVector<Integer> initialSet = Factory.createVector(points);
         // System.out.println("Initial Set for point " + temp.get(i).toString()
         // + ": " + initialSet.toString());
-        // System.out.println("Reduction Points for rising point " + i + ": "
-        // + initialSet.toString());
+        System.out.println("Reduction Points for rising point " + i + ": "
+                           + initialSet.toString());
 
         // Set the max combination of reduction point for each rising point
         int upperThres =
@@ -682,11 +834,11 @@ public class Utils
 
               // If accepted then an array is created with 1 in the index of the
               // points included, 0 otherwise
-              if ((1 / distance) < Constants.DISTANCE_THRESHOLD) {
+              if ((1 / distance) < distanceThreshold) {
 
-                // System.out.println("Subset: " + subSet.toString()
-                // + " Distance: " + 1 / distance + " Z: "
-                // + distance);
+                System.out.println("Subset: " + subSet.toString()
+                                   + " Distance: " + 1 / distance + " Z: "
+                                   + distance);
 
                 pointsArray = new int[temp.size()];
                 pointsArray[i] = 1;
@@ -745,8 +897,8 @@ public class Utils
 
         // System.out.println("Initial Set for point " + temp.get(i).toString()
         // + ": " + initialSet.toString());
-        // System.out.println("Rising Points for reduction point " + i + ": "
-        // + initialSet.toString());
+        System.out.println("Rising Points for reduction point " + i + ": "
+                           + initialSet.toString());
 
         int upperThres =
           Math.min(Constants.MAX_POINTS_LIMIT, initialSet.getSize());
@@ -778,11 +930,11 @@ public class Utils
 
               // If accepted then an array is created with 1 in the index of the
               // points included, 0 otherwise
-              if ((1 / distance) < Constants.DISTANCE_THRESHOLD) {
+              if ((1 / distance) < distanceThreshold) {
 
-                // System.out.println("Subset: " + subSet.toString()
-                // + " Distance: " + 1 / distance + " Z: "
-                // + distance);
+                System.out.println("Subset: " + subSet.toString()
+                                   + " Distance: " + 1 / distance + " Z: "
+                                   + distance);
 
                 pointsArray = new int[temp.size()];
                 pointsArray[i] = 1;

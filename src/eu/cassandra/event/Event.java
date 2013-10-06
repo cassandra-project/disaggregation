@@ -408,6 +408,9 @@ public class Event
       if (i != activePowerConsumptions.length - 1) {
         activePowerConsumptions[i] -= active;
         reactivePowerConsumptions[i] -= reactive;
+
+        if (activePowerConsumptions[i] < 0)
+          activePowerConsumptions[i] = 0;
       }
       else {
         activePowerConsumptions[i] = 0;
@@ -1618,8 +1621,10 @@ public class Event
    * searches for close matching groups of points of interest without requiring
    * taking all of them in the solution, but the solution solving better the
    * distance problem at hand.
+   * 
+   * @throws Exception
    */
-  public void findCombinations ()
+  public void findCombinations () throws Exception
   {
 
     // System.out.println("Before Combinations: Rising " + risingPoints.size()
@@ -1639,10 +1644,25 @@ public class Event
     if (temp.size() > 1 && risingPoints.size() > 0
         && reductionPoints.size() > 0) {
 
-      if (temp.size() < Constants.MAX_POINTS_OF_INTEREST)
-        simpleCombinationMethod(temp);
-      else
-        complexCombinationMethod(temp);
+      ArrayList<PointOfInterest> remaining = null;
+      if (temp.size() < Constants.MAX_POINTS_OF_INTEREST) {
+        remaining = simpleCombinationMethod(temp, false);
+        if (remaining != null) {
+          System.out.println("Remaining Size:" + remaining.size());
+          System.out.println("Remaining Points:" + remaining.toString());
+        }
+        else
+          System.out.println("No Points Remaining.");
+      }
+      else {
+        remaining = complexCombinationMethod(temp);
+        if (remaining != null) {
+          System.out.println("Remaining Size:" + remaining.size());
+          System.out.println("Remaining Points:" + remaining.toString());
+        }
+        else
+          System.out.println("No Points Remaining.");
+      }
     }
     else {
 
@@ -1662,17 +1682,46 @@ public class Event
 
   }
 
-  private void complexCombinationMethod (ArrayList<PointOfInterest> temp)
+  private ArrayList<PointOfInterest>
+    complexCombinationMethod (ArrayList<PointOfInterest> temp) throws Exception
   {
+    ArrayList<ArrayList<PointOfInterest>> tempArray = Utils.clusterPoints(temp);
 
+    ArrayList<PointOfInterest> remaining = null;
+
+    System.out.println(tempArray);
+
+    for (int i = 0; i < tempArray.size(); i++) {
+
+      System.out.println("Cluster " + (i + 1));
+
+      remaining = simpleCombinationMethod(tempArray.get(i), true);
+
+      if (remaining == null)
+        System.out.println("No Points Remaining.");
+      else {
+        System.out.println("Remaining Size:" + remaining.size());
+        System.out.println("Remaining: " + remaining.toString());
+        if (i < tempArray.size() - 1) {
+          tempArray.get(i + 1).addAll(remaining);
+          Collections.sort(tempArray.get(i + 1), Constants.comp);
+        }
+      }
+
+    }
+
+    return remaining;
   }
 
-  private void simpleCombinationMethod (ArrayList<PointOfInterest> temp)
+  private ArrayList<PointOfInterest>
+    simpleCombinationMethod (ArrayList<PointOfInterest> temp, boolean complex)
   {
 
-    Map<int[], Double> input = new HashMap<int[], Double>();
+    ArrayList<PointOfInterest> result = null;
 
-    input = Utils.findCombinations(temp);
+    Map<int[], Double> input = new HashMap<int[], Double>();
+    ArrayList<Integer> solution = new ArrayList<Integer>();
+    input = Utils.findCombinations(temp, complex);
     System.out.println("Input for event " + id + ": " + input.size());
 
     // Creating the input for the integer programming solver
@@ -1695,28 +1744,7 @@ public class Event
     if (input.size() == 0) {
 
       System.out.println("No Available input");
-
-    }
-    // If there is only one pair, then this is the solution
-    else if (input.size() == 1) {
-
-      double[] rise = new double[2];
-      double[] red = new double[2];
-
-      rise[0] = risingPoints.get(0).getPDiff();
-      rise[1] = risingPoints.get(0).getQDiff();
-
-      red[0] = -reductionPoints.get(0).getPDiff();
-      red[1] = -reductionPoints.get(0).getQDiff();
-
-      double distance = Utils.percentageEuclideanDistance(rise, red);
-      // System.out.println("Distance: " + distance);
-      if (distance < Constants.SECOND_DISTANCE_THRESHOLD) {
-        PointOfInterest[] pair =
-          { risingPoints.get(0), reductionPoints.get(0) };
-
-        finalPairs.add(pair);
-      }
+      return temp;
     }
     // In case of more solutions the integer solver is called.
     else {
@@ -1726,7 +1754,7 @@ public class Event
       System.out.println("INTEGER PROGRAMMING");
 
       // Solving the problem and presenting the solution
-      ArrayList<Integer> solution = Utils.solve2(tempArray, cost);
+      solution = Utils.solve2(tempArray, cost);
       // ArrayList<Integer> solution = Utils.solve3(tempArray, cost);
       // System.out.println("Solutions:");
 
@@ -1743,11 +1771,17 @@ public class Event
         // and added to the final pairs.
         ArrayList<PointOfInterest[]> newFinalPairs =
           Utils.createFinalPairs(temp, tempArray[index]);
+
         finalPairs.addAll(newFinalPairs);
       }
     }
 
     input.clear();
+
+    if (solution.size() > 0)
+      result = Utils.extractRemainingPoints(temp, solution, tempArray);
+
+    return result;
   }
 
   /**

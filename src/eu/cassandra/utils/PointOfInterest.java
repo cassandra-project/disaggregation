@@ -81,6 +81,16 @@ public class PointOfInterest
   }
 
   /**
+   * This function is used as a getter for the id of the point of interest.
+   * 
+   * @return minute the point of interest is located.
+   */
+  public int getId ()
+  {
+    return id;
+  }
+
+  /**
    * This function is used as a getter for the minute of the point of interest.
    * 
    * @return minute the point of interest is located.
