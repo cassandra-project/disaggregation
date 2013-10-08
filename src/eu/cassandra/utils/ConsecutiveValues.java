@@ -19,16 +19,70 @@ package eu.cassandra.utils;
 
 import java.util.Arrays;
 
+/**
+ * This is an auxiliary class used during the washing machine identification
+ * procedure. It is used for storing the values of consecutive minutes where the
+ * reactive power is over zero.
+ * 
+ * @author Antonios Chrysopoulos
+ * @version 0.9, Date: 29.07.2013
+ */
+
 public class ConsecutiveValues
 {
 
-  private int start = -1, end = -1;
+  /**
+   * The starting minute of the set of consecutive minutes with positive
+   * reactive values.
+   */
+  private int start = -1;
+
+  /**
+   * The ending minute of the set of consecutive minutes with positive
+   * reactive values
+   */
+  private int end = -1;
+
+  /**
+   * The array that contains the active power values of the consecutive minutes.
+   */
   private double[] pValues;
+
+  /**
+   * The array that contains the reactive power values of the consecutive
+   * minutes.
+   */
   private double[] qValues;
+
+  /**
+   * A metric showing how consistent is the reactive power value in the set.
+   */
   private double difference;
+
+  /**
+   * The number of consecutive minutes.
+   */
   private int numberOfElements = 0;
+
+  /**
+   * The maximum value of the reactive power array.
+   */
   private double maxQ = 0;
 
+  /**
+   * A constructor of a consecutive values set of minutes.
+   * 
+   * @param start
+   *          The starting minute of the consecutive set of minutes
+   * @param end
+   *          The ending minute of the consecutive set of minutes
+   * @param pValues
+   *          The array that contains the active power values of the consecutive
+   *          minutes.
+   * @param qValues
+   *          The array that contains the reactive power values of the
+   *          consecutive minutes.
+   */
   public ConsecutiveValues (int start, int end, double[] pValues,
                             double[] qValues)
   {
@@ -40,31 +94,70 @@ public class ConsecutiveValues
     fillMetrics();
   }
 
+  /**
+   * 
+   * This function is used as a getter for the start minute of the consecutive
+   * minutes set.
+   * 
+   * @return the start minute of the set.
+   */
   public int getStart ()
   {
     return start;
   }
 
+  /**
+   * 
+   * This function is used as a getter for the end minute of the consecutive
+   * minutes set.
+   * 
+   * @return the end minute of the set.
+   */
   public int getEnd ()
   {
     return end;
   }
 
+  /**
+   * 
+   * This function is used as a getter for the difference metric of the
+   * consecutive
+   * minutes set.
+   * 
+   * @return the difference metric of the set.
+   */
   public double getDifference ()
   {
     return difference;
   }
 
+  /**
+   * 
+   * This function is used as a getter for the number of minutes.
+   * 
+   * @return the number of minutes of the set.
+   */
   public int getNumberOfElements ()
   {
     return numberOfElements;
   }
 
+  /**
+   * 
+   * This function is used as a getter for the max reactive value of the
+   * consecutive minutes set.
+   * 
+   * @return the max reactive value of the set.
+   */
   public double getMaxQ ()
   {
     return maxQ;
   }
 
+  /**
+   * This function is used for the calculation of the several metrics that are
+   * used for the washing machine identification procedure.
+   */
   private void fillMetrics ()
   {
 
@@ -85,7 +178,7 @@ public class ConsecutiveValues
 
     qValues = Arrays.copyOf(tempReactive, tempReactive.length);
 
-    maxQ = findMax(qValues);
+    maxQ = Utils.findMax(qValues);
     numberOfElements = tempReactive.length;
 
     for (int i = 0; i < tempReactive.length; i++) {
@@ -97,18 +190,10 @@ public class ConsecutiveValues
 
   }
 
-  private double findMax (double[] matrix)
-  {
-
-    double result = Double.NEGATIVE_INFINITY;
-
-    for (int i = 0; i < matrix.length; i++)
-      if (result < matrix[i])
-        result = matrix[i];
-
-    return result;
-  }
-
+  /**
+   * This function is used to show the attributes and the details of the
+   * consecutive values object.
+   */
   public void status ()
   {
     System.out.println("Start: " + start + " End: " + end);

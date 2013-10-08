@@ -622,17 +622,37 @@ public class Utils
     return result;
   }
 
+  /**
+   * This function is used to extract the file name from a path of a file,
+   * excluding the file extension.
+   * 
+   * @param filename
+   *          The full name and path of the file of interest.
+   * @return The name of the file without the file extension.
+   */
   public static String getFileName (String filename)
   {
     return filename.substring(0, filename.length() - 4);
   }
 
+  /**
+   * This function is used in order to create clusters of points of interest
+   * based on the active power difference they have.
+   * 
+   * @param pois
+   *          The list of points of interest that will be clustered.
+   * @return The newly created clusters with the points that are comprising
+   *         them.
+   * @throws Exception
+   */
   public static ArrayList<ArrayList<PointOfInterest>>
     clusterPoints (ArrayList<PointOfInterest> pois) throws Exception
   {
+    // Initialize the auxiliary variables
     ArrayList<ArrayList<PointOfInterest>> result =
       new ArrayList<ArrayList<PointOfInterest>>();
 
+    // Estimating the number of clusters that will be created
     double numberOfClusters =
       Math.ceil((double) pois.size()
                 / (double) Constants.MAX_POINTS_OF_INTEREST);
@@ -641,6 +661,7 @@ public class Utils
                        + Constants.MAX_POINTS_OF_INTEREST + " = "
                        + numberOfClusters);
 
+    // Create a new empty list of points for each cluster
     for (int i = 0; i < numberOfClusters; i++)
       result.add(new ArrayList<PointOfInterest>());
 
@@ -693,6 +714,8 @@ public class Utils
 
     // System.out.println(newInst.toString());
 
+    // Parse through the dataset to see where each point is placed in the
+    // clusters.
     for (int i = 0; i < newInst.size(); i++) {
 
       String cluster = newInst.get(i).stringValue(newInst.attribute(2));
@@ -704,14 +727,30 @@ public class Utils
       result.get(Integer.parseInt(cluster) - 1).add(pois.get(i));
     }
 
-    Collections.sort(result, Constants.comp5);
-
+    // Sorting the each cluster points by their minutes.
     for (int i = 0; i < result.size(); i++)
       Collections.sort(result.get(i), Constants.comp);
+
+    // Sorting the all clusters by their active power.
+    Collections.sort(result, Constants.comp5);
 
     return result;
   }
 
+  /**
+   * This function is utilized for the extraction of the points that are not
+   * combined with other ones in order to create the final pairs of operation.
+   * 
+   * @param pois
+   *          The list of all the points of interest.
+   * @param solution
+   *          This is the list that contains the solution vectors for the points
+   *          of interest.
+   * @param solutionArray
+   *          This array contains the indices of the points of interest
+   *          participating in each solution.
+   * @return
+   */
   public static ArrayList<PointOfInterest>
     extractRemainingPoints (ArrayList<PointOfInterest> pois,
                             ArrayList<Integer> solution, int[][] solutionArray)
@@ -737,6 +776,15 @@ public class Utils
     return result;
   }
 
+  /**
+   * This function is used to remove the smallest points of interest from a list
+   * in order to make its size viable to estimate the pairs.
+   * 
+   * @param pois
+   *          The list of points of interest.
+   * @return The list of points of interest with a percentage of the points
+   *         removed.
+   */
   public static ArrayList<PointOfInterest>
     removePoints (ArrayList<PointOfInterest> pois)
   {
@@ -763,6 +811,18 @@ public class Utils
 
   }
 
+  /**
+   * This function is responsible for creating the possible combinations of the
+   * rising and reduction points of interest in the event in order to create the
+   * final pairs that can be matched.
+   * 
+   * @param temp
+   *          The list of points of interest in the procedure.
+   * @param complex
+   *          The flag that show that this is a complex procedure due to the
+   *          large number of points of interest involved.
+   * @return A hashmap of the matched points with the distance that they have.
+   */
   public static Map<int[], Double>
     findCombinations (ArrayList<PointOfInterest> temp, boolean complex)
   {
@@ -982,5 +1042,23 @@ public class Utils
       }
     }
     return input;
+  }
+
+  /**
+   * This function is used in order to find the maximum value from an array.
+   * 
+   * @param matrix
+   * @return
+   */
+  public static double findMax (double[] matrix)
+  {
+
+    double result = Double.NEGATIVE_INFINITY;
+
+    for (int i = 0; i < matrix.length; i++)
+      if (result < matrix[i])
+        result = matrix[i];
+
+    return result;
   }
 }

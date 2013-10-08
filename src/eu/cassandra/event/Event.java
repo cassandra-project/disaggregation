@@ -202,7 +202,10 @@ public class Event
     Collections.sort(reductionPoints, Constants.comp);
 
     // Clean the points of interest that are not important to the event.
-    cleanPointsOfInterest();
+    int tempSize = risingPoints.size() + reductionPoints.size();
+
+    if (tempSize > Constants.THRESHOLD_POINT_LIMIT)
+      cleanPointsOfInterest();
     // cleanPointsOfInterest(Constants.MATCHING_THRESHOLD);
 
     status();
@@ -981,7 +984,6 @@ public class Event
       // System.out.println("For alteration " + alter);
 
       // Initialize the auxiliary variables
-      // double sumOldRisingP = 0, sumOldReductionP = 0, devOldP = 0;
       double sumRisingP = 0, sumReductionP = 0, sumRisingQ = 0, sumReductionQ =
         0, devP = 0, devQ = 0;
 
@@ -992,7 +994,7 @@ public class Event
 
       // Removing the smaller rising points of interest
       for (int i = rising.size() - 1; i >= 0; i--) {
-        // sumOldRisingP += rising.get(i).getPDiff();
+
         if (Math.abs(rising.get(i).getPDiff()) < alter) {
           // System.out.println(Math.abs(risingPoints.get(i).getPDiff()) + "<"
           // + alter);
@@ -1002,7 +1004,7 @@ public class Event
 
       // Removing the smaller reduction points of interest
       for (int i = reduction.size() - 1; i >= 0; i--) {
-        // sumOldReductionP += reduction.get(i).getPDiff();
+
         if (Math.abs(reduction.get(i).getPDiff()) < alter) {
           // System.out.println(Math.abs(reductionPoints.get(i).getPDiff()) +
           // "<"
@@ -1034,25 +1036,18 @@ public class Event
 
         // System.out.println(sumRisingP + " " + sumRisingQ);
         // System.out.println(sumReductionP + " " + sumReductionQ);
-        // System.out.println(sumOldRisingP + " " + sumOldReductionP);
 
         // Estimating the deviation for active and reactive power
         devP = Math.abs(100 * (sumRisingP + sumReductionP) / sumRisingP);
         devQ = Math.abs(100 * (sumRisingQ + sumReductionQ) / sumRisingQ);
-        // devOldP =
-        // Math.abs(100
-        // * ((sumOldRisingP - sumOldReductionP) - (sumRisingP - sumReductionP))
-        // / (sumOldRisingP - sumOldReductionP));
 
+        // System.out.println();
         // System.out.println("Alteration: " + alter + " DevP: " + devP
-        // + " DevQ: " + devQ + " DevOldP: " + devOldP);
+        // + " DevQ: " + devQ);
 
         // If they are in an acceptable rate
         if (devP < Constants.DIFFERENCE_LIMIT
             && devQ < Constants.DIFFERENCE_LIMIT) {
-          // && devOldP < Constants.OLD_DIFFERENCE_LIMIT) {
-          // System.out.println("Alteration: " + alter + " DevP: " + devP
-          // + " DevQ: " + devQ + " DevOldP: " + devOldP);
 
           // Making a big collection of points of interest
           rising.addAll(reduction);
@@ -1073,12 +1068,13 @@ public class Event
 
           // System.out.println("SumOld: " + sumOld + " SumNew: " + sumNew
           // + " Distance: " + distance);
-
+          // System.out.println();
           // If it is not over a threshold then this alteration is the new
           // threshold.
           if (distance < Constants.OLD_DIFFERENCE_LIMIT)
             threshold = alter;
-
+          else
+            break;
         }
       }
 
@@ -1682,6 +1678,17 @@ public class Event
 
   }
 
+  /**
+   * This function is used in case of a large number of points of interest in
+   * the event. This procedure creates clusters of points of interest based on
+   * their active power and then solves each cluster as in the simple procedure,
+   * pushing the remaining points to the next cluster in turn.
+   * 
+   * @param temp
+   *          The list of points of interest.
+   * @return The remaining points of interest after finishing the procedure.
+   * @throws Exception
+   */
   private ArrayList<PointOfInterest>
     complexCombinationMethod (ArrayList<PointOfInterest> temp) throws Exception
   {
@@ -1713,6 +1720,19 @@ public class Event
     return remaining;
   }
 
+  /**
+   * This function is used in case of a small number of points of interest in
+   * the event. This procedure uses integer programming in order to find the
+   * best candidates of the matching points.
+   * 
+   * @param temp
+   *          The list of points of interest.
+   * @param complex
+   *          The flag that show that this is a complex procedure due to the
+   *          large number of points of interest involved.
+   * @return The remaining points of interest after finishing the procedure.
+   * @throws Exception
+   */
   private ArrayList<PointOfInterest>
     simpleCombinationMethod (ArrayList<PointOfInterest> temp, boolean complex)
   {

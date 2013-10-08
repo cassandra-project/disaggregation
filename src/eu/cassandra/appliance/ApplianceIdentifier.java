@@ -391,7 +391,7 @@ public class ApplianceIdentifier
           if (maxIndex != -1) {
             boolean check =
               (Utils.checkLimit(cons.get(maxIndex).getDifference(),
-                                Constants.WASHING_MACHINE_DEVIATION_LIMIT) && cons
+                                Constants.WASHING_MACHINE_DIFFERENCE_LIMIT) && cons
                       .get(maxIndex).getNumberOfElements() > Constants.WASHING_MACHINE_NUMBER_OF_MINUTES_LIMIT);
             // System.out.println("Objectives Met: " + check);
 

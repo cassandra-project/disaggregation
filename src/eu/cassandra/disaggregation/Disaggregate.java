@@ -135,8 +135,8 @@ public class Disaggregate
       e.printStackTrace();
     }
 
-    // For each event an analysis is at hand helping to separate the different
-    // consumption models and identify their results
+    // For each event an analysis is at hand helping to separate the
+    // different consumption models and identify their results
     for (Event event: events) {
 
       System.out.println();
@@ -171,8 +171,8 @@ public class Disaggregate
     output.close();
     System.setOut(realSystemOut);
 
-    // The extracted appliances are printed to see the results of the procedure
-    // for (Appliance appliance: ai.getApplianceList())
+    // The extracted appliances are printed to see the results of the
+    // procedure for (Appliance appliance: ai.getApplianceList())
     // appliance.status();
 
   }
@@ -180,8 +180,8 @@ public class Disaggregate
   public static void main (String[] args) throws Exception
   {
     // String input = "Demo/Household1.csv";
-    String input = "Demo/Milioudis.csv";
-    // String input = "Demo/measurements.csv";
+    // String input = "Demo/Milioudis.csv";
+    String input = "Demo/measurements.csv";
     // String input = "Demo/Benchmark.csv";
     // String input = "Demo/Household2.csv";
     // String input = "Demo/BenchmarkingTest1.csv";
