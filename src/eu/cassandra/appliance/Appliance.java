@@ -69,14 +69,14 @@ public class Appliance
    * This variable is a map of the event id number and a list of the detected
    * matching pairs of points of interest.
    */
-  private Map<Integer, ArrayList<PointOfInterest[]>> matchingPoints =
+  private final Map<Integer, ArrayList<PointOfInterest[]>> matchingPoints =
     new TreeMap<Integer, ArrayList<PointOfInterest[]>>();
 
   /**
    * This variable represents the summary of the values of the active and
    * reactive power from the matching number of matching pairs.
    */
-  private double[] meanValuesSum = new double[2];
+  private final double[] meanValuesSum = new double[2];
 
   /**
    * This variable represents the number of matching points detected as part of
@@ -104,6 +104,23 @@ public class Appliance
     risingPoints.clear();
     reductionPoints.clear();
     matchingPoints.clear();
+  }
+
+  /**
+   * The constructor of an Appliance Model coming from a file.
+   * 
+   * @param name
+   *          The name of the Appliance Model
+   * @param activity
+   *          The name of the activity the appliance participates in.
+   */
+  public Appliance (String name, String activity, double p, double q)
+  {
+    this.name = name;
+    this.activity = activity;
+    meanValuesSum[0] = p * Constants.USER_HEADSTART;
+    meanValuesSum[1] = q * Constants.USER_HEADSTART;
+    numberOfMatchingPoints = Constants.USER_HEADSTART;
   }
 
   /**
@@ -309,12 +326,12 @@ public class Appliance
 
       for (PointOfInterest[] pois: matchingPoints.get(key)) {
         String[] tempString =
-          { Integer.toString(offset + pois[0].getMinute()),
+          { name, activity, Integer.toString(offset + pois[0].getMinute()),
            Integer.toString(offset + pois[1].getMinute()),
            Double.toString(pois[0].getPDiff()),
            Double.toString(pois[0].getQDiff()),
            Double.toString(pois[1].getPDiff()),
-           Double.toString(pois[1].getQDiff()), activity, name };
+           Double.toString(pois[1].getQDiff()) };
         result.add(tempString);
       }
     }
@@ -332,13 +349,12 @@ public class Appliance
   public String[] applianceToString ()
   {
 
-    String[] result = new String[5];
-
-    result[0] = Double.toString(getMeanActive());
-    result[1] = Double.toString(getMeanReactive());
-    result[2] = Integer.toString(numberOfMatchingPoints / 2);
-    result[3] = activity;
-    result[4] = name;
+    String[] result = new String[4];
+    result[0] = name;
+    result[1] = activity;
+    // result[2] = Integer.toString(numberOfMatchingPoints / 2);
+    result[2] = Double.toString(getMeanActive());
+    result[3] = Double.toString(getMeanReactive());
 
     return result;
   }

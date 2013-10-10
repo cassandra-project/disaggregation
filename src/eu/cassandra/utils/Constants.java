@@ -28,6 +28,7 @@ public class Constants
    */
   public static Comparator<PointOfInterest> comp =
     new Comparator<PointOfInterest>() {
+      @Override
       public int compare (PointOfInterest poi1, PointOfInterest poi2)
       {
         return Integer.compare(poi1.getMinute(), poi2.getMinute());
@@ -40,6 +41,7 @@ public class Constants
    */
   public static Comparator<PointOfInterest[]> comp2 =
     new Comparator<PointOfInterest[]>() {
+      @Override
       public int compare (PointOfInterest[] poi1, PointOfInterest[] poi2)
       {
         if (poi1[0].getMinute() != poi2[0].getMinute())
@@ -54,14 +56,15 @@ public class Constants
    * minutes of interest, which of the two starts and ends first.
    */
   public static Comparator<String[]> comp3 = new Comparator<String[]>() {
+    @Override
     public int compare (String[] activity1, String[] activity2)
     {
-      if (Integer.parseInt(activity1[0]) != Integer.parseInt(activity2[0]))
-        return Integer.compare(Integer.parseInt(activity1[0]),
-                               Integer.parseInt(activity2[0]));
+      if (Integer.parseInt(activity1[2]) != Integer.parseInt(activity2[2]))
+        return Integer.compare(Integer.parseInt(activity1[2]),
+                               Integer.parseInt(activity2[2]));
       else
-        return Integer.compare(Integer.parseInt(activity1[1]),
-                               Integer.parseInt(activity2[1]));
+        return Integer.compare(Integer.parseInt(activity1[3]),
+                               Integer.parseInt(activity2[3]));
     }
   };
 
@@ -71,6 +74,7 @@ public class Constants
    */
   public static Comparator<PointOfInterest> comp4 =
     new Comparator<PointOfInterest>() {
+      @Override
       public int compare (PointOfInterest poi1, PointOfInterest poi2)
       {
         return Double.compare(-Math.abs(poi1.getPDiff()),
@@ -85,6 +89,7 @@ public class Constants
    */
   public static Comparator<ArrayList<PointOfInterest>> comp5 =
     new Comparator<ArrayList<PointOfInterest>>() {
+      @Override
       public int compare (ArrayList<PointOfInterest> poi1,
                           ArrayList<PointOfInterest> poi2)
       {
@@ -116,6 +121,13 @@ public class Constants
    * zero.
    */
   public static final double NEAR_ZERO = 1.0E-6;
+
+  /**
+   * This constant is used in order to give more weight in the appliances the
+   * user has put in as a base for the disaggregation procedure.
+   */
+  public static final int USER_HEADSTART = 100;
+
   // ================= ID CONSTANTS =================
 
   /**

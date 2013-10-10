@@ -74,6 +74,24 @@ public class ApplianceIdentifier
   }
 
   /**
+   * This constructor creates the appliance list added by the user as a base for
+   * the next steps of the procedure.
+   * 
+   * @param applianceFilename
+   *          The filename of the file containing the attributes of the
+   *          installed appliances.
+   * @throws FileNotFoundException
+   */
+  public ApplianceIdentifier (String applianceFilename)
+    throws FileNotFoundException
+  {
+    applianceList.clear();
+    activityList.clear();
+
+    applianceList = Utils.appliancesFromFile(applianceFilename);
+  }
+
+  /**
    * This function is used as a getter for the list of the detected appliances.
    * 
    * @return a list with the detected appliances.

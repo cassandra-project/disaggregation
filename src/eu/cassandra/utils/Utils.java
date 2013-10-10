@@ -17,12 +17,15 @@ limitations under the License.
 
 package eu.cassandra.utils;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 import org.paukov.combinatorics.Factory;
 import org.paukov.combinatorics.Generator;
@@ -40,6 +43,8 @@ import com.google.ortools.constraintsolver.DecisionBuilder;
 import com.google.ortools.constraintsolver.IntVar;
 import com.google.ortools.constraintsolver.OptimizeVar;
 import com.google.ortools.constraintsolver.Solver;
+
+import eu.cassandra.appliance.Appliance;
 
 /**
  * This class contains static functions that are used for general purposes
@@ -1060,5 +1065,50 @@ public class Utils
         result = matrix[i];
 
     return result;
+  }
+
+  /**
+   * This function is used when the user has already tracked the electrical
+   * appliances installed in the installation. He can used them as a base case
+   * and extend it with any additional ones that may be found during the later
+   * stages of analysis of the consumption.
+   * 
+   * @param filename
+   *          The filename of the file containing the appliances.
+   * @return
+   *         A list of appliances
+   * @throws FileNotFoundException
+   */
+  public static ArrayList<Appliance> appliancesFromFile (String filename)
+    throws FileNotFoundException
+  {
+    // Read appliance file and start appliance parsing
+    File file = new File(filename);
+    Scanner input = new Scanner(file);
+
+    ArrayList<Appliance> appliances = new ArrayList<Appliance>();
+
+    String nextLine;
+    String[] line;
+
+    while (input.hasNext()) {
+      nextLine = input.nextLine();
+      line = nextLine.split(",");
+      String name = line[0];
+      String activity = line[1];
+      double p = Double.parseDouble(line[3]);
+      double q = Double.parseDouble(line[4]);
+
+      // For each appliance found in the file, an temporary Appliance
+      // Entity is created.
+      appliances.add(new Appliance(name, activity, p, q));
+
+    }
+
+    System.out.println("Appliances:" + appliances.size());
+
+    input.close();
+
+    return appliances;
   }
 }

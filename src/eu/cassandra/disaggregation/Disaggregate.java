@@ -17,6 +17,7 @@ limitations under the License.
 
 package eu.cassandra.disaggregation;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -60,12 +61,13 @@ public class Disaggregate
    *          The filename of the input
    * @throws Exception
    */
-  public Disaggregate (String input) throws Exception
+  public Disaggregate (String input, String applianceFilename) throws Exception
   {
 
     String inputPrefix = Utils.getFileName(input);
 
-    initDisaggregation(input, inputPrefix + "ApplianceList.csv",
+    initDisaggregation(input, applianceFilename, inputPrefix
+                                                 + "ApplianceList.csv",
                        inputPrefix + "ActivityList.csv");
   }
 
@@ -80,8 +82,10 @@ public class Disaggregate
    *          The file name of the output file containing the activities.
    * @throws Exception
    */
-  public void initDisaggregation (String filename, String outputAppliance,
-                                  String outputActivity) throws Exception
+  public void
+    initDisaggregation (String filename, String applianceFilename,
+                        String outputAppliance, String outputActivity)
+      throws Exception
   {
     // Adding a file as a second output that will help keep track of the
     // procedure.
@@ -98,6 +102,8 @@ public class Disaggregate
       e.printStackTrace();
     }
 
+    File appliancesFile = new File(applianceFilename);
+
     // MultiOutputStream multiOut = new MultiOutputStream(System.out, fout);
     // PrintStream stdout = new PrintStream(multiOut);
     // System.setOut(stdout);
@@ -107,7 +113,11 @@ public class Disaggregate
 
     // Initialize the auxiliary variables
     EventDetector ed = new EventDetector();
-    ApplianceIdentifier ai = new ApplianceIdentifier();
+    ApplianceIdentifier ai = null;
+    if (appliancesFile.exists())
+      ai = new ApplianceIdentifier(applianceFilename);
+    else
+      ai = new ApplianceIdentifier();
 
     // Run the event detector in order to find the possible events in the
     // data
@@ -180,12 +190,14 @@ public class Disaggregate
   public static void main (String[] args) throws Exception
   {
     // String input = "Demo/Household1.csv";
-    // String input = "Demo/Milioudis.csv";
-    String input = "Demo/measurements.csv";
+    String input = "Demo/Milioudis.csv";
+    // String input = "Demo/measurements.csv";
     // String input = "Demo/Benchmark.csv";
     // String input = "Demo/Household2.csv";
     // String input = "Demo/BenchmarkingTest1.csv";
 
-    Disaggregate dis = new Disaggregate(input);
+    String applianceFile = "";
+
+    Disaggregate dis = new Disaggregate(input, applianceFile);
   }
 }
