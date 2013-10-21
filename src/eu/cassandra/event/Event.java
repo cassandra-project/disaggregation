@@ -42,7 +42,7 @@ public class Event
   /**
    * This variable is a unique id number in order to separate the events.
    */
-  private int id;
+  private final int id;
 
   /**
    * This variable is the start minute of the event in the summary of all
@@ -96,35 +96,35 @@ public class Event
    * This variable is an list of the detected rising points (points that the
    * active power is increasing).
    */
-  private ArrayList<PointOfInterest> risingPoints =
+  private final ArrayList<PointOfInterest> risingPoints =
     new ArrayList<PointOfInterest>();
 
   /**
    * This variable is an list of the detected reduction points (points that the
    * active power is decreasing).
    */
-  private ArrayList<PointOfInterest> reductionPoints =
+  private final ArrayList<PointOfInterest> reductionPoints =
     new ArrayList<PointOfInterest>();
 
   /**
    * This variable is an list of pairs of points of interest that mark an
    * complex consumption event of an appliance.
    */
-  private ArrayList<PointOfInterest[]> clusters =
+  private final ArrayList<PointOfInterest[]> clusters =
     new ArrayList<PointOfInterest[]>();
 
   /**
    * This variable is an list of pairs of points of interest that mark an
    * switching event of an appliance.
    */
-  private ArrayList<PointOfInterest[]> switchingPoints =
+  private final ArrayList<PointOfInterest[]> switchingPoints =
     new ArrayList<PointOfInterest[]>();
 
   /**
    * This variable is an list of pairs of points of interest that mark an
    * definite matching event of an appliance.
    */
-  private ArrayList<PointOfInterest[]> matchingPoints =
+  private final ArrayList<PointOfInterest[]> matchingPoints =
     new ArrayList<PointOfInterest[]>();
 
   /**
@@ -132,7 +132,7 @@ public class Event
    * a chairing consumption event of an appliance (rising - reduction -
    * reduction).
    */
-  private ArrayList<PointOfInterest[]> chairs =
+  private final ArrayList<PointOfInterest[]> chairs =
     new ArrayList<PointOfInterest[]>();
 
   /**
@@ -140,7 +140,7 @@ public class Event
    * an inverse chairing consumption event of an appliance (rising - rising -
    * reduction).
    */
-  private ArrayList<PointOfInterest[]> inversedChairs =
+  private final ArrayList<PointOfInterest[]> inversedChairs =
     new ArrayList<PointOfInterest[]>();
 
   /**
@@ -148,7 +148,7 @@ public class Event
    * a triangle consumption event of an appliance (rising - reduction in a
    * single minute).
    */
-  private ArrayList<PointOfInterest[]> triangles =
+  private final ArrayList<PointOfInterest[]> triangles =
     new ArrayList<PointOfInterest[]>();
 
   /**
@@ -156,7 +156,7 @@ public class Event
    * a triangle consumption event of an appliance (rising - reduction for a time
    * interval larger than minute).
    */
-  private ArrayList<PointOfInterest[]> rectangles =
+  private final ArrayList<PointOfInterest[]> rectangles =
     new ArrayList<PointOfInterest[]>();
 
   /**
@@ -164,7 +164,7 @@ public class Event
    * the final pairs of appliance switching on / off that are included in this
    * event appliance.
    */
-  private ArrayList<PointOfInterest[]> finalPairs =
+  private final ArrayList<PointOfInterest[]> finalPairs =
     new ArrayList<PointOfInterest[]>();
 
   /**
@@ -1331,10 +1331,8 @@ public class Event
 
               // Estimate the concentration of points of interest
               concentration =
-                100
-                        * (double) (j - i + 1)
-                        / (double) (temp.get(j).getMinute() - temp.get(i)
-                                .getMinute());
+                100 * (double) (j - i + 1)
+                        / (temp.get(j).getMinute() - temp.get(i).getMinute());
 
               // System.out.println("Start Index: "
               // + i
@@ -1701,6 +1699,12 @@ public class Event
     for (int i = 0; i < tempArray.size(); i++) {
 
       System.out.println("Cluster " + (i + 1));
+
+      while (tempArray.get(i).size() > Constants.REMOVAL_MAX_POINTS) {
+        System.out.println("Size Before: " + tempArray.get(i).size());
+        tempArray.set(i, Utils.removePoints(tempArray.get(i)));
+        System.out.println("Size After: " + tempArray.get(i).size());
+      }
 
       remaining = simpleCombinationMethod(tempArray.get(i), true);
 

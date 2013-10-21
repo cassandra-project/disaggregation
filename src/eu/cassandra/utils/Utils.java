@@ -392,10 +392,8 @@ public class Utils
       solutionThreshold = Constants.SOLUTION_THRESHOLD_UNDER_15;
     else if (input[0].length < 20)
       solutionThreshold = Constants.SOLUTION_THRESHOLD_UNDER_20;
-    else if (input[0].length < 25)
-      solutionThreshold = Constants.SOLUTION_THRESHOLD_UNDER_25;
     else
-      solutionThreshold = Constants.SOLUTION_THRESHOLD_OVER_25;
+      solutionThreshold = Constants.SOLUTION_THRESHOLD_UNDER_25;
 
     System.out.println("Objects: " + num_objects + " Threshold: "
                        + solutionThreshold);
@@ -658,9 +656,9 @@ public class Utils
       new ArrayList<ArrayList<PointOfInterest>>();
 
     // Estimating the number of clusters that will be created
-    double numberOfClusters =
-      Math.ceil((double) pois.size()
-                / (double) Constants.MAX_POINTS_OF_INTEREST);
+    int numberOfClusters =
+      (int) (Math.ceil((double) pois.size()
+                       / (double) Constants.MAX_POINTS_OF_INTEREST));
 
     System.out.println("Clusters: " + pois.size() + " / "
                        + Constants.MAX_POINTS_OF_INTEREST + " = "
@@ -703,11 +701,11 @@ public class Utils
 
     SimpleKMeans kmeans = new SimpleKMeans();
 
-    kmeans.setSeed(10);
+    kmeans.setSeed(numberOfClusters);
 
     // This is the important parameter to set
     kmeans.setPreserveInstancesOrder(true);
-    kmeans.setNumClusters((int) numberOfClusters);
+    kmeans.setNumClusters(numberOfClusters);
     kmeans.buildClusterer(instances);
 
     addcluster.setClusterer(kmeans);
@@ -725,7 +723,7 @@ public class Utils
 
       String cluster = newInst.get(i).stringValue(newInst.attribute(2));
 
-      cluster = cluster.substring(cluster.length() - 1, cluster.length());
+      cluster = cluster.replace("cluster", "");
 
       System.out.println("Point of Interest: " + i + " Cluster: " + cluster);
 
@@ -796,7 +794,7 @@ public class Utils
 
     ArrayList<PointOfInterest> result = new ArrayList<PointOfInterest>(pois);
 
-    int number = (int) (result.size() * Constants.REMOVAL_PERCENTAGE / 100);
+    int number = result.size() * Constants.REMOVAL_PERCENTAGE / 100;
 
     System.out.println("Initial Size: " + result.size() + " Removing: "
                        + number);

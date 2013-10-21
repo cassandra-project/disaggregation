@@ -409,12 +409,6 @@ public class Constants
 
   /**
    * This constant is setting the threshold for the solution in the integer
-   * programming in case the points under consideration are over 25 in number.
-   */
-  public static final int SOLUTION_THRESHOLD_OVER_25 = 2000;
-
-  /**
-   * This constant is setting the threshold for the solution in the integer
    * programming in case we are using the perfect matching of all points and not
    * the subset.
    */
@@ -425,6 +419,12 @@ public class Constants
    * removed in order to make the dataset smaller.
    */
   public static final int REMOVAL_PERCENTAGE = 20;
+
+  /**
+   * This constant is used to set the number of points that are acceptable after
+   * removal in order to make the dataset smaller.
+   */
+  public static final int REMOVAL_MAX_POINTS = 20;
 
   /**
    * This constant is setting the threshold of the points of interest that
