@@ -399,13 +399,13 @@ public class Constants
    * This constant is setting the threshold for the solution in the integer
    * programming in case the points under consideration are under 20 in number.
    */
-  public static final int SOLUTION_THRESHOLD_UNDER_20 = 20000;
+  public static final int SOLUTION_THRESHOLD_UNDER_20 = 2000;
 
   /**
    * This constant is setting the threshold for the solution in the integer
    * programming in case the points under consideration are under 25 in number.
    */
-  public static final int SOLUTION_THRESHOLD_UNDER_25 = 10000;
+  public static final int SOLUTION_THRESHOLD_UNDER_25 = 2000;
 
   /**
    * This constant is setting the threshold for the solution in the integer

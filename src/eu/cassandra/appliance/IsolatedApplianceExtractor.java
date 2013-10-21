@@ -50,12 +50,12 @@ public class IsolatedApplianceExtractor
    * This is a list containing the events that are comprised of an isolated
    * appliance.
    */
-  private ArrayList<Event> isolated = new ArrayList<Event>();
+  private final ArrayList<Event> isolated = new ArrayList<Event>();
 
   /**
    * This is a map of the events contained in each cluster estimated later.
    */
-  private Map<String, ArrayList<Integer>> clusters =
+  private final Map<String, ArrayList<Integer>> clusters =
     new TreeMap<String, ArrayList<Integer>>();
 
   /**
@@ -67,7 +67,8 @@ public class IsolatedApplianceExtractor
    * This is a list containing pairs of points of interest that correspond to
    * the refrigerator.
    */
-  private ArrayList<Double[]> refConsumptionMeans = new ArrayList<Double[]>();
+  private final ArrayList<Double[]> refConsumptionMeans =
+    new ArrayList<Double[]>();
 
   /**
    * This is the constructor of the isolated appliance extractor class. It
@@ -371,5 +372,13 @@ public class IsolatedApplianceExtractor
 
     return meanValues;
 
+  }
+
+  public void clear ()
+  {
+    isolated.clear();
+    clusters.clear();
+    refrigeratorCluster = "";
+    refConsumptionMeans.clear();
   }
 }

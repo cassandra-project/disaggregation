@@ -69,8 +69,7 @@ public class ApplianceIdentifier
    */
   public ApplianceIdentifier ()
   {
-    applianceList.clear();
-    activityList.clear();
+    clear();
   }
 
   /**
@@ -740,5 +739,12 @@ public class ApplianceIdentifier
       }
     }
 
+  }
+
+  public void clear ()
+  {
+    applianceList.clear();
+    activityList.clear();
+    secondPass.clear();
   }
 }

@@ -54,6 +54,23 @@ public class Disaggregate
   static ArrayList<Event> events = new ArrayList<Event>();
 
   /**
+   * This variable is implementing the event detector of the power dataset.
+   */
+  static EventDetector ed = null;
+
+  /**
+   * This variable is implementing the event detector of the power dataset.
+   */
+  static ApplianceIdentifier ai = null;
+
+  /**
+   * The Isolated Appliance Extractor helps the procedure of finding
+   * the refrigerator and washing machine amongst others.
+   * 
+   */
+  IsolatedApplianceExtractor iso = null;
+
+  /**
    * This is the constructor function of the Disaggregation class.
    * 
    * @param input
@@ -181,15 +198,24 @@ public class Disaggregate
     // procedure for (Appliance appliance: ai.getApplianceList())
     // appliance.status();
 
+    clearAll();
+
+  }
+
+  private void clearAll ()
+  {
+    events.clear();
+    ai.clear();
+    iso.clear();
   }
 
   public static void main (String[] args) throws Exception
   {
     // String input = "Demo/Household1.csv";
-    String input = "Demo/Milioudis.csv";
+    // String input = "Demo/Milioudis.csv";
     // String input = "Demo/measurements.csv";
     // String input = "Demo/Benchmark.csv";
-    // String input = "Demo/Household2.csv";
+    String input = "Demo/Household39.csv";
     // String input = "Demo/BenchmarkingTest1.csv";
 
     // String applianceFile = "";
