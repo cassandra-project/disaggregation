@@ -84,9 +84,7 @@ public class ApplianceIdentifier
   public ApplianceIdentifier (String applianceFilename)
     throws FileNotFoundException
   {
-    applianceList.clear();
-    activityList.clear();
-
+    clear();
     applianceList = Utils.appliancesFromFile(applianceFilename);
   }
 

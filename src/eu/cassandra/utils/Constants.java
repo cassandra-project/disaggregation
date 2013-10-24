@@ -483,4 +483,27 @@ public class Constants
    * microwave oven.
    */
   public static final int MICROWAVE_DURATION = 5;
+
+  public static final void clear ()
+  {
+
+    EVENTS_ID = 1;
+
+    POI_ID = 1;
+
+    WATERHEATER_ID = 1;
+
+    LIGHTING_ID = 1;
+
+    ENTERTAINMENT_ID = 1;
+
+    COOKING_ID = 1;
+
+    MICROWAVE_OVEN_ID = 1;
+
+    EXTRACTOR_ID = 1;
+
+    VACUUM_CLEANER_ID = 1;
+
+  }
 }

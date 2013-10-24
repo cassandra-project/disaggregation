@@ -28,6 +28,7 @@ import eu.cassandra.appliance.ApplianceIdentifier;
 import eu.cassandra.appliance.IsolatedApplianceExtractor;
 import eu.cassandra.event.Event;
 import eu.cassandra.event.EventDetector;
+import eu.cassandra.utils.Constants;
 import eu.cassandra.utils.PointOfInterest;
 import eu.cassandra.utils.PowerDatasets;
 import eu.cassandra.utils.Utils;
@@ -100,8 +101,14 @@ public class Disaggregate
   public void initDisaggregation (String filename, String outputAppliance,
                                   String outputActivity) throws Exception
   {
-    // Adding a file as a second output that will help keep track of the
-    // procedure.
+
+    // MultiOutputStream multiOut = new MultiOutputStream(System.out, fout);
+    // PrintStream stdout = new PrintStream(multiOut);
+    // System.setOut(stdout);
+
+    // Creating the data sets under investigation.
+    PowerDatasets data = new PowerDatasets(filename);
+
     PrintStream realSystemOut = System.out;
     OutputStream output = null;
     try {
@@ -115,18 +122,9 @@ public class Disaggregate
       e.printStackTrace();
     }
 
-    // File appliancesFile = new File(applianceFilename);
-
-    // MultiOutputStream multiOut = new MultiOutputStream(System.out, fout);
-    // PrintStream stdout = new PrintStream(multiOut);
-    // System.setOut(stdout);
-
-    // Creating the data sets under investigation.
-    PowerDatasets data = new PowerDatasets(filename);
-
     // Initialize the auxiliary variables
     EventDetector ed = new EventDetector();
-    ApplianceIdentifier ai = null;
+
     // if (appliancesFile.exists())
     // ai = new ApplianceIdentifier(applianceFilename);
     // else
@@ -138,7 +136,7 @@ public class Disaggregate
 
     // The Isolated Appliance Extractor helps the procedure of finding the
     // refrigerator and washing machine amongst others.
-    IsolatedApplianceExtractor iso = new IsolatedApplianceExtractor(events);
+    iso = new IsolatedApplianceExtractor(events);
 
     if (iso.getIsolatedEvents().size() != 0)
       ai.refrigeratorIdentification(events, iso);
@@ -207,15 +205,16 @@ public class Disaggregate
     events.clear();
     ai.clear();
     iso.clear();
+    Constants.clear();
   }
 
   public static void main (String[] args) throws Exception
   {
     // String input = "Demo/Household1.csv";
-    // String input = "Demo/Milioudis.csv";
+    String input = "Demo/Milioudis.csv";
     // String input = "Demo/measurements.csv";
     // String input = "Demo/Benchmark.csv";
-    String input = "Demo/Household39.csv";
+    // String input = "Demo/rs1192New_CC.csv";
     // String input = "Demo/BenchmarkingTest1.csv";
 
     // String applianceFile = "";
