@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.paukov.combinatorics.Factory;
 import org.paukov.combinatorics.Generator;
@@ -146,7 +148,7 @@ public class Utils
     double lowerLimit = (1 - Constants.ERROR_FRIDGE) * limit;
     double upperLimit = (1 + Constants.ERROR_FRIDGE) * limit;
 
-    return (trueValue < upperLimit || trueValue > lowerLimit);
+    return (trueValue < upperLimit && trueValue > lowerLimit);
   }
 
   /**
@@ -862,8 +864,8 @@ public class Utils
 
         // An initial vector of all the reduction points
         ICombinatoricsVector<Integer> initialSet = Factory.createVector(points);
-        // System.out.println("Initial Set for point " + temp.get(i).toString()
-        // + ": " + initialSet.toString());
+        System.out.println("Initial Set for point " + temp.get(i).toString()
+                           + ": " + initialSet.toString());
         System.out.println("Reduction Points for rising point " + i + ": "
                            + initialSet.toString());
 
@@ -958,8 +960,8 @@ public class Utils
 
         ICombinatoricsVector<Integer> initialSet = Factory.createVector(points);
 
-        // System.out.println("Initial Set for point " + temp.get(i).toString()
-        // + ": " + initialSet.toString());
+        System.out.println("Initial Set for point " + temp.get(i).toString()
+                           + ": " + initialSet.toString());
         System.out.println("Rising Points for reduction point " + i + ": "
                            + initialSet.toString());
 
@@ -1108,5 +1110,90 @@ public class Utils
     input.close();
 
     return appliances;
+  }
+
+  /**
+   * This is an auxiliary function used in case of the refrigerator in order to
+   * estimate some metrics useful for the successful detection of its end-use in
+   * more complex events.
+   */
+  public static double[]
+    calculateMetrics (Map<Integer, ArrayList<PointOfInterest>> risingPoints,
+                      Map<Integer, ArrayList<PointOfInterest>> reductionPoints)
+  {
+    double[] result = new double[3];
+    // Initializing auxiliary variables.
+    int counter = 0;
+
+    // Create a collection of the events in the rising and reduction
+    // maps' keysets.
+    Set<Integer> keys = new TreeSet<Integer>();
+    keys.addAll(risingPoints.keySet());
+    keys.addAll(reductionPoints.keySet());
+
+    // For each event present, a search for a clean one to one identification of
+    // rising and reduction points is at hand.
+    for (Integer key: keys) {
+
+      if (risingPoints.containsKey(key) && reductionPoints.containsKey(key)) {
+
+        result[0] +=
+          risingPoints.get(key).get(0).getPDiff()
+                  - reductionPoints.get(key).get(0).getPDiff();
+        result[1] +=
+          risingPoints.get(key).get(0).getQDiff()
+                  - reductionPoints.get(key).get(0).getQDiff();
+        result[2] +=
+          reductionPoints.get(key).get(0).getMinute()
+                  - risingPoints.get(key).get(0).getMinute();
+        PointOfInterest[] temp =
+          { risingPoints.get(key).get(0), reductionPoints.get(key).get(0) };
+
+        ArrayList<PointOfInterest[]> tempArray =
+          new ArrayList<PointOfInterest[]>();
+        tempArray.add(temp);
+        // matchingPoints.put(key, tempArray);
+        // numberOfMatchingPoints += 2;
+        counter++;
+        risingPoints.remove(key);
+        reductionPoints.remove(key);
+
+      }
+    }
+    // From those the mean duration is calculated.
+    result[0] /= (counter * 2);
+    result[1] /= (counter * 2);
+    result[2] /= counter;
+
+    keys.clear();
+
+    risingPoints.clear();
+    reductionPoints.clear();
+
+    return result;
+  }
+
+  /**
+   * This is an auxiliary function used to check if the distance in time and
+   * space of a pair is close to this appliance, meaning that it belongs to this
+   * appliance.
+   * 
+   * @param mean
+   *          The mean active and reactive power measurements.
+   * @param duration
+   *          The duration of the end-use.
+   * @param metrics
+   *          The metrics that are the base level
+   * @return true if it is close, false otherwise.
+   */
+  public static boolean isCloseRef (double[] mean, int duration,
+                                    double[] metrics)
+  {
+
+    double[] meanValues = { metrics[0], metrics[1] };
+
+    return ((Utils.percentageEuclideanDistance(mean, meanValues) < Constants.REF_THRESHOLD) && (Utils
+            .checkLimitFridge(duration, metrics[2])));
+
   }
 }

@@ -22,6 +22,7 @@ import java.util.Comparator;
 
 public class Constants
 {
+
   /**
    * This comparator is used for sorting the points of interest based on the
    * minute of interest.
@@ -181,7 +182,7 @@ public class Constants
    * This constant is used as the minimum background stand-by consumption of a
    * household installation.
    */
-  public static final int HOUSEHOLD_BACKGROUND_THRESHOLD = 30;
+  public static final int HOUSEHOLD_BACKGROUND_THRESHOLD = 110;
 
   /**
    * This constant is used as the minimum background stand-by consumption of a
@@ -268,6 +269,18 @@ public class Constants
   public static final int KMEANS_LIMIT_NUMBER = 10;
 
   // ================= REFRIGERATOR CONSTANTS =================
+
+  /**
+   * This constant signifies the minimum duration value that the refrigerator
+   * cycle can take.
+   */
+  public static final double REF_MIN_DURATION = 10;
+
+  /**
+   * This constant signifies the maximum duration value that the refrigerator
+   * cycle can take.
+   */
+  public static final double REF_MAX_DURATION = 25;
 
   /**
    * This constant signifies the threshold of similarity that is acceptable in

@@ -65,6 +65,12 @@ public class ApplianceIdentifier
     new TreeMap<Integer, ArrayList<PointOfInterest>>();
 
   /**
+   * This variable is a used for storing the metrics from the refrigerator
+   * cluster and using them later on the create the refrigerator appliance.
+   */
+  double[] metrics = new double[3];
+
+  /**
    * The simple constructor of the appliance identifier.
    */
   public ApplianceIdentifier ()
@@ -177,26 +183,31 @@ public class ApplianceIdentifier
 
       if (risingPoints.get(key) != null && reductionPoints.get(key) != null) {
         // System.out.println("Event " + events.get(i).getId()
-        // + " Before: Rising "
-        // + events.get(i).getRisingPoints() + "  Reduction "
-        // + events.get(i).getReductionPoints());
+        // + " Before: Rising " + risingPoints.get(key)
+        // + "  Reduction " + reductionPoints.get(key));
         cleanEvent(events.get(i), risingPoints.get(key),
                    reductionPoints.get(key));
         // System.out.println("Event " + events.get(i).getId() +
         // " After: Rising "
-        // + events.get(i).getRisingPoints() + "  Reduction "
-        // + events.get(i).getReductionPoints());
+        // + risingPoints.get(key) + "  Reduction "
+        // + reductionPoints.get(key));
+        if (risingPoints.get(key).size() == 0) {
+          risingPoints.remove(key);
+          reductionPoints.remove(key);
+        }
       }
     }
 
+    metrics = Utils.calculateMetrics(risingPoints, reductionPoints);
+
+    System.out.println("Metrics: " + Arrays.toString(metrics));
+
     // Creation of the appliance and insert in the appliance list
-    Appliance appliance =
-      new Appliance("Refrigerator", "Refrigeration", risingPoints,
-                    reductionPoints);
+    Appliance appliance = new Appliance("Refrigerator", "Refrigeration");
 
     // appliance.status();
 
-    cleanSecondPass(events, appliance, secondPass);
+    cleanSecondPass(events, appliance);
 
     // appliance.status();
 
@@ -222,26 +233,27 @@ public class ApplianceIdentifier
                            ArrayList<PointOfInterest> reductionPoints)
   {
 
-    // If there are both rising and reduction points.
+    // System.out.println("rising: " + risingPoints.size());
+    // System.out.println("reduction: " + reductionPoints.size());
 
-    // System.out.println("rising: " + risingPoints.toString());
-    // System.out.println("reduction: " + reductionPoints.toString());
+    ArrayList<PointOfInterest> temp =
+      new ArrayList<PointOfInterest>(risingPoints);
+    temp.addAll(reductionPoints);
+    secondPass.put(event.getId() - 1, temp);
 
-    // In case all the rising and reduction points of the event are found to
-    // be refrigerator then all are removed from the event
-    if (risingPoints.size() == 1 && reductionPoints.size() == 1) {
-      // System.out.println("1 - 1");
-      event.getRisingPoints().remove(risingPoints.get(0));
-      event.getReductionPoints().remove(reductionPoints.get(0));
-    }
-    else {
-      // System.out.println("Other case. Cannot do anything!");
-      ArrayList<PointOfInterest> temp =
-        new ArrayList<PointOfInterest>(risingPoints);
-      temp.addAll(reductionPoints);
-      secondPass.put(event.getId() - 1, temp);
+    if ((risingPoints.size() == 1 && reductionPoints.size() == 1) == false) {
       risingPoints.clear();
       reductionPoints.clear();
+    }
+    else {
+      int duration =
+        reductionPoints.get(0).getMinute() - risingPoints.get(0).getMinute();
+
+      if (duration < Constants.REF_MIN_DURATION
+          || duration > Constants.REF_MAX_DURATION) {
+        risingPoints.clear();
+        reductionPoints.clear();
+      }
     }
   }
 
@@ -255,11 +267,10 @@ public class ApplianceIdentifier
    * @param secondPass
    *          The list of event indices that need a second pass.
    */
-  private void
-    cleanSecondPass (ArrayList<Event> events, Appliance fridge,
-                     Map<Integer, ArrayList<PointOfInterest>> secondPass)
+  private void cleanSecondPass (ArrayList<Event> events, Appliance fridge)
   {
     int duration = -1;
+    double[] meanValues = new double[2];
 
     // For each event in need of second pass
     for (Integer key: secondPass.keySet()) {
@@ -279,23 +290,31 @@ public class ApplianceIdentifier
 
           for (int j = i; j < temp.size(); j++) {
 
-            if (temp.get(j).getRising() == false
-                && Utils.checkLimitFridge(duration, fridge.getMeanDuration())) {
+            if (temp.get(j).getRising() == false) {
 
               PointOfInterest red = temp.get(j);
 
               PointOfInterest[] pois = { rise, red };
 
-              fridge.addMatchingPoints(events.get(key).getId(), pois);
+              meanValues = Utils.meanValues(pois);
+              duration = red.getMinute() - rise.getMinute();
 
-              events.get(key).getRisingPoints().remove(rise);
-              events.get(key).getReductionPoints().remove(red);
-              temp.remove(j);
-              temp.remove(i);
-              i--;
-              break;
+              if (Utils.isCloseRef(meanValues, duration, metrics)) {
+
+                // System.out.println("Mean Values: "
+                // + Arrays.toString(meanValues) + " Duration:"
+                // + duration);
+
+                fridge.addMatchingPoints(events.get(key).getId(), pois);
+
+                events.get(key).getRisingPoints().remove(rise);
+                events.get(key).getReductionPoints().remove(red);
+                temp.remove(j);
+                temp.remove(i);
+                i--;
+                break;
+              }
             }
-
           }
         }
         if (temp.size() == 0 || allSamePoints(temp))
@@ -720,7 +739,9 @@ public class ApplianceIdentifier
         else
           System.out.println(temp[i]);
       }
+      System.setOut(System.out);
       activityList.addAll(appliance.matchingPairsToString(events));
+      System.setOut(printOut);
     }
 
     output = new FileOutputStream(outputActivity);

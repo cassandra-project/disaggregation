@@ -1704,6 +1704,7 @@ public class Event
         System.out.println("Size Before: " + tempArray.get(i).size());
         tempArray.set(i, Utils.removePoints(tempArray.get(i)));
         System.out.println("Size After: " + tempArray.get(i).size());
+        Collections.sort(tempArray.get(i), Constants.comp);
       }
 
       remaining = simpleCombinationMethod(tempArray.get(i), true);

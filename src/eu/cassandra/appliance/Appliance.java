@@ -55,14 +55,14 @@ public class Appliance
    * This variable is a map of the event id number and a list of the detected
    * rising points (points that the active power is increasing).
    */
-  private Map<Integer, ArrayList<PointOfInterest>> risingPoints =
+  private final Map<Integer, ArrayList<PointOfInterest>> risingPoints =
     new TreeMap<Integer, ArrayList<PointOfInterest>>();
 
   /**
    * This variable is a map of the event id number and a list of the detected
    * reduction points (points that the active power is increasing).
    */
-  private Map<Integer, ArrayList<PointOfInterest>> reductionPoints =
+  private final Map<Integer, ArrayList<PointOfInterest>> reductionPoints =
     new TreeMap<Integer, ArrayList<PointOfInterest>>();
 
   /**
@@ -87,7 +87,7 @@ public class Appliance
   /**
    * This variable represents the mean duration of the appliance end-use.
    */
-  private double meanDuration = 0;
+  private double durationSum = 0;
 
   /**
    * The constructor of an Appliance Model.
@@ -121,31 +121,6 @@ public class Appliance
     meanValuesSum[0] = p * Constants.USER_HEADSTART;
     meanValuesSum[1] = q * Constants.USER_HEADSTART;
     numberOfMatchingPoints = Constants.USER_HEADSTART;
-  }
-
-  /**
-   * The constructor of an Appliance Model.
-   * 
-   * @param name
-   *          The name of the Appliance Model
-   * @param activity
-   *          The name of the activity the appliance participates in.
-   * @param rising
-   *          The map of rising points per event.
-   * @param reduction
-   *          The map of reduction points per event.
-   */
-  public Appliance (String name, String activity,
-                    Map<Integer, ArrayList<PointOfInterest>> rising,
-                    Map<Integer, ArrayList<PointOfInterest>> reduction)
-  {
-    this.name = name;
-    this.activity = activity;
-    risingPoints = rising;
-    reductionPoints = reduction;
-    if (activity.equalsIgnoreCase("Refrigeration"))
-      calculateMetrics();
-
   }
 
   /**
@@ -200,7 +175,7 @@ public class Appliance
    */
   public double getMeanDuration ()
   {
-    return meanDuration;
+    return 2 * durationSum / numberOfMatchingPoints;
   }
 
   /**
@@ -213,63 +188,6 @@ public class Appliance
   {
     double[] temp = { getMeanActive(), getMeanReactive() };
     return temp;
-  }
-
-  /**
-   * This is an auxiliary function used in case of the refrigerator in order to
-   * estimate some metrics useful for the successful detection of its end-use in
-   * more complex events.
-   */
-  private void calculateMetrics ()
-  {
-    // Initializing auxiliary variables.
-    int counter = 0;
-
-    // Create a collection of the events in the rising and reduction
-    // maps' keysets.
-    Set<Integer> keys = new TreeSet<Integer>();
-    keys.addAll(risingPoints.keySet());
-    keys.addAll(reductionPoints.keySet());
-
-    // For each event present, a search for a clean one to one identification of
-    // rising and reduction points is at hand.
-    for (Integer key: keys) {
-
-      if (risingPoints.containsKey(key) && reductionPoints.containsKey(key)
-          && risingPoints.get(key).size() == 1
-          && risingPoints.get(key).size() == reductionPoints.get(key).size()) {
-
-        meanValuesSum[0] +=
-          risingPoints.get(key).get(0).getPDiff()
-                  - reductionPoints.get(key).get(0).getPDiff();
-        meanValuesSum[1] +=
-          risingPoints.get(key).get(0).getQDiff()
-                  - reductionPoints.get(key).get(0).getQDiff();
-        meanDuration +=
-          reductionPoints.get(key).get(0).getMinute()
-                  - risingPoints.get(key).get(0).getMinute();
-        PointOfInterest[] temp =
-          { risingPoints.get(key).get(0), reductionPoints.get(key).get(0) };
-
-        ArrayList<PointOfInterest[]> tempArray =
-          new ArrayList<PointOfInterest[]>();
-        tempArray.add(temp);
-        matchingPoints.put(key, tempArray);
-        numberOfMatchingPoints += 2;
-        counter++;
-        risingPoints.remove(key);
-        reductionPoints.remove(key);
-
-      }
-    }
-    // From those the mean duration is calculated.
-    meanDuration /= counter;
-
-    keys.clear();
-
-    risingPoints.clear();
-    reductionPoints.clear();
-
   }
 
   /**
@@ -303,6 +221,7 @@ public class Appliance
   {
     meanValuesSum[0] += pois[0].getPDiff() - pois[1].getPDiff();
     meanValuesSum[1] += pois[0].getQDiff() - pois[1].getQDiff();
+    durationSum += pois[1].getMinute() - pois[0].getMinute();
     numberOfMatchingPoints += 2;
   }
 
@@ -319,15 +238,26 @@ public class Appliance
 
     ArrayList<String[]> result = new ArrayList<String[]>();
     int offset = 0;
+    int start = -1, end = -1;
 
     for (Integer key: matchingPoints.keySet()) {
 
       offset = events.get(key - 1).getStartMinute();
 
       for (PointOfInterest[] pois: matchingPoints.get(key)) {
+        start = offset + pois[0].getMinute();
+        end = offset + pois[1].getMinute();
+
+        // if (start > end) {
+        // System.out.println("Event: " + events.get(key - 1).getId());
+        // System.out.println("Appliance: " + name);
+        // System.out.println("Start: " + start);
+        // System.out.println("End: " + end);
+        // System.out.println();
+        // }
+
         String[] tempString =
-          { name, activity, Integer.toString(offset + pois[0].getMinute()),
-           Integer.toString(offset + pois[1].getMinute()),
+          { name, activity, Integer.toString(start), Integer.toString(end),
            Double.toString(pois[0].getPDiff()),
            Double.toString(pois[0].getQDiff()),
            Double.toString(pois[1].getPDiff()),
@@ -379,9 +309,8 @@ public class Appliance
       return (Utils.percentageEuclideanDistance(mean, meanValues) < Constants.PERCENTAGE_CLOSENESS_THRESHOLD || Utils
               .absoluteEuclideanDistance(mean, meanValues) < Constants.ABSOLUTE_CLOSENESS_THRESHOLD
                                                                                                                 && Utils.checkLimitFridge(duration,
-                                                                                                                                          meanDuration));
+                                                                                                                                          getMeanDuration()));
     else
-
       return (Utils.percentageEuclideanDistance(mean, meanValues) < Constants.PERCENTAGE_CLOSENESS_THRESHOLD || Utils
               .absoluteEuclideanDistance(mean, meanValues) < Constants.ABSOLUTE_CLOSENESS_THRESHOLD);
 
@@ -415,7 +344,7 @@ public class Appliance
       }
     }
     if (activity.equalsIgnoreCase("Refrigeration"))
-      System.out.println("Mean Duration: " + meanDuration);
+      System.out.println("Mean Duration: " + getMeanDuration());
     System.out.println("Mean Power: " + getMeanActive());
     System.out.println("Mean Reactive: " + getMeanReactive());
   }
