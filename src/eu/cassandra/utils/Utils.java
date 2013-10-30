@@ -733,10 +733,15 @@ public class Utils
     }
 
     // Sorting the each cluster points by their minutes.
-    for (int i = 0; i < result.size(); i++)
-      Collections.sort(result.get(i), Constants.comp);
+    for (int i = result.size() - 1; i >= 0; i--) {
+      if (result.get(i).size() == 0)
+        result.remove(i);
+      else
+        Collections.sort(result.get(i), Constants.comp);
+    }
 
     // Sorting the all clusters by their active power.
+
     Collections.sort(result, Constants.comp5);
 
     return result;
