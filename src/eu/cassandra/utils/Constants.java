@@ -100,6 +100,18 @@ public class Constants
     };
 
   // ================= GENERAL CONSTANTS =================
+
+  /**
+   * This variable is used as the folder where the result files will be stored.
+   */
+  public static final String resultFolder = "ResultFiles/";
+
+  /**
+   * This variable is used as the folder where the temporary files will be
+   * stored.
+   */
+  public static final String tempFolder = "TempFiles/";
+
   /**
    * This constant is used as a small error fringe during the washing machine
    * identification procedure.
@@ -182,7 +194,8 @@ public class Constants
    * This constant is used as the minimum background stand-by consumption of a
    * household installation.
    */
-  public static final int HOUSEHOLD_BACKGROUND_THRESHOLD = 110;
+  // public static final int HOUSEHOLD_BACKGROUND_THRESHOLD = 110;
+  public static final int HOUSEHOLD_BACKGROUND_THRESHOLD = 30;
 
   /**
    * This constant is used as the minimum background stand-by consumption of a

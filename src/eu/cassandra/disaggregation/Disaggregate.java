@@ -17,6 +17,7 @@ limitations under the License.
 
 package eu.cassandra.disaggregation;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -31,7 +32,6 @@ import eu.cassandra.event.EventDetector;
 import eu.cassandra.utils.Constants;
 import eu.cassandra.utils.PointOfInterest;
 import eu.cassandra.utils.PowerDatasets;
-import eu.cassandra.utils.Utils;
 
 /**
  * This is the main class that is used for implementing the Disaggregation
@@ -78,12 +78,21 @@ public class Disaggregate
    *          The filename of the input
    * @throws Exception
    */
-  public Disaggregate (String input) throws Exception
+  public Disaggregate (String folder, String input) throws Exception
   {
 
-    String inputPrefix = Utils.getFileName(input);
+    String inputPrefix =
+      Constants.resultFolder + input.substring(0, input.length() - 4);
 
-    initDisaggregation(input, inputPrefix + "ApplianceList.csv",
+    // System.out.println("Folder: " + folder);
+    //
+    // System.out.println("Filename: " + input);
+    //
+    // System.out.println("Input: " + folder + input);
+    //
+    // System.out.println("Input prefix: " + inputPrefix);
+
+    initDisaggregation(folder, input, inputPrefix + "ApplianceList.csv",
                        inputPrefix + "ActivityList.csv");
   }
 
@@ -98,8 +107,9 @@ public class Disaggregate
    *          The file name of the output file containing the activities.
    * @throws Exception
    */
-  public void initDisaggregation (String filename, String outputAppliance,
-                                  String outputActivity) throws Exception
+  public void
+    initDisaggregation (String folder, String filename, String outputAppliance,
+                        String outputActivity) throws Exception
   {
 
     // MultiOutputStream multiOut = new MultiOutputStream(System.out, fout);
@@ -107,13 +117,14 @@ public class Disaggregate
     // System.setOut(stdout);
 
     // Creating the data sets under investigation.
-    PowerDatasets data = new PowerDatasets(filename);
+    PowerDatasets data = new PowerDatasets(folder + filename);
 
     PrintStream realSystemOut = System.out;
     OutputStream output = null;
     try {
       output =
-        new FileOutputStream(Utils.getFileName(filename)
+        new FileOutputStream(Constants.tempFolder
+                             + filename.substring(0, filename.length() - 4)
                              + " Event Analysis.txt");
       PrintStream printOut = new PrintStream(output);
       System.setOut(printOut);
@@ -147,7 +158,8 @@ public class Disaggregate
 
     try {
       output =
-        new FileOutputStream(Utils.getFileName(filename)
+        new FileOutputStream(Constants.tempFolder
+                             + filename.substring(0, filename.length() - 4)
                              + " Final Pairs Analysis.txt");
       PrintStream printOut = new PrintStream(output);
       System.setOut(printOut);
@@ -202,23 +214,38 @@ public class Disaggregate
 
   private void clearAll ()
   {
+
     events.clear();
     ai.clear();
     iso.clear();
     Constants.clear();
+    // Utils.cleanFiles();
   }
 
   public static void main (String[] args) throws Exception
   {
     // String input = "Demo/Household1.csv";
-    String input = "Demo/Milioudis.csv";
+    // String input = "Demo/Milioudis.csv";
     // String input = "Demo/measurements.csv";
     // String input = "Demo/Benchmark.csv";
     // String input = "Demo/rs1192New_CC.csv";
     // String input = "Demo/BenchmarkingTest1.csv";
+    // String input = "Demo/rs1246New_CC.csv";
+    // String applianceFile = "";`
 
-    // String applianceFile = "";
+    File folder = new File("DataFiles/");
+    String path = folder.getPath() + "/";
+    String[] datasets = folder.list();
 
-    Disaggregate dis = new Disaggregate(input);
+    System.out.println(path);
+    System.out.println(Arrays.toString(datasets));
+    for (int i = 0; i < datasets.length; i++) {
+      // for (int i = 0; i < 1; i++) {
+
+      System.out.println("File:" + datasets[i]);
+
+      Disaggregate dis = new Disaggregate(path, datasets[i]);
+    }
+
   }
 }
