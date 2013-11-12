@@ -573,26 +573,29 @@ public class Event
     int maxIndex =
       Math.min(derivative.length - 1, rise + Constants.RISING_LIMIT);
 
-    // System.out.println("Min Index: " + minIndex + " MaxIndex: " + maxIndex);
-
+    //System.out.println("Rise");
+    //System.out.println("Min Index: " + minIndex + " MaxIndex: " + maxIndex);
+    //int[] mar = Arrays.copyOfRange(marker, minIndex, maxIndex + 1);
+    //double[] der = Arrays.copyOfRange(derivative, minIndex, maxIndex + 1);
+    //System.out.println("Marker: " + Arrays.toString(mar));
+    //System.out.println("Derivative: " + Arrays.toString(der));
     // Finding the first point that the reduction starts
     lastReductionPoint = rise;
     lastRisingPoint = rise + 1;
 
-    for (int i = minIndex; i < rise; i++) {
-
-      if (derivative[i] < 0 && marker[i] == 0)
+    for (int i = rise - 1; i >= minIndex; i--) {
+      if (derivative[i] > 0 && marker[i] == 0)
         lastReductionPoint = i;
-      else if (derivative[i] > 0 || marker[i] != 0)
-        lastReductionPoint = rise;
+      else if (derivative[i] < 0 || marker[i] != 0)
+        break;
     }
 
     // Finding the last point that the rising ends
-    for (int i = maxIndex; i > rise; i--) {
+    for (int i = rise + 1; i < maxIndex; i++) {
       if (derivative[i] > 0 && marker[i] == 0)
-        lastRisingPoint = i;
+        lastRisingPoint = i + 1;
       else if (derivative[i] < 0 || marker[i] != 0)
-        lastRisingPoint = rise + 1;
+        break;
     }
 
     // System.out.println("Index: " + rise + " Reduction Point: "
@@ -633,24 +636,29 @@ public class Event
     int maxIndex =
       Math.min(derivative.length - 1, red + Constants.REDUCTION_LIMIT);
 
+  //  System.out.println("Reduction");
+  //  System.out.println("Min Index: " + minIndex + " MaxIndex: " + maxIndex);
+  //  int[] mar = Arrays.copyOfRange(marker, minIndex, maxIndex + 1);
+  //  double[] der = Arrays.copyOfRange(derivative, minIndex, maxIndex + 1);
+  //  System.out.println("Marker: " + Arrays.toString(mar));
+  //  System.out.println("Derivative: " + Arrays.toString(der));
     // Finding the first point that the rising ends
     lastRisingPoint = red;
     lastReductionPoint = red + 1;
 
-    for (int i = minIndex; i < red; i++) {
-
-      if (derivative[i] > 0 && marker[i] == 0)
+    for (int i = red - 1; i >= minIndex; i--) {
+      if (derivative[i] < 0 && marker[i] == 0)
         lastRisingPoint = i;
-      else if (derivative[i] < 0 || marker[i] != 0)
-        lastRisingPoint = red;
+      else if (derivative[i] > 0 || marker[i] != 0)
+        break;
     }
 
     // Finding the first point that the reduction ends
     for (int i = red + 1; i < maxIndex; i++) {
       if (derivative[i] < 0 && marker[i] == 0)
-        lastReductionPoint = i;
+        lastReductionPoint = i + 1;
       else if (derivative[i] > 0 || marker[i] != 0)
-        lastReductionPoint = red + 1;
+        break;
     }
 
     // System.out.println("Index: " + red + " Rising Point: " + lastRisingPoint
@@ -742,10 +750,9 @@ public class Event
         int minIndex = Math.max(0, i - Constants.REDUCTION_LIMIT);
 
         for (int j = minIndex; j < i; j++) {
-
-          if (derivative[j] < 0 && marker[j] == 0)
+          if (derivative[j] > 0 && marker[j] == 0)
             lastReductionPoint = j;
-          else if (derivative[j] > 0 || marker[j] != 0)
+          else if (derivative[j] < 0 || marker[j] != 0)
             lastReductionPoint = i;
         }
       }
@@ -797,9 +804,9 @@ public class Event
 
         for (int j = minIndex; j < i; j++) {
 
-          if (derivative[j] > 0 && marker[j] == 0)
+          if (derivative[j] < 0 && marker[j] == 0)
             lastRisingPoint = j;
-          else if (derivative[j] < 0 || marker[j] != 0)
+          else if (derivative[j] > 0 || marker[j] != 0)
             lastRisingPoint = i;
         }
 
@@ -902,6 +909,8 @@ public class Event
    */
   private void cleanPointsOfInterest (Double... threshold)
   {
+   // System.out.println("Threshold Searching for Event" + getId());
+
     // If there is a threshold provided by user take it
     if (threshold.length == 1) {
       this.threshold = threshold[0];
@@ -973,7 +982,7 @@ public class Event
       temp += step;
     }
 
-    // System.out.println("Alterations: " + alterations.toString());
+    //System.out.println("Alterations: " + alterations.toString());
 
     // For each value in the created array we remove the points of interest that
     // are smaller and then see if the result is a closed system meaning the
@@ -1073,8 +1082,8 @@ public class Event
           // threshold.
           if (distance < Constants.OLD_DIFFERENCE_LIMIT)
             threshold = alter;
-          else
-            break;
+          // else
+          // break;
         }
       }
 
