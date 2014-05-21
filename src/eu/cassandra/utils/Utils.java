@@ -19,19 +19,18 @@ package eu.cassandra.utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
-import java.util.TreeSet;
 
-import org.paukov.combinatorics.Factory;
-import org.paukov.combinatorics.Generator;
-import org.paukov.combinatorics.ICombinatoricsVector;
+import org.apache.log4j.Logger;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 import weka.clusterers.SimpleKMeans;
 import weka.core.Attribute;
@@ -40,13 +39,8 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.AddCluster;
-
-import com.google.ortools.constraintsolver.DecisionBuilder;
-import com.google.ortools.constraintsolver.IntVar;
-import com.google.ortools.constraintsolver.OptimizeVar;
-import com.google.ortools.constraintsolver.Solver;
-
 import eu.cassandra.appliance.Appliance;
+import eu.cassandra.event.Event;
 
 /**
  * This class contains static functions that are used for general purposes
@@ -58,6 +52,7 @@ import eu.cassandra.appliance.Appliance;
 
 public class Utils
 {
+  static Logger log = Logger.getLogger(Utils.class);
 
   /** Loading a library for integer programming. */
   static {
@@ -144,9 +139,23 @@ public class Utils
    */
   public static boolean checkLimitFridge (double trueValue, double limit)
   {
+    double lowerLimit = 0, upperLimit = 0;
 
-    double lowerLimit = (1 - Constants.ERROR_FRIDGE) * limit;
-    double upperLimit = (1 + Constants.ERROR_FRIDGE) * limit;
+    if (Constants.REF_LOOSE_COUPLING) {
+
+      lowerLimit = Constants.REF_DURATION_FRINGE - limit;
+      upperLimit = Constants.REF_DURATION_FRINGE + limit;
+
+    }
+    else {
+
+      lowerLimit = (1 - Constants.STRICT_REF_DURATION_FRINGE) * limit;
+      upperLimit = (1 + Constants.STRICT_REF_DURATION_FRINGE) * limit;
+
+    }
+
+    log.debug("True Value: " + trueValue + " Limit: " + limit + " UpperLimit: "
+              + upperLimit + " Lower Limit: " + lowerLimit);
 
     return (trueValue < upperLimit && trueValue > lowerLimit);
   }
@@ -187,8 +196,14 @@ public class Utils
 
     ArrayList<Integer> temp = new ArrayList<Integer>();
     double limit = pairingLimit(pois.get(index).getPDiff());
+    double timeLimit = Double.POSITIVE_INFINITY;
+    if (Constants.SIMPLE_TIME_COMPLEXITY == true)
+      timeLimit = pois.get(index).getMinute() + Constants.TEMPORAL_THRESHOLD;
+
     for (int i = index + 1; i < pois.size(); i++)
-      if (pois.get(i).getRising() == false && limit > -pois.get(i).getPDiff())
+      if (pois.get(i).getRising() == false
+          && pois.get(i).getMinute() <= timeLimit
+          && limit > -pois.get(i).getPDiff())
         temp.add(i);
 
     Integer[] result = new Integer[temp.size()];
@@ -218,8 +233,13 @@ public class Utils
 
     ArrayList<Integer> temp = new ArrayList<Integer>();
     double limit = -pairingLimit(pois.get(index).getPDiff());
+    double timeLimit = Double.NEGATIVE_INFINITY;
+    if (Constants.SIMPLE_TIME_COMPLEXITY == true)
+      timeLimit = pois.get(index).getMinute() - Constants.TEMPORAL_THRESHOLD;
+
     for (int i = 0; i < index; i++)
-      if (pois.get(i).getRising() && limit > pois.get(i).getPDiff())
+      if (pois.get(i).getRising() && pois.get(i).getMinute() >= timeLimit
+          && limit > pois.get(i).getPDiff())
         temp.add(i);
 
     Integer[] result = new Integer[temp.size()];
@@ -247,315 +267,6 @@ public class Utils
        (pois[0].getQDiff() - pois[1].getQDiff()) / 2 };
 
     return result;
-
-  }
-
-  /**
-   * This auxiliary function checks if two pairs of points of interest are cross
-   * covered
-   * or not into time.
-   * 
-   * @param poi1
-   *          The first pair of the points of interest.
-   * @param poi2
-   *          The second pair of the points of interest.
-   * @return true if they are not cross covered, false otherwise.
-   */
-  public static boolean independentPair (PointOfInterest[] poi1,
-                                         PointOfInterest[] poi2)
-  {
-    return (poi2[0].getMinute() > poi1[1].getMinute());
-  }
-
-  public static int sumArray (int[] array)
-  {
-    int sum = 0;
-
-    for (int i = 0; i < array.length; i++)
-      sum += array[i];
-
-    return sum;
-  }
-
-  /**
-   * This is an integer programming solver.
-   * 
-   * @param input
-   *          The input array of alternatives.
-   * @param cost
-   *          The cost array of the alternatives.
-   * @return a list of all the solutions.
-   */
-  public static ArrayList<ArrayList<Integer>> solve (int[][] input,
-                                                     double[] cost)
-  {
-    ArrayList<ArrayList<Integer>> solutions =
-      new ArrayList<ArrayList<Integer>>();
-    Solver solver = new Solver("Integer Programming");
-
-    int num_alternatives = cost.length;
-    int num_objects = input[0].length;
-
-    int[] costNew = new int[cost.length];
-    int lambda = 1000;
-    for (int i = 0; i < costNew.length; i++) {
-      costNew[i] = (int) (100 * cost[i]);
-      costNew[i] *= lambda;
-    }
-    //
-    // variables
-    //
-    IntVar[] x = solver.makeIntVarArray(num_alternatives, 0, 1, "x");
-
-    // number of assigned senators, to be minimize
-    IntVar z = solver.makeScalProd(x, costNew).var();
-
-    //
-    // constraints
-    //
-
-    for (int j = 0; j < num_objects; j++) {
-      IntVar[] b = new IntVar[num_alternatives];
-      for (int i = 0; i < num_alternatives; i++) {
-        b[i] = solver.makeProd(x[i], input[i][j]).var();
-      }
-
-      solver.addConstraint(solver.makeSumLessOrEqual(b, 1));
-
-    }
-
-    //
-    // objective
-    //
-    OptimizeVar objective = solver.makeMaximize(z, 1);
-
-    //
-    // search
-    //
-    DecisionBuilder db =
-      solver.makePhase(x, solver.INT_VAR_DEFAULT, solver.INT_VALUE_DEFAULT);
-    solver.newSearch(db, objective);
-
-    //
-    // output
-    //
-
-    // ArrayList<Integer> temp = ArrayList<Integer>()
-    ArrayList<Integer> temp = null;
-    while (solver.nextSolution()) {
-      temp = new ArrayList<Integer>();
-      System.out.println("z: " + z.value());
-      System.out.print("Selected alternatives: ");
-      for (int i = 0; i < num_alternatives; i++) {
-        if (x[i].value() == 1) {
-          System.out.print((1 + i) + " ");
-          temp.add(i);
-        }
-      }
-      solutions.add(temp);
-      // System.out.println("\n");
-
-    }
-    solver.endSearch();
-
-    // Statistics
-    System.out.println();
-    System.out.println("Solutions: " + solver.solutions());
-    System.out.println("Failures: " + solver.failures());
-    System.out.println("Branches: " + solver.branches());
-    System.out.println("Wall time: " + solver.wallTime() + "ms");
-
-    return solutions;
-
-  }
-
-  /**
-   * This is an integer programming solver.
-   * 
-   * @param input
-   *          The input array of alternatives.
-   * @param cost
-   *          The cost array of the alternatives.
-   * @return a list of the indexes of the solution alternatives.
-   */
-  public static ArrayList<Integer> solve2 (int[][] input, double[] cost)
-  {
-
-    Solver solver = new Solver("Integer Programming");
-
-    int num_alternatives = cost.length;
-    int num_objects = input[0].length;
-
-    int solutionThreshold = 0;
-
-    if (input[0].length < 10)
-      solutionThreshold = Constants.SOLUTION_THRESHOLD_UNDER_10;
-    else if (input[0].length < 15)
-      solutionThreshold = Constants.SOLUTION_THRESHOLD_UNDER_15;
-    else if (input[0].length < 20)
-      solutionThreshold = Constants.SOLUTION_THRESHOLD_UNDER_20;
-    else
-      solutionThreshold = Constants.SOLUTION_THRESHOLD_UNDER_25;
-
-    System.out.println("Objects: " + num_objects + " Threshold: "
-                       + solutionThreshold);
-
-    int[] costNew = new int[cost.length];
-
-    for (int i = 0; i < costNew.length; i++)
-      costNew[i] = (int) (10000 * cost[i]);
-
-    //
-    // variables
-    //
-    IntVar[] x = solver.makeIntVarArray(num_alternatives, 0, 1, "x");
-
-    // number of assigned senators, to be minimize
-    IntVar z = solver.makeScalProd(x, costNew).var();
-
-    //
-    // constraints
-    //
-
-    for (int j = 0; j < num_objects; j++) {
-      IntVar[] b = new IntVar[num_alternatives];
-      for (int i = 0; i < num_alternatives; i++) {
-        b[i] = solver.makeProd(x[i], input[i][j]).var();
-      }
-
-      solver.addConstraint(solver.makeSumLessOrEqual(b, 1));
-
-    }
-
-    //
-    // objective
-    //
-    OptimizeVar objective = solver.makeMaximize(z, 1);
-
-    //
-    // search
-    //
-    DecisionBuilder db =
-      solver.makePhase(x, solver.INT_VAR_DEFAULT, solver.INT_VALUE_DEFAULT);
-    solver.newSearch(db, objective);
-
-    //
-    // output
-    //
-    ArrayList<Integer> temp = new ArrayList<Integer>();
-    while (solver.nextSolution()) {
-      temp.clear();
-      System.out.println("z: " + z.value());
-      System.out.print("Selected alternatives: ");
-      for (int i = 0; i < num_alternatives; i++) {
-        if (x[i].value() == 1) {
-          System.out.print((1 + i) + " ");
-          temp.add(i);
-        }
-      }
-      if (z.value() > solutionThreshold)
-        break;
-      // System.out.println("\n");
-
-    }
-    solver.endSearch();
-
-    // Statistics
-    System.out.println();
-    System.out.println("Solutions: " + solver.solutions());
-    System.out.println("Failures: " + solver.failures());
-    System.out.println("Branches: " + solver.branches());
-    System.out.println("Wall time: " + solver.wallTime() + "ms");
-
-    return temp;
-
-  }
-
-  /**
-   * Testing another type of solution.
-   * 
-   * @param input
-   *          The input array of alternatives.
-   * @param cost
-   *          The cost array of the alternatives.
-   * @return a list of the indexes of the solution alternatives.
-   */
-  public static ArrayList<Integer> solve3 (int[][] input, double[] cost)
-  {
-
-    Solver solver = new Solver("Integer Programming");
-
-    int num_alternatives = cost.length;
-    int num_objects = input[0].length;
-
-    int[] costNew = new int[cost.length];
-
-    for (int i = 0; i < costNew.length; i++)
-      costNew[i] = (int) (10000 * cost[i]);
-
-    //
-    // variables
-    //
-    IntVar[] x = solver.makeIntVarArray(num_alternatives, 0, 1, "x");
-
-    // number of assigned senators, to be minimize
-    IntVar z = solver.makeScalProd(x, costNew).var();
-
-    //
-    // constraints
-    //
-
-    for (int j = 0; j < num_objects; j++) {
-      IntVar[] b = new IntVar[num_alternatives];
-      for (int i = 0; i < num_alternatives; i++) {
-        b[i] = solver.makeProd(x[i], input[i][j]).var();
-      }
-
-      solver.addConstraint(solver.makeSumEquality(b, 1));
-
-    }
-
-    //
-    // objective
-    //
-    OptimizeVar objective = solver.makeMaximize(z, 1);
-
-    //
-    // search
-    //
-    DecisionBuilder db =
-      solver.makePhase(x, solver.INT_VAR_DEFAULT, solver.INT_VALUE_DEFAULT);
-    solver.newSearch(db, objective);
-
-    //
-    // output
-    //
-    ArrayList<Integer> temp = new ArrayList<Integer>();
-    while (solver.nextSolution()) {
-      temp.clear();
-      System.out.println("z: " + z.value());
-      System.out.print("Selected alternatives: ");
-      for (int i = 0; i < num_alternatives; i++) {
-        if (x[i].value() == 1) {
-          System.out.print((1 + i) + " ");
-          temp.add(i);
-        }
-      }
-      if (z.value() > Constants.OTHER_SOLUTION_THRESHOLD)
-        break;
-      // System.out.println("\n");
-
-    }
-    solver.endSearch();
-
-    // Statistics
-    System.out.println();
-    System.out.println("Solutions: " + solver.solutions());
-    System.out.println("Failures: " + solver.failures());
-    System.out.println("Branches: " + solver.branches());
-    System.out.println("Wall time: " + solver.wallTime() + "ms");
-
-    return temp;
 
   }
 
@@ -651,7 +362,7 @@ public class Utils
    * @throws Exception
    */
   public static ArrayList<ArrayList<PointOfInterest>>
-    clusterPoints (ArrayList<PointOfInterest> pois) throws Exception
+    clusterPoints (ArrayList<PointOfInterest> pois, int bias) throws Exception
   {
     // Initialize the auxiliary variables
     ArrayList<ArrayList<PointOfInterest>> result =
@@ -660,11 +371,12 @@ public class Utils
     // Estimating the number of clusters that will be created
     int numberOfClusters =
       (int) (Math.ceil((double) pois.size()
-                       / (double) Constants.MAX_POINTS_OF_INTEREST));
+                       / (double) Constants.MAX_POINTS_OF_INTEREST))
+              + bias;
 
-    System.out.println("Clusters: " + pois.size() + " / "
-                       + Constants.MAX_POINTS_OF_INTEREST + " = "
-                       + numberOfClusters);
+    log.info("Clusters: " + pois.size() + " / "
+             + Constants.MAX_POINTS_OF_INTEREST + " + " + bias + " = "
+             + numberOfClusters);
 
     // Create a new empty list of points for each cluster
     for (int i = 0; i < numberOfClusters; i++)
@@ -695,7 +407,7 @@ public class Utils
 
     Instances newInst = null;
 
-    System.out.println("Instances: " + instances.toSummaryString());
+    log.debug("Instances: " + instances.toSummaryString());
 
     // Create the addcluster filter of Weka and the set up the hierarchical
     // clusterer.
@@ -727,7 +439,7 @@ public class Utils
 
       cluster = cluster.replace("cluster", "");
 
-      System.out.println("Point of Interest: " + i + " Cluster: " + cluster);
+      log.debug("Point of Interest: " + i + " Cluster: " + cluster);
 
       result.get(Integer.parseInt(cluster) - 1).add(pois.get(i));
     }
@@ -799,259 +511,25 @@ public class Utils
     removePoints (ArrayList<PointOfInterest> pois)
   {
 
-    ArrayList<PointOfInterest> result = new ArrayList<PointOfInterest>(pois);
+    ArrayList<PointOfInterest> result = new ArrayList<PointOfInterest>();
 
-    int number = result.size() * Constants.REMOVAL_PERCENTAGE / 100;
+    int number = pois.size() - Constants.REMOVAL_MAX_POINTS;
 
-    System.out.println("Initial Size: " + result.size() + " Removing: "
-                       + number);
+    log.debug("Initial Size: " + pois.size() + " Removing: " + number);
 
     Collections.sort(pois, Constants.comp4);
 
-    System.out.println("Initial POIS: " + pois.toString());
+    log.debug("Initial POIS: " + pois.toString());
 
     Collections.sort(result, Constants.comp4);
 
     for (int i = 0; i < number; i++)
-      result.remove(result.size() - 1);
+      result.add(pois.remove(pois.size() - 1));
 
-    System.out.println("Final POIS: " + result.toString());
+    log.debug("Removed POIS: " + result.toString());
 
     return result;
 
-  }
-
-  /**
-   * This function is responsible for creating the possible combinations of the
-   * rising and reduction points of interest in the event in order to create the
-   * final pairs that can be matched.
-   * 
-   * @param temp
-   *          The list of points of interest in the procedure.
-   * @param complex
-   *          The flag that show that this is a complex procedure due to the
-   *          large number of points of interest involved.
-   * @return A hashmap of the matched points with the distance that they have.
-   */
-  public static Map<int[], Double>
-    findCombinations (ArrayList<PointOfInterest> temp, boolean complex)
-  {
-
-    // Initializing the auxiliary variables
-    Map<int[], Double> input = new HashMap<int[], Double>();
-    Integer[] points = null;
-    int[] pointsArray = null;
-    List<Integer> subset = new ArrayList<Integer>();
-    double distance = 0;
-
-    int distanceThreshold = 0;
-
-    if (complex)
-      distanceThreshold = Constants.SECOND_DISTANCE_THRESHOLD;
-    else
-      distanceThreshold = Constants.DISTANCE_THRESHOLD;
-
-    // For each point
-    for (int i = 0; i < temp.size(); i++) {
-      // If rising point then we find the reduction points after that point,
-      // create all the possible subsets from them and estimate the distance
-      // of the active and reactive power measurements.If the distance is
-      // under a certain threshold, the combination is accepted.
-
-      double previousMaxDistance = Double.NEGATIVE_INFINITY, currentMaxDistance =
-        Double.NEGATIVE_INFINITY;
-
-      if (temp.get(i).getRising()) {
-
-        // Returns the reduction points that can be associated with this rising
-        // point
-        points = Utils.findRedPoints(i, temp);
-
-        // An initial vector of all the reduction points
-        ICombinatoricsVector<Integer> initialSet = Factory.createVector(points);
-        System.out.println("Initial Set for point " + temp.get(i).toString()
-                           + ": " + initialSet.toString());
-        System.out.println("Reduction Points for rising point " + i + ": "
-                           + initialSet.toString());
-
-        // Set the max combination of reduction point for each rising point
-        int upperThres =
-          Math.min(Constants.MAX_POINTS_LIMIT, initialSet.getSize());
-        // System.out.println("Upper Threshold:" + upperThres);
-
-        // For a number of reduction points for the rising point
-        for (int pairing = 1; pairing <= upperThres; pairing++) {
-
-          Generator<Integer> gen =
-            Factory.createSimpleCombinationGenerator(initialSet, pairing);
-
-          for (ICombinatoricsVector<Integer> subSet: gen) {
-            // System.out.println(subSet.toString());
-            if (subSet.getSize() > 0) {
-              double sumP = 0, sumQ = 0;
-
-              subset = subSet.getVector();
-
-              for (Integer index: subset) {
-                sumP += temp.get(index).getPDiff();
-                sumQ += temp.get(index).getQDiff();
-              }
-
-              double[] tempValues = { -sumP, -sumQ };
-
-              distance =
-                1 / (temp.get(i).percentageEuclideanDistance(tempValues) + Constants.NEAR_ZERO);
-
-              // If accepted then an array is created with 1 in the index of the
-              // points included, 0 otherwise
-              if ((1 / distance) < distanceThreshold) {
-
-                System.out.println("Subset: " + subSet.toString()
-                                   + " Distance: " + 1 / distance + " Z: "
-                                   + distance);
-
-                pointsArray = new int[temp.size()];
-                pointsArray[i] = 1;
-                for (Integer index: subset)
-                  pointsArray[index] = 1;
-
-                if (distance > currentMaxDistance) {
-                  // System.out.println("Distance: " + distance
-                  // + " Current Max Distance: "
-                  // + currentMaxDistance);
-                  currentMaxDistance = distance;
-                }
-
-                // Check if the array is already included in the alternatives.If
-                // not, it is added to the alternatives.
-                boolean flag = true;
-                for (int[] content: input.keySet()) {
-                  if (Arrays.equals(content, pointsArray)) {
-                    flag = false;
-                    break;
-                  }
-                }
-
-                if (flag) {
-                  input.put(pointsArray, distance);
-                  // System.out.println("Input:" + input);
-                }
-              }
-            }
-          }
-          // System.out.println("Input size for pairing of " + pairing + ":"
-          // + input.size());
-          // System.out.println("Current Max Distance: " + currentMaxDistance
-          // + " Previous Max Distance:" + previousMaxDistance);
-
-          // Checking if the max distance is reduced and continue for larger
-          // combination else stop the procedure
-          if (previousMaxDistance < currentMaxDistance
-              || currentMaxDistance == Double.NEGATIVE_INFINITY)
-            previousMaxDistance = currentMaxDistance;
-          else {
-            // System.out.println("Breaking for pairing = " + pairing);
-            break;
-          }
-
-        }
-      }
-      // If reduction point then we find the rising points before that point,
-      // create all the possible subsets from them and estimate the distance
-      // of the active and reactive power measurements.If the distance is
-      // under a certain threshold, the combination is accepted.
-      else {
-        points = Utils.findRisPoints(i, temp);
-
-        ICombinatoricsVector<Integer> initialSet = Factory.createVector(points);
-
-        System.out.println("Initial Set for point " + temp.get(i).toString()
-                           + ": " + initialSet.toString());
-        System.out.println("Rising Points for reduction point " + i + ": "
-                           + initialSet.toString());
-
-        int upperThres =
-          Math.min(Constants.MAX_POINTS_LIMIT, initialSet.getSize());
-        // System.out.println("Upper Threshold:" + upperThres);
-
-        for (int pairing = 1; pairing <= upperThres; pairing++) {
-
-          Generator<Integer> gen =
-            Factory.createSimpleCombinationGenerator(initialSet, pairing);
-
-          for (ICombinatoricsVector<Integer> subSet: gen) {
-
-            if (subSet.getSize() > 0) {
-              double sumP = 0, sumQ = 0;
-
-              subset = subSet.getVector();
-
-              for (Integer index: subset) {
-                sumP += temp.get(index).getPDiff();
-                sumQ += temp.get(index).getQDiff();
-              }
-
-              double[] sum = { sumP, sumQ };
-              double[] tempValues =
-                { -temp.get(i).getPDiff(), -temp.get(i).getQDiff() };
-
-              distance =
-                1 / (Utils.percentageEuclideanDistance(sum, tempValues) + Constants.NEAR_ZERO);
-
-              // If accepted then an array is created with 1 in the index of the
-              // points included, 0 otherwise
-              if ((1 / distance) < distanceThreshold) {
-
-                System.out.println("Subset: " + subSet.toString()
-                                   + " Distance: " + 1 / distance + " Z: "
-                                   + distance);
-
-                pointsArray = new int[temp.size()];
-                pointsArray[i] = 1;
-                for (Integer index: subset)
-                  pointsArray[index] = 1;
-
-                if (distance > currentMaxDistance) {
-                  // System.out.println("Distance: " + distance
-                  // + " Current Max Distance: "
-                  // + currentMaxDistance);
-                  currentMaxDistance = distance;
-                }
-
-                // Check if the array is already included in the alternatives.If
-                // not, it is added to the alternatives.
-                boolean flag = true;
-                for (int[] content: input.keySet()) {
-                  if (Arrays.equals(content, pointsArray)) {
-                    flag = false;
-                    break;
-                  }
-                }
-
-                if (flag) {
-                  input.put(pointsArray, distance);
-                  // System.out.println("Input:" + input);
-                }
-              }
-            }
-          }
-
-          // System.out.println("Input size for pairing of " + pairing + ":"
-          // + input.size());
-          // System.out.println("Current Max Distance: " + currentMaxDistance
-          // + " Previous Max Distance:" + previousMaxDistance);
-
-          if (previousMaxDistance < currentMaxDistance
-              || currentMaxDistance == Double.NEGATIVE_INFINITY)
-            previousMaxDistance = currentMaxDistance;
-          else {
-            // System.out.println("Breaking for pairing = " + pairing);
-            break;
-          }
-        }
-      }
-    }
-    return input;
   }
 
   /**
@@ -1106,7 +584,7 @@ public class Utils
 
       // For each appliance found in the file, an temporary Appliance
       // Entity is created.
-      appliances.add(new Appliance(name, activity, p, q));
+      appliances.add(new Appliance(name, activity, p, q, 0, 0));
 
     }
 
@@ -1115,67 +593,6 @@ public class Utils
     input.close();
 
     return appliances;
-  }
-
-  /**
-   * This is an auxiliary function used in case of the refrigerator in order to
-   * estimate some metrics useful for the successful detection of its end-use in
-   * more complex events.
-   */
-  public static double[]
-    calculateMetrics (Map<Integer, ArrayList<PointOfInterest>> risingPoints,
-                      Map<Integer, ArrayList<PointOfInterest>> reductionPoints)
-  {
-    double[] result = new double[3];
-    // Initializing auxiliary variables.
-    int counter = 0;
-
-    // Create a collection of the events in the rising and reduction
-    // maps' keysets.
-    Set<Integer> keys = new TreeSet<Integer>();
-    keys.addAll(risingPoints.keySet());
-    keys.addAll(reductionPoints.keySet());
-
-    // For each event present, a search for a clean one to one identification of
-    // rising and reduction points is at hand.
-    for (Integer key: keys) {
-
-      if (risingPoints.containsKey(key) && reductionPoints.containsKey(key)) {
-
-        result[0] +=
-          risingPoints.get(key).get(0).getPDiff()
-                  - reductionPoints.get(key).get(0).getPDiff();
-        result[1] +=
-          risingPoints.get(key).get(0).getQDiff()
-                  - reductionPoints.get(key).get(0).getQDiff();
-        result[2] +=
-          reductionPoints.get(key).get(0).getMinute()
-                  - risingPoints.get(key).get(0).getMinute();
-        PointOfInterest[] temp =
-          { risingPoints.get(key).get(0), reductionPoints.get(key).get(0) };
-
-        ArrayList<PointOfInterest[]> tempArray =
-          new ArrayList<PointOfInterest[]>();
-        tempArray.add(temp);
-        // matchingPoints.put(key, tempArray);
-        // numberOfMatchingPoints += 2;
-        counter++;
-        risingPoints.remove(key);
-        reductionPoints.remove(key);
-
-      }
-    }
-    // From those the mean duration is calculated.
-    result[0] /= (counter * 2);
-    result[1] /= (counter * 2);
-    result[2] /= counter;
-
-    keys.clear();
-
-    risingPoints.clear();
-    reductionPoints.clear();
-
-    return result;
   }
 
   /**
@@ -1231,5 +648,204 @@ public class Utils
         }
       }
     }
+  }
+
+  public static double estimateThreshold (double[] power, boolean median)
+  {
+    double result = 0;
+
+    ArrayList<Double> minimums = new ArrayList<Double>();
+    double min = Double.POSITIVE_INFINITY;
+
+    for (int i = 0; i < power.length; i++) {
+
+      if (min > power[i])
+        min = power[i];
+
+      if (i % 1440 == 0 && i != 0) {
+        minimums.add(min);
+        min = Double.POSITIVE_INFINITY;
+      }
+
+    }
+
+    if (minimums.size() == 0)
+      minimums.add(min);
+
+    log.debug("================THRESHOLD SETTING================");
+    log.debug("Minimums: " + minimums.toString());
+    log.debug("Median:" + median);
+
+    if (median)
+      result = Utils.estimateMedian(minimums);
+    else
+      result = Utils.estimateMean(minimums);
+
+    log.debug("Resulting threshold: " + result);
+    log.debug("");
+    log.debug("");
+
+    return result;
+  }
+
+  public static double estimateMedian (ArrayList<Double> values)
+  {
+    double result = 0.0;
+    int index = -1;
+    Collections.sort(values);
+
+    log.info("Values: " + values);
+
+    if (values.size() == 2)
+      index = 0;
+    else
+      index = values.size() / 2;
+
+    if (values.size() % 2 == 0)
+      result = (values.get(index) + values.get(index + 1)) / 2;
+    else
+      result = values.get(index);
+
+    log.info("Result:" + result);
+
+    return result;
+  }
+
+  public static double estimateMean (ArrayList<Double> values)
+  {
+    double result = 0.0;
+    double sum = 0;
+
+    for (double minimum: values)
+      sum += minimum;
+
+    result = sum / values.size();
+
+    return result;
+  }
+
+  /**
+   * This is an auxiliary function used for checking if all the points of
+   * interest are of the same type.
+   * 
+   * @param pois
+   *          A list of points of interest
+   * @return true if they are all of the same type, false otherwise.
+   */
+  public static boolean allSamePoints (ArrayList<PointOfInterest> pois)
+  {
+    // Initializing the auxiliary variables
+    boolean flag = true;
+    boolean start = pois.get(0).getRising();
+
+    for (PointOfInterest poi: pois)
+      if (start != poi.getRising()) {
+        flag = false;
+        break;
+      }
+
+    return flag;
+  }
+
+  public static double[] normalizeReactive (Event event)
+  {
+    double[] result = new double[event.getReactivePowerConsumptions().length];
+
+    return result;
+
+  }
+
+  /**
+   * This function is used for the visualization of a Line Diagram.
+   * 
+   * @param title
+   *          The title of the chart.
+   * @param x
+   *          The unit on the X axis of the chart.
+   * @param y
+   *          The unit on the Y axis of the chart.
+   * @param data
+   *          The array of values.
+   * @return a chart panel with the graphical representation.
+   */
+  public static void createLineDiagram (String title, String x, String y,
+                                        ArrayList<Double> data)
+  {
+
+    XYSeries series1 = new XYSeries("Active Power");
+    for (int i = 0; i < data.size(); i++) {
+      series1.add(i, data.get(i));
+    }
+
+    XYSeriesCollection dataset = new XYSeriesCollection();
+    dataset.addSeries(series1);
+
+    PlotOrientation orientation = PlotOrientation.VERTICAL;
+    boolean show = true;
+    boolean toolTips = false;
+    boolean urls = false;
+
+    JFreeChart chart =
+      ChartFactory.createXYLineChart(title, x, y, dataset, orientation, show,
+                                     toolTips, urls);
+
+    int width = 1024;
+    int height = 768;
+
+    try {
+      ChartUtilities.saveChartAsPNG(new File(Constants.chartFolder + title
+                                             + ".PNG"), chart, width, height);
+    }
+    catch (IOException e) {
+    }
+
+  }
+
+  public static double countPoints (int[] points)
+  {
+    int counter = 0;
+
+    for (int i = 0; i < points.length; i++)
+      if (points[i] == 1)
+        counter++;
+
+    return counter;
+  }
+
+  public static void durationCheck (ArrayList<Event> events)
+  {
+
+    log.info("====================DURATIONS========================");
+
+    ArrayList<Integer> durations = new ArrayList<Integer>();
+    int start = -1, end = -1, counter = 0;
+    int duration = -1;
+    for (Event event: events) {
+      start = event.getStartMinute();
+      end = event.getEndMinute();
+      duration = end - start;
+      if (duration > Constants.MINUTES_PER_DAY) {
+        counter++;
+        log.info("Start:" + +start + " End: " + end + " Duration:" + duration);
+      }
+      durations.add(duration);
+    }
+
+    Collections.sort(durations);
+    log.info("Durations:" + durations.toString());
+    log.info("Events over a day: " + counter);
+  }
+
+  public static void
+    removePoints (ArrayList<PointOfInterest> points, int minute)
+  {
+    int i = 0;
+
+    for (i = 0; i < points.size(); i++)
+      if (points.get(i).getMinute() == minute)
+        break;
+
+    points.remove(i);
+
   }
 }

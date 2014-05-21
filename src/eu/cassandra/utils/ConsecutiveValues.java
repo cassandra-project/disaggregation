@@ -19,6 +19,8 @@ package eu.cassandra.utils;
 
 import java.util.Arrays;
 
+import org.apache.log4j.Logger;
+
 /**
  * This is an auxiliary class used during the washing machine identification
  * procedure. It is used for storing the values of consecutive minutes where the
@@ -30,6 +32,8 @@ import java.util.Arrays;
 
 public class ConsecutiveValues
 {
+
+  static Logger log = Logger.getLogger(ConsecutiveValues.class);
 
   /**
    * The starting minute of the set of consecutive minutes with positive
@@ -155,6 +159,30 @@ public class ConsecutiveValues
   }
 
   /**
+   * 
+   * This function is used as a getter for the active power consumption during
+   * this consecutive set.
+   * 
+   * @return the active power consumption during this period.
+   */
+  public double[] getPValues ()
+  {
+    return pValues;
+  }
+
+  /**
+   * 
+   * This function is used as a getter for the reactive power consumption during
+   * this consecutive set.
+   * 
+   * @return the reactive power consumption during this period.
+   */
+  public double[] getQValues ()
+  {
+    return qValues;
+  }
+
+  /**
    * This function is used for the calculation of the several metrics that are
    * used for the washing machine identification procedure.
    */
@@ -196,12 +224,14 @@ public class ConsecutiveValues
    */
   public void status ()
   {
-    System.out.println("Start: " + start + " End: " + end);
-    System.out.println("PValues: " + Arrays.toString(pValues));
-    System.out.println("QValues: " + Arrays.toString(qValues));
-    System.out.println("Difference: " + difference);
-    System.out.println("Number of Elements: " + numberOfElements);
-    System.out.println("MaxQ: " + maxQ);
+    log.debug("");
+    log.debug("Start: " + start + " End: " + end);
+    log.debug("PValues: " + Arrays.toString(pValues));
+    log.debug("QValues: " + Arrays.toString(qValues));
+    log.debug("Difference: " + difference);
+    log.debug("Number of Elements: " + numberOfElements);
+    log.debug("MaxQ: " + maxQ);
+    log.debug("");
   }
 
 }

@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
+
 import eu.cassandra.event.Event;
 import eu.cassandra.utils.ConsecutiveValues;
 import eu.cassandra.utils.Constants;
@@ -45,6 +47,8 @@ import eu.cassandra.utils.Utils;
  */
 public class ApplianceIdentifier
 {
+
+  static Logger log = Logger.getLogger(ApplianceIdentifier.class);
 
   /**
    * This variable is a list of the appliances detected from the events.
@@ -114,9 +118,12 @@ public class ApplianceIdentifier
    *          The isolated appliance extractor, who contains information about
    *          the temporary refrigerator appliance.
    */
-  public void refrigeratorIdentification (ArrayList<Event> events,
-                                          IsolatedApplianceExtractor iso)
+  public void refrigeratorIdentification (ArrayList<Event> events)
   {
+
+    log.info("=============FRIDGE DETECTION=================");
+
+    Appliance ref = applianceList.get(0);
 
     // Initializing the auxiliary variables
     Map<Integer, ArrayList<PointOfInterest>> risingPoints =
@@ -125,72 +132,96 @@ public class ApplianceIdentifier
       new TreeMap<Integer, ArrayList<PointOfInterest>>();
 
     ArrayList<PointOfInterest> poiRef;
-    ArrayList<Double[]> tempCompare = iso.getRefConsumptionMeans();
+    ArrayList<PointOfInterest> risingRef = ref.getRisingPoints();
+    log.debug("Ref Rising Points:" + risingRef.toString());
+    ArrayList<PointOfInterest> reductionRef = ref.getReductionPoints();
+    log.debug("Ref Reduction Points:" + reductionRef.toString());
+    log.debug("Ref Means:" + Arrays.toString(ref.getMeanValues()));
 
     // For each event available, each point of interest is compared with the
     // mean values of the refrigerator cluster.
     for (int i = 0; i < events.size(); i++) {
-      // for (int i = 0; i < 3; i++) {
 
       int key = events.get(i).getId();
-
-      // System.out.println("Event " + key);
+      log.debug("");
+      log.debug("Event " + key);
       poiRef = new ArrayList<PointOfInterest>();
 
-      // System.out.println("Rising Points");
+      // log.debug("Rising Points");
       // Search through the rising points
       for (PointOfInterest poi: events.get(i).getRisingPoints()) {
 
-        for (Double[] means: tempCompare) {
+        double[] means = { poi.getPDiff(), poi.getQDiff() };
+        // log.debug("Investigating Point: " + poi.getPDiff() + ", "
+        // + poi.getQDiff());
 
-          if (poi.percentageEuclideanDistance(means) < Constants.REF_THRESHOLD) {
-            // System.out.println("Euclidean Distance Rising: "
-            // + poi.percentageEuclideanDistance(means));
+        for (PointOfInterest rise: risingRef) {
+          // log.debug("Rising Point: " + rise.getPDiff() + ", " +
+          // rise.getQDiff());
+          double distance = rise.percentageEuclideanDistance(means);
+          // log.debug("Euclidean Distance Rising: " + distance);
+
+          if (distance < Constants.REF_THRESHOLD) {
+            // log.debug("Euclidean Distance Rising: "
+            // + distance);
             poiRef.add(poi);
             break;
           }
         }
-        if (poiRef.size() > 0)
-          risingPoints.put(key, poiRef);
+
       }
 
+      // log.debug("Poiref: " + poiRef.toString());
+      if (poiRef.size() > 0)
+        risingPoints.put(key, poiRef);
+
       poiRef = new ArrayList<PointOfInterest>();
-      // System.out.println("Reduction Points");
+      // log.debug("Reduction Points");
       // Search through the reduction points
       for (PointOfInterest poi: events.get(i).getReductionPoints()) {
 
-        for (Double[] means: tempCompare) {
+        double[] means = { poi.getPDiff(), poi.getQDiff() };
+        // log.debug("Investigating Point: " + poi.getPDiff() + ", "
+        // + poi.getQDiff());
 
-          Double[] tempMeans = { -means[0], -means[1] };
+        for (PointOfInterest red: reductionRef) {
+          // log.debug("Rising Point: " + red.getPDiff() + ", " +
+          // red.getQDiff());
+          double distance = red.percentageEuclideanDistance(means);
+          // log.debug("Euclidean Distance Rising: " + distance);
 
-          if (poi.percentageEuclideanDistance(tempMeans) < Constants.REF_THRESHOLD) {
-            // System.out.println("Euclidean Distance Reduction: "
-            // + poi.percentageEuclideanDistance(tempMeans));
+          if (distance < Constants.REF_THRESHOLD) {
+            // log.debug("Euclidean Distance Rising: "
+            // + distance);
             poiRef.add(poi);
             break;
           }
         }
-        if (poiRef.size() > 0)
-          reductionPoints.put(key, poiRef);
       }
+
+      // log.debug("Poiref: " + poiRef.toString());
+      if (poiRef.size() > 0)
+        reductionPoints.put(key, poiRef);
+
+      // log.debug(risingPoints.get(key));
+      // log.debug(reductionPoints.get(key));
+
       // After finding the points of interest similar to the refrigerator's
       // end-use the event is cleaned of them
-      // if (risingPoints.get(key) != null)
-      // System.out.println("Rising size:" + risingPoints.get(key).size());
-      // if (reductionPoints.get(key) != null)
-      // System.out.println("Reduction size:" +
-      // reductionPoints.get(key).size());
+      if (risingPoints.get(key) != null)
+        log.debug("Rising size:" + risingPoints.get(key).size());
+      if (reductionPoints.get(key) != null)
+        log.debug("Reduction size:" + reductionPoints.get(key).size());
 
       if (risingPoints.get(key) != null && reductionPoints.get(key) != null) {
-        // System.out.println("Event " + events.get(i).getId()
-        // + " Before: Rising " + risingPoints.get(key)
-        // + "  Reduction " + reductionPoints.get(key));
+        log.debug("Event " + events.get(i).getId() + " Before: Rising "
+                  + risingPoints.get(key) + "  Reduction "
+                  + reductionPoints.get(key));
         cleanEvent(events.get(i), risingPoints.get(key),
                    reductionPoints.get(key));
-        // System.out.println("Event " + events.get(i).getId() +
-        // " After: Rising "
-        // + risingPoints.get(key) + "  Reduction "
-        // + reductionPoints.get(key));
+        log.debug("Event " + events.get(i).getId() + " After: Rising "
+                  + risingPoints.get(key) + "  Reduction "
+                  + reductionPoints.get(key));
         if (risingPoints.get(key).size() == 0) {
           risingPoints.remove(key);
           reductionPoints.remove(key);
@@ -198,20 +229,21 @@ public class ApplianceIdentifier
       }
     }
 
-    metrics = Utils.calculateMetrics(risingPoints, reductionPoints);
+    metrics[0] = ref.getMeanActive();
+    metrics[1] = ref.getMeanReactive();
+    metrics[2] = ref.getMeanDuration();
 
-    System.out.println("Metrics: " + Arrays.toString(metrics));
+    log.info("Metrics: ");
+    log.info("Mean P: " + metrics[0]);
+    log.info("Mean Q: " + metrics[1]);
+    log.info("Mean Duration: " + metrics[2]);
+    log.info("");
+    log.info("==========REF SECOND PASS============");
 
-    // Creation of the appliance and insert in the appliance list
-    Appliance appliance = new Appliance("Refrigerator", "Refrigeration");
+    cleanSecondPass(events, ref);
 
-    // appliance.status();
+    // ref.status();
 
-    cleanSecondPass(events, appliance);
-
-    // appliance.status();
-
-    applianceList.add(appliance);
   }
 
   /**
@@ -233,8 +265,10 @@ public class ApplianceIdentifier
                            ArrayList<PointOfInterest> reductionPoints)
   {
 
-    // System.out.println("rising: " + risingPoints.size());
-    // System.out.println("reduction: " + reductionPoints.size());
+    if (risingPoints.size() > 0)
+      log.debug("rising: " + risingPoints.size());
+    if (reductionPoints.size() > 0)
+      log.debug("reduction: " + reductionPoints.size());
 
     ArrayList<PointOfInterest> temp =
       new ArrayList<PointOfInterest>(risingPoints);
@@ -272,14 +306,19 @@ public class ApplianceIdentifier
     int duration = -1;
     double[] meanValues = new double[2];
 
+    log.debug("");
+    log.debug("");
+    log.debug("Second Pass: " + secondPass.toString());
+
     // For each event in need of second pass
     for (Integer key: secondPass.keySet()) {
 
       ArrayList<PointOfInterest> temp = secondPass.get(key);
       Collections.sort(temp, Constants.comp);
 
-      // System.out.println("Event " + events.get(key).getId());
-      // System.out.println("Before: " + temp.toString());
+      log.debug("Event: " + events.get(key).getId());
+      log.debug("Before Size: " + temp.size());
+      log.debug("Before: " + temp.toString());
 
       // For each point of interest
       for (int i = temp.size() - 2; i >= 0; i--) {
@@ -317,12 +356,13 @@ public class ApplianceIdentifier
             }
           }
         }
-        if (temp.size() == 0 || allSamePoints(temp))
+        if (temp.size() == 0 || Utils.allSamePoints(temp))
           break;
       }
 
-      // System.out.println("After: " + temp.toString());
-      // System.out.println();
+      log.debug("After Size: " + temp.size());
+      log.debug("After: " + temp.toString());
+      log.debug("");
     }
 
   }
@@ -339,58 +379,70 @@ public class ApplianceIdentifier
   {
     // Initializing the auxiliary variables
     boolean risingFlag = false, reductionFlag = false;
-    Appliance appliance = null;
 
+    log.info("===============WASHING MACHINE=================");
+    log.info("");
     // For each event
     for (int i = 0; i < events.size(); i++) {
 
+      Event event = events.get(i);
+
       // Check if the event's duration is over a certain time interval
-      if (events.get(i).getActivePowerConsumptions().length > Constants.WASHING_MACHINE_NUMBER_OF_MINUTES_LIMIT) {
+      if (event.getActivePowerConsumptions().length > Constants.WASHING_MACHINE_NUMBER_OF_MINUTES_LIMIT) {
+
+        log.debug("");
+        log.debug("Event " + event.getId() + " Start: "
+                  + event.getStartMinute() + " End: " + event.getEndMinute());
+        log.debug("===================");
 
         // Check if there are rising and reduction points with large active
         // power differences
-        for (PointOfInterest rise: events.get(i).getRisingPoints())
+        for (PointOfInterest rise: event.getRisingPoints())
           if (Math.abs(rise.getPDiff()) > Constants.WASHING_MACHINE_POWER_THRESHOLD) {
             risingFlag = true;
             // System.out.println("Rising Point: " + rise.toString());
             break;
           }
 
-        for (PointOfInterest reduction: events.get(i).getReductionPoints())
+        for (PointOfInterest reduction: event.getReductionPoints())
           if (Math.abs(reduction.getPDiff()) > Constants.WASHING_MACHINE_POWER_THRESHOLD) {
             reductionFlag = true;
             // System.out.println("Reduction Point: " + reduction.toString());
             break;
           }
 
+        log.debug("Rising over 1K5: " + risingFlag + " Reduction over 1K5: "
+                  + reductionFlag);
+
         // In case there are such points of interest
         if (risingFlag && reductionFlag) {
           // System.out.println();
           // System.out.println();
-          // System.out.println("Search for Washing Machine in Event "
-          // + events.get(i).getId());
-          // System.out.println();
+          log.debug("Search for Washing Machine in Event "
+                    + events.get(i).getId());
+          log.debug("");
           // Collect the event's active and reactive power measurements
           double[] tempReactive =
-            Arrays.copyOf(events.get(i).getReactivePowerConsumptions(), events
-                    .get(i).getReactivePowerConsumptions().length);
+            Arrays.copyOf(event.getReactivePowerConsumptions(),
+                          event.getReactivePowerConsumptions().length);
           double[] tempActive =
-            Arrays.copyOf(events.get(i).getActivePowerConsumptions(), events
-                    .get(i).getActivePowerConsumptions().length);
+            Arrays.copyOf(event.getActivePowerConsumptions(),
+                          event.getActivePowerConsumptions().length);
           // System.out.println("Reactive: " + Arrays.toString(tempReactive));
           // Removing refrigerator load from the measurements if it has been
           // detected in the current event.
-          if (applianceList.size() == 1) {
+          if (applianceList.size() > 1) {
             Appliance ref = applianceList.get(0);
 
-            if (ref.getMatchingPoints().containsKey(events.get(i).getId())) {
+            if (ref.getMatchingPoints().containsKey(event.getId())) {
+
+              log.debug("Reactive Before: " + Arrays.toString(tempReactive));
 
               double refReactive = ref.getMeanReactive();
               // System.out.println("Refrigerator Reactive: " + refReactive);
               int start = -1, end = -1;
 
-              for (PointOfInterest[] poi: ref.getMatchingPoints(events.get(i)
-                      .getId())) {
+              for (PointOfInterest[] poi: ref.getMatchingPoints(event.getId())) {
 
                 start = poi[0].getMinute();
                 end = poi[1].getMinute();
@@ -399,8 +451,9 @@ public class ApplianceIdentifier
                   tempReactive[j] -= refReactive;
               }
 
-              // System.out.println("Reactive: " +
-              // Arrays.toString(tempReactive));
+              log.debug("Reactive After Refrigerator: "
+                        + Arrays.toString(tempReactive));
+
             }
           }
 
@@ -420,68 +473,55 @@ public class ApplianceIdentifier
             }
 
           }
-          // System.out.println("The WINNER IS");
-          // cons.get(maxIndex).status();
+
+          for (int j = 0; j < cons.size(); j++)
+            cons.get(j).status();
+
           if (maxIndex != -1) {
+
+            log.debug("The WINNER IS");
+            cons.get(maxIndex).status();
+
             boolean check =
               (Utils.checkLimit(cons.get(maxIndex).getDifference(),
                                 Constants.WASHING_MACHINE_DIFFERENCE_LIMIT) && cons
                       .get(maxIndex).getNumberOfElements() > Constants.WASHING_MACHINE_NUMBER_OF_MINUTES_LIMIT);
-            // System.out.println("Objectives Met: " + check);
+            log.debug("Objectives Met: " + check);
 
             // If all the criteria are met
             if (check) {
 
+              log.info("Event Id: " + events.get(i).getId()
+                       + " Washing Machine Detected");
+              cons.get(maxIndex).status();
+
+              int[] pair =
+                { i, cons.get(maxIndex).getStart(), cons.get(maxIndex).getEnd() };
+
               // Switch the event's washing machine flag.
               events.get(i).setWashingMachineFlag();
-              // Create points of interest and then add them to the washing
-              // machine appliance (create if not already created).
-              PointOfInterest[] match =
-                {
-                 new PointOfInterest(cons.get(maxIndex).getStart(), true, cons
-                         .get(maxIndex).getMaxQ(), cons.get(maxIndex).getMaxQ()),
-                 new PointOfInterest(cons.get(maxIndex).getEnd(), false, -cons
-                         .get(maxIndex).getMaxQ(), -cons.get(maxIndex)
-                         .getMaxQ()) };
 
-              if (appliance == null)
-                appliance = new Appliance("Washing Machine", "Cleaning");
+              // If a washing machine was found create it and add it to the
+              // appliance list.
+              Appliance washing =
+                new Appliance("Washing Machine "
+                              + Constants.WASHING_MACHINE_ID++, "Cleaning");
 
-              int key = events.get(i).getId();
-
-              appliance.addMatchingPoints(key, match);
+              double[][] consumption =
+                { cons.get(maxIndex).getPValues(),
+                 cons.get(maxIndex).getQValues() };
+              washing.setConsumption(consumption);
+              washing.setTimeStamp(pair);
+              applianceList.add(washing);
 
             }
           }
-          // Not only one at a time
-          // for (int j = 0; j < cons.size(); j++) {
-          // if (cons.get(j).getDifference() >
-          // Constants.WASHING_MACHINE_DEVIATION_LIMIT
-          // && cons.get(j).getNumberOfElements() >
-          // Constants.WASHING_MACHINE_NUMBER_OF_MINUTES_LIMIT) {
-          //
-          // ArrayList<PointOfInterest> temp =
-          // new ArrayList<PointOfInterest>();
-          // temp.add(events.get(i).findPOI(cons.get(j).getStart(), true));
-          // risingPoints.put(i, temp);
-          //
-          // temp = new ArrayList<PointOfInterest>();
-          // temp.add(events.get(i).findPOI(cons.get(j).getStart(), true));
-          // reductionPoints.put(i, temp);
-          // break;
-          // }
-          //
-          // }
-
         }
       }
       risingFlag = false;
       reductionFlag = false;
 
     }
-    // If a washing machine was found add it to the appliance list.
-    if (appliance != null)
-      applianceList.add(appliance);
 
   }
 
@@ -553,48 +593,30 @@ public class ApplianceIdentifier
   }
 
   /**
-   * This is an auxiliary function used for checking if all the points of
-   * interest are of the same type.
-   * 
-   * @param pois
-   *          A list of points of interest
-   * @return true if they are all of the same type, false otherwise.
-   */
-  private boolean allSamePoints (ArrayList<PointOfInterest> pois)
-  {
-    // Initializing the auxiliary variables
-    boolean flag = true;
-    boolean start = pois.get(0).getRising();
-
-    for (PointOfInterest poi: pois)
-      if (start != poi.getRising()) {
-        flag = false;
-        break;
-      }
-
-    return flag;
-  }
-
-  /**
    * This function is responsible for the analysis of an events final pairs of
    * points of interest. Each pair is compared with already detected appliance
    * and if they do not fit, then they are added to a new appliance.
    * 
    * @param event
    *          The event under examination.
+   * @param isolated
+   *          The flag that shows if the event is isolated or not.
    */
-  public void analyseEvent (Event event)
+  public void analyseEvent (Event event, boolean isolated)
   {
     // Initializing the auxiliary variables
     double[] meanValues = null;
     double minDistance = Double.POSITIVE_INFINITY;
     int minIndex = -1;
     int duration = 0;
+    double percDistance = 0, absDistance = 0;
+    boolean switchedOn, close;
 
     // For each final pair included in the event.
     for (int i = 0; i < event.getFinalPairs().size(); i++) {
-
-      // System.out.println("Final Pair " + i);
+      minIndex = -1;
+      minDistance = Double.POSITIVE_INFINITY;
+      // log.info("Final Pair " + i);
 
       // Estimate the mean values and the duration of the pair
       meanValues = Utils.meanValues(event.getFinalPairs(i));
@@ -602,51 +624,204 @@ public class ApplianceIdentifier
         event.getFinalPairs(i)[1].getMinute()
                 - event.getFinalPairs(i)[0].getMinute();
 
-      // System.out.println("Mean Values: " + Arrays.toString(meanValues));
+      if (duration > Constants.TEMPORAL_THRESHOLD)
+        log.info("Event: " + event.getId() + " Pair: "
+                 + event.getFinalPairs(i)[0].toString() + "    "
+                 + event.getFinalPairs(i)[1] + " Duration:" + duration);
 
+      int startTime =
+        event.getFinalPairs(i)[0].getMinute() + event.getStartMinute();
+
+      int endTime =
+        event.getFinalPairs(i)[1].getMinute() + event.getStartMinute();
+
+      if (!isolated) {
+        log.debug("");
+        log.debug("Start: " + startTime + " End: " + endTime + " Duration: "
+                  + duration);
+
+        log.debug("Mean Values: " + Arrays.toString(meanValues));
+
+        log.debug("");
+      }
       // Try to match the pair with an already existing appliance.
       for (int j = 0; j < applianceList.size(); j++) {
-        // System.out.println("Appliance " + j);
-        // System.out.println("Appliance Mean Values "
-        // + Arrays.toString(applianceList.get(j)
-        // .getMeanValues()));
 
-        // System.out
-        // .println("Distance: "
-        // + Utils.percentageEuclideanDistance(meanValues,
-        // applianceList
-        // .get(j)
-        // .getMeanValues()));
+        if (applianceList.get(j).getMeanActive() != -1) {
 
-        if (applianceList.get(j).isClose(meanValues, duration)
-            && minDistance > Utils.percentageEuclideanDistance(applianceList
-                    .get(j).getMeanValues(), meanValues)) {
+          if (!isolated) {
+            log.debug("");
+            log.debug(applianceList.get(j).toString());
 
-          // System.out.println("Percentage Distance: "
-          // + Utils.percentageEuclideanDistance(applianceList
-          // .get(j).getMeanValues(), meanValues));
-          //
-          // System.out.println("Absolute Distance: "
-          // + Utils.absoluteEuclideanDistance(applianceList
-          // .get(j).getMeanValues(), meanValues));
-
-          minDistance =
+            log.debug("Appliance Mean Values "
+                      + Arrays.toString(applianceList.get(j).getMeanValues()));
+          }
+          percDistance =
             Utils.percentageEuclideanDistance(applianceList.get(j)
                     .getMeanValues(), meanValues);
-          minIndex = j;
-        }
 
+          absDistance =
+            Utils.absoluteEuclideanDistance(applianceList.get(j)
+                    .getMeanValues(), meanValues);
+
+          if (Constants.CLUSTER_APPLIANCES) {
+            switchedOn = false;
+
+            close = applianceList.get(j).isCloseClustered(meanValues, duration);
+          }
+          else {
+            switchedOn =
+              applianceList.get(j).isSwitchedOn(event, startTime, endTime);
+
+            close = applianceList.get(j).isClose(meanValues, duration);
+          }
+          if (!isolated) {
+            log.debug("Percentage Distance: " + percDistance);
+
+            log.debug("Absolute Distance: " + absDistance);
+
+            log.debug("Switched On: " + switchedOn);
+
+            log.debug("Close By?: " + close);
+          }
+          if (close && (minDistance > percDistance) && (switchedOn == false)) {
+
+            minDistance =
+              Utils.percentageEuclideanDistance(applianceList.get(j)
+                      .getMeanValues(), meanValues);
+            minIndex = j;
+            if (!isolated)
+              log.debug("New Min Distance: " + minDistance);
+
+            if (isolated
+                && applianceList.get(j).getActivity()
+                        .equalsIgnoreCase("Refrigeration"))
+              minDistance = Constants.NEAR_ZERO;
+
+          }
+
+        }
       }
       // If an appropriate appliance is found, the pair is added to that
       // appliance. Otherwise, a new appliance is created.
-      if (minIndex != -1)
+      if (minIndex != -1) {
+        if (!isolated)
+          log.debug("Matches Appliance " + minIndex);
         applianceList.get(minIndex).addMatchingPoints(event.getId(),
                                                       event.getFinalPairs(i));
-      else
-        createNewAppliance(event.getId(), event.getFinalPairs(i), meanValues);
 
+      }
+      else {
+        if (Constants.APPLIANCE_TYPE.equalsIgnoreCase("Generic"))
+          createNewAppliance(event.getId(), event.getFinalPairs(i), meanValues);
+        else if (Constants.APPLIANCE_TYPE.equalsIgnoreCase("Activity"))
+          createNewApplianceActivity(event.getId(), event.getFinalPairs(i),
+                                     meanValues);
+        if (!isolated) {
+          log.debug("No Match! New Appliance");
+
+        }
+      }
     }
-    event.clear();
+    if (!isolated) {
+      log.info("");
+      log.info("Final Number Of Appliances: " + applianceList.size());
+    }
+    event.clear(isolated);
+  }
+
+  /**
+   * This function is used to extract the knowledge of appliances and activities
+   * resulted from the disaggregation procedure into files.
+   * 
+   * @param outputAppliance
+   *          The file name of the output file containing the appliances.
+   * @param outputActivity
+   *          The file name of the output file containing the activity.
+   * @param events
+   *          The list of available events.
+   * @throws FileNotFoundException
+   */
+  public void createDisaggregationFiles (String outputAppliance,
+                                         String outputActivity,
+                                         ArrayList<Event> events)
+    throws FileNotFoundException
+  {
+    log.info("");
+    log.info("============== DISAGGREGATION FILES ================");
+
+    OutputStream output = new FileOutputStream(outputAppliance);
+    PrintStream printOut = new PrintStream(output);
+    System.setOut(printOut);
+
+    String[] temp = null;
+
+    Collections.sort(applianceList, Constants.comp7);
+
+    for (Appliance appliance: applianceList) {
+
+      int operations = appliance.operationTimes();
+      boolean wmFlag = appliance.getName().contains("Washing");
+      log.debug("Appliance: " + appliance.toString());
+      log.debug("Appliance Operations: " + operations + " Weeks: "
+                + Constants.WEEKS);
+
+      if (appliance.getActivity().equalsIgnoreCase("Refrigeration"))
+        appliance.estimateDistance(events, true);
+
+      if (operations > Constants.WEEKS || wmFlag) {
+        // if (operations >= Constants.WEEKS || wmFlag) {
+        log.debug("IN!");
+        temp = appliance.applianceToString();
+        for (int i = 0; i < temp.length; i++) {
+          if (i != temp.length - 1)
+            System.out.print(temp[i] + ",");
+          else
+            System.out.println(temp[i]);
+        }
+        activityList.addAll(appliance.matchingPairsToString(events));
+
+      }
+    }
+
+    // Add standby consumption
+    System.out.println("Consumption,Standby," + Constants.MINIMUM_THRESHOLD
+                       + ",0.0");
+
+    output = new FileOutputStream(outputActivity);
+    printOut = new PrintStream(output);
+    System.setOut(printOut);
+    Collections.sort(activityList, Constants.comp3);
+
+    for (String[] activity: activityList) {
+      for (int i = 0; i < activity.length; i++) {
+        if (i != activity.length - 1)
+          System.out.print(activity[i] + ",");
+        else
+          System.out.println(activity[i]);
+      }
+    }
+
+  }
+
+  public void appliancesFromIsolated (IsolatedEventsExtractor iso)
+  {
+    if (Constants.REF_LOOSE_COUPLING == false) {
+      double[] meanValues = iso.getRefMeans();
+      Appliance fridge =
+        new Appliance("Refrigerator Cluster", "Refrigeration", meanValues[0],
+                      meanValues[1], meanValues[2], iso.getClusters()
+                              .get(iso.getRefrigeratorCluster()).size());
+
+      fridge.status();
+
+      applianceList.add(fridge);
+    }
+    ArrayList<Event> isolated = iso.getIsolatedEvents();
+
+    for (Event event: isolated) {
+      analyseEvent(event, true);
+    }
   }
 
   /**
@@ -660,6 +835,29 @@ public class ApplianceIdentifier
    */
   private void createNewAppliance (int eventIndex, PointOfInterest[] finalPair,
                                    double[] meanValues)
+  {
+    // Initializing the auxiliary variables
+    // int duration = finalPair[1].getMinute() - finalPair[0].getMinute();
+    // System.out.println("New Appliance");
+    Appliance appliance =
+      new Appliance("Appliance " + Constants.APPLIANCE_ID++, "Generic");
+
+    appliance.addMatchingPoints(eventIndex, finalPair);
+    applianceList.add(appliance);
+  }
+
+  /**
+   * This is the appliance creation function. A set of heuristic rules are used
+   * to identify the appliance type and then the appliance is created and added
+   * to the appliance list.
+   * 
+   * @param eventIndex
+   * @param finalPair
+   * @param meanValues
+   */
+  private void createNewApplianceActivity (int eventIndex,
+                                           PointOfInterest[] finalPair,
+                                           double[] meanValues)
   {
     // Initializing the auxiliary variables
     int duration = finalPair[1].getMinute() - finalPair[0].getMinute();
@@ -705,59 +903,6 @@ public class ApplianceIdentifier
     }
     appliance.addMatchingPoints(eventIndex, finalPair);
     applianceList.add(appliance);
-  }
-
-  /**
-   * This function is used to extract the knowledge of appliances and activities
-   * resulted from the disaggregation procedure into files.
-   * 
-   * @param outputAppliance
-   *          The file name of the output file containing the appliances.
-   * @param outputActivity
-   *          The file name of the output file containing the activity.
-   * @param events
-   *          The list of available events.
-   * @throws FileNotFoundException
-   */
-  public void createDisaggregationFiles (String outputAppliance,
-                                         String outputActivity,
-                                         ArrayList<Event> events)
-    throws FileNotFoundException
-  {
-
-    OutputStream output = new FileOutputStream(outputAppliance);
-    PrintStream printOut = new PrintStream(output);
-    System.setOut(printOut);
-
-    String[] temp = null;
-
-    for (Appliance appliance: applianceList) {
-      temp = appliance.applianceToString();
-      for (int i = 0; i < temp.length; i++) {
-        if (i != temp.length - 1)
-          System.out.print(temp[i] + ",");
-        else
-          System.out.println(temp[i]);
-      }
-      System.setOut(System.out);
-      activityList.addAll(appliance.matchingPairsToString(events));
-      System.setOut(printOut);
-    }
-
-    output = new FileOutputStream(outputActivity);
-    printOut = new PrintStream(output);
-    System.setOut(printOut);
-    Collections.sort(activityList, Constants.comp3);
-
-    for (String[] activity: activityList) {
-      for (int i = 0; i < activity.length; i++) {
-        if (i != activity.length - 1)
-          System.out.print(activity[i] + ",");
-        else
-          System.out.println(activity[i]);
-      }
-    }
-
   }
 
   public void clear ()

@@ -20,6 +20,8 @@ package eu.cassandra.event;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.apache.log4j.Logger;
+
 import eu.cassandra.utils.Constants;
 
 /**
@@ -33,6 +35,8 @@ import eu.cassandra.utils.Constants;
  */
 public class EventDetector
 {
+
+  static Logger log = Logger.getLogger(EventDetector.class);
 
   /**
    * This is the threshold which must be passed for considering summary of the
@@ -66,27 +70,25 @@ public class EventDetector
     boolean check = true;
     int start = -1;
     int end = -1;
+    int duration = -1;
 
     // Defining the threshold as the minimum value plus the estimated threshold
     // of the installation type.
-    eventThreshold = findMin(activePower) + estimateThreshold();
-
-    System.out.println("Event Threshold: " + eventThreshold);
+    eventThreshold = Constants.BACKGROUND_THRESHOLD;
 
     // For each minute of measurements
     for (int i = 0; i < activePower.length; i++) {
 
       // If the active power surpasses the threshold and an event hasn't started
       // yet, then flag the start of an event.
-      if (activePower[i] >= eventThreshold && started == false) {
+      if (activePower[i] > eventThreshold && started == false) {
         start = i - 1;
         started = true;
       }
 
       // If the active power goes below the threshold and an event has started
       // yet, then this may be the end of an event.
-      if (activePower[i] < eventThreshold && started == true) {
-
+      if (activePower[i] <= eventThreshold && started == true) {
         boolean flag = true;
 
         // Checking if the measurements do not pass the event threshold after a
@@ -94,13 +96,15 @@ public class EventDetector
         // not finished.
         int endingIndex =
           Math.min(i + Constants.EVENT_TIME_LIMIT, activePower.length);
+
         for (int j = i + 1; j < endingIndex; j++) {
 
           if (activePower[j] > eventThreshold) {
 
             flag = false;
-            // System.out.println("Index: " + j + " Value: " + activePower[j]
-            // + " Flag: " + flag);
+            log.debug("Not Finished Because:");
+            log.debug("Index: " + j + " Value: " + activePower[j] + " Flag: "
+                      + flag);
             break;
           }
         }
@@ -108,8 +112,6 @@ public class EventDetector
         // If the event is over
         if (flag) {
           end = i;
-
-          // System.out.println("Start: " + start + " End: " + end);
 
           // If the event has not began before the start of the measurements
           if (start != -1) {
@@ -122,14 +124,24 @@ public class EventDetector
             // If the check is passed then an event is created and added to the
             // event list.
             if (check) {
-              Event temp =
-                new Event(start, end, Arrays.copyOfRange(activePower, start,
-                                                         end + 1),
-                          Arrays.copyOfRange(reactivePower, start, end + 1));
+              duration = (end - start + 1);
+              log.debug("");
+              log.debug("Event: " + (events.size() + 1) + " Start: " + start
+                        + " End: " + end + " Duration: " + duration);
 
-              events.add(temp);
-              // if (i > 200)
-              // break;
+              if ((Constants.REMOVE_LARGE_EVENTS && duration < Constants.LARGE_EVENT_THRESHOLD)
+                  || Constants.REMOVE_LARGE_EVENTS == false) {
+                Event temp =
+                  new Event(start, end, Arrays.copyOfRange(activePower, start,
+                                                           end + 1),
+                            Arrays.copyOfRange(reactivePower, start, end + 1));
+
+                events.add(temp);
+              }
+              else
+                log.info("Start:" + start + " End: " + end + " Duration:"
+                         + duration + " Too large Event!");
+
             }
           }
 
@@ -141,41 +153,10 @@ public class EventDetector
 
     }
 
+    log.info("Events Detected: " + events.size());
+    log.info("");
     return events;
 
-  }
-
-  /**
-   * This is an auxiliary function used for searching over an array of active
-   * power measurements for the smallest value available.
-   * 
-   * @param activePower
-   *          The array of active power measurements.
-   * @return the smallest value found.
-   */
-  private double findMin (double[] activePower)
-  {
-
-    double min = Double.POSITIVE_INFINITY;
-
-    for (int i = 0; i < activePower.length; i++)
-      if (min > activePower[i])
-        min = activePower[i];
-
-    return min;
-
-  }
-
-  /**
-   * This is an auxiliary function helping to threshold of the event detection
-   * algorithm and is depending on the installation type (Household, Commercial,
-   * Factory etc.).
-   * 
-   * @return the threshold above which a consumption event has started.
-   */
-  private double estimateThreshold ()
-  {
-    return Constants.HOUSEHOLD_BACKGROUND_THRESHOLD;
   }
 
   /**

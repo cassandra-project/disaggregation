@@ -19,10 +19,13 @@ package eu.cassandra.appliance;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import org.apache.log4j.Logger;
 
 import eu.cassandra.event.Event;
 import eu.cassandra.utils.Constants;
@@ -41,6 +44,8 @@ import eu.cassandra.utils.Utils;
 
 public class Appliance
 {
+  static Logger log = Logger.getLogger(Appliance.class);
+
   /**
    * This variable is the name of the appliance.
    */
@@ -90,6 +95,24 @@ public class Appliance
   private double durationSum = 0;
 
   /**
+   * This variable represents the mean distance between triggering of the
+   * appliance.
+   */
+  private double distance = 0;
+
+  /**
+   * This is a variable containing the active and reactive consumption model of
+   * the washing machine.
+   */
+  private double[][] consumptionModel = null;
+
+  /**
+   * This is a variable containing the active and reactive consumption model of
+   * the washing machine.
+   */
+  private int[] timeStamp = null;
+
+  /**
    * The constructor of an Appliance Model.
    * 
    * @param name
@@ -114,13 +137,15 @@ public class Appliance
    * @param activity
    *          The name of the activity the appliance participates in.
    */
-  public Appliance (String name, String activity, double p, double q)
+  public Appliance (String name, String activity, double p, double q,
+                    double duration, int numberOfPoints)
   {
     this.name = name;
     this.activity = activity;
-    meanValuesSum[0] = p * Constants.USER_HEADSTART;
-    meanValuesSum[1] = q * Constants.USER_HEADSTART;
-    numberOfMatchingPoints = Constants.USER_HEADSTART;
+    meanValuesSum[0] = p * numberOfPoints;
+    meanValuesSum[1] = q * numberOfPoints;
+    durationSum = duration * numberOfPoints / 2;
+    numberOfMatchingPoints = numberOfPoints;
   }
 
   /**
@@ -130,7 +155,10 @@ public class Appliance
    */
   public Map<Integer, ArrayList<PointOfInterest[]>> getMatchingPoints ()
   {
-    return matchingPoints;
+    if (name.contains("Washing"))
+      return null;
+    else
+      return matchingPoints;
   }
 
   /**
@@ -142,7 +170,10 @@ public class Appliance
    */
   public ArrayList<PointOfInterest[]> getMatchingPoints (int index)
   {
-    return matchingPoints.get(index);
+    if (name.contains("Washing"))
+      return null;
+    else
+      return matchingPoints.get(index);
   }
 
   /**
@@ -153,7 +184,10 @@ public class Appliance
    */
   public double getMeanActive ()
   {
-    return meanValuesSum[0] / numberOfMatchingPoints;
+    if (name.contains("Washing"))
+      return -1;
+    else
+      return meanValuesSum[0] / numberOfMatchingPoints;
   }
 
   /**
@@ -164,7 +198,10 @@ public class Appliance
    */
   public double getMeanReactive ()
   {
-    return meanValuesSum[1] / numberOfMatchingPoints;
+    if (name.contains("Washing"))
+      return -1;
+    else
+      return meanValuesSum[1] / numberOfMatchingPoints;
   }
 
   /**
@@ -175,7 +212,10 @@ public class Appliance
    */
   public double getMeanDuration ()
   {
-    return 2 * durationSum / numberOfMatchingPoints;
+    if (name.contains("Washing"))
+      return -1;
+    else
+      return 2 * durationSum / numberOfMatchingPoints;
   }
 
   /**
@@ -184,10 +224,79 @@ public class Appliance
    * 
    * @return the mean active and reactive power.
    */
-  double[] getMeanValues ()
+  public double[] getMeanValues ()
   {
-    double[] temp = { getMeanActive(), getMeanReactive() };
-    return temp;
+    if (name.contains("Washing"))
+      return null;
+    else {
+      double[] temp = { getMeanActive(), getMeanReactive() };
+      return temp;
+    }
+  }
+
+  /**
+   * This function is used as a getter for the name of the appliance.
+   * 
+   * @return the name of the appliance.
+   */
+  public String getName ()
+  {
+    return name;
+  }
+
+  /**
+   * This function is used as a getter for all the rising points detected for an
+   * appliance.
+   * 
+   * @return a list of the rising points of the appliance.
+   */
+  public ArrayList<PointOfInterest> getRisingPoints ()
+  {
+    ArrayList<PointOfInterest> result = new ArrayList<PointOfInterest>();
+
+    for (Integer index: matchingPoints.keySet())
+      for (PointOfInterest[] pois: matchingPoints.get(index))
+        result.add(pois[0]);
+
+    return result;
+  }
+
+  /**
+   * This function is used as a getter for all the reduction points detected for
+   * an appliance.
+   * 
+   * @return a list of the reduction points of the appliance.
+   */
+  public ArrayList<PointOfInterest> getReductionPoints ()
+  {
+    ArrayList<PointOfInterest> result = new ArrayList<PointOfInterest>();
+
+    for (Integer index: matchingPoints.keySet())
+      for (PointOfInterest[] pois: matchingPoints.get(index))
+        result.add(pois[1]);
+
+    return result;
+  }
+
+  /**
+   * This function is used as a getter for the activity of the appliance.
+   * 
+   * @return the activity of the appliance.
+   */
+  public String getActivity ()
+  {
+    return activity;
+  }
+
+  /**
+   * This function is used as a getter for the distance between end-uses
+   * of the appliance.
+   * 
+   * @return the distance between end uses.
+   */
+  public double getDistance ()
+  {
+    return distance;
   }
 
   /**
@@ -240,29 +349,46 @@ public class Appliance
     int offset = 0;
     int start = -1, end = -1;
 
-    for (Integer key: matchingPoints.keySet()) {
+    boolean wmFlag = name.contains("Washing");
 
-      offset = events.get(key - 1).getStartMinute();
+    if (wmFlag) {
 
-      for (PointOfInterest[] pois: matchingPoints.get(key)) {
-        start = offset + pois[0].getMinute();
-        end = offset + pois[1].getMinute();
+      offset = events.get(timeStamp[0]).getStartMinute();
 
-        // if (start > end) {
-        // System.out.println("Event: " + events.get(key - 1).getId());
-        // System.out.println("Appliance: " + name);
-        // System.out.println("Start: " + start);
-        // System.out.println("End: " + end);
-        // System.out.println();
-        // }
+      start = offset + timeStamp[1];
+      end = offset + timeStamp[2];
 
-        String[] tempString =
-          { name, activity, Integer.toString(start), Integer.toString(end),
-           Double.toString(pois[0].getPDiff()),
-           Double.toString(pois[0].getQDiff()),
-           Double.toString(pois[1].getPDiff()),
-           Double.toString(pois[1].getQDiff()) };
-        result.add(tempString);
+      String[] tempString =
+        { name, activity, Integer.toString(start), Integer.toString(end) };
+      result.add(tempString);
+
+    }
+    else {
+      for (Integer key: matchingPoints.keySet()) {
+
+        offset = events.get(key - 1).getStartMinute();
+
+        for (PointOfInterest[] pois: matchingPoints.get(key)) {
+          start = offset + pois[0].getMinute();
+          end = offset + pois[1].getMinute();
+
+          if (start > end) {
+            log.debug("Problem with Start > End");
+            log.debug("Event: " + events.get(key - 1).getId());
+            log.debug("Appliance: " + name);
+            log.debug("Start: " + start);
+            log.debug("End: " + end);
+            log.debug("");
+          }
+
+          String[] tempString =
+            { name, activity, Integer.toString(start), Integer.toString(end),
+             Double.toString(pois[0].getPDiff()),
+             Double.toString(pois[0].getQDiff()),
+             Double.toString(pois[1].getPDiff()),
+             Double.toString(pois[1].getQDiff()) };
+          result.add(tempString);
+        }
       }
     }
     // for (String[] string: result)
@@ -278,13 +404,37 @@ public class Appliance
    */
   public String[] applianceToString ()
   {
+    String[] result = null;
 
-    String[] result = new String[4];
+    boolean refFlag = activity.equalsIgnoreCase("Refrigeration");
+    // boolean wmFlag = activity.equalsIgnoreCase("Cleaning");
+    boolean wmFlag = name.contains("Washing");
+    if (refFlag)
+      result = new String[6];
+    else if (wmFlag) {
+      result = new String[2 + 2 * consumptionModel[0].length];
+    }
+    else
+      result = new String[4];
     result[0] = name;
     result[1] = activity;
     // result[2] = Integer.toString(numberOfMatchingPoints / 2);
     result[2] = Double.toString(getMeanActive());
     result[3] = Double.toString(getMeanReactive());
+
+    if (refFlag) {
+      int duration = (int) (0.5 + getMeanDuration());
+      result[4] = Integer.toString(duration);
+      result[5] = Integer.toString((int) distance);
+    }
+    else if (wmFlag) {
+
+      for (int i = 0; i < consumptionModel[0].length; i++) {
+        result[2 + 2 * i] = Double.toString(consumptionModel[0][i]);
+        result[3 + 2 * i] = Double.toString(consumptionModel[1][i]);
+      }
+
+    }
 
     return result;
   }
@@ -307,11 +457,36 @@ public class Appliance
 
     if (activity.equalsIgnoreCase("Refrigeration"))
       return (Utils.percentageEuclideanDistance(mean, meanValues) < Constants.PERCENTAGE_CLOSENESS_THRESHOLD || Utils
-              .absoluteEuclideanDistance(mean, meanValues) < Constants.ABSOLUTE_CLOSENESS_THRESHOLD
-                                                                                                                && Utils.checkLimitFridge(duration,
-                                                                                                                                          getMeanDuration()));
+              .absoluteEuclideanDistance(mean, meanValues) < Constants.ABSOLUTE_CLOSENESS_THRESHOLD)
+             && Utils.checkLimitFridge(duration, getMeanDuration());
     else
       return (Utils.percentageEuclideanDistance(mean, meanValues) < Constants.PERCENTAGE_CLOSENESS_THRESHOLD || Utils
+              .absoluteEuclideanDistance(mean, meanValues) < Constants.ABSOLUTE_CLOSENESS_THRESHOLD);
+
+  }
+
+  /**
+   * This is an auxiliary function used to check if the distance in time and
+   * space of a pair is close to this appliance, meaning that it belongs to this
+   * appliance.
+   * 
+   * @param mean
+   *          The mean active and reactive power measurements.
+   * @param duration
+   *          The duration of the end-use.
+   * @return true if it is close, false otherwise.
+   */
+  public boolean isCloseClustered (double[] mean, int duration)
+  {
+
+    double[] meanValues = { getMeanActive(), getMeanReactive() };
+
+    if (activity.equalsIgnoreCase("Refrigeration"))
+      return (Utils.percentageEuclideanDistance(mean, meanValues) < Constants.CLUSTERED_PERCENTAGE_CLOSENESS_THRESHOLD || Utils
+              .absoluteEuclideanDistance(mean, meanValues) < Constants.ABSOLUTE_CLOSENESS_THRESHOLD)
+             && Utils.checkLimitFridge(duration, getMeanDuration());
+    else
+      return (Utils.percentageEuclideanDistance(mean, meanValues) < Constants.CLUSTERED_PERCENTAGE_CLOSENESS_THRESHOLD || Utils
               .absoluteEuclideanDistance(mean, meanValues) < Constants.ABSOLUTE_CLOSENESS_THRESHOLD);
 
   }
@@ -322,7 +497,9 @@ public class Appliance
    */
   public void status ()
   {
-    System.out.println("Name:" + name);
+    log.info("");
+    log.info("Name:" + name);
+    log.info("Activity:" + activity);
 
     Set<Integer> keys = new TreeSet<Integer>();
     keys.addAll(risingPoints.keySet());
@@ -330,22 +507,145 @@ public class Appliance
     keys.addAll(matchingPoints.keySet());
 
     for (Integer key: keys) {
-      System.out.println("Event: " + key);
+      log.info("Event: " + key);
       if (risingPoints.containsKey(key))
-        System.out
-                .println("Rising Points: " + risingPoints.get(key).toString());
+        log.info("Rising Points: " + risingPoints.get(key).toString());
       if (reductionPoints.containsKey(key))
-        System.out.println("Reduction Points: "
-                           + reductionPoints.get(key).toString());
+        log.info("Reduction Points: " + reductionPoints.get(key).toString());
       if (matchingPoints.containsKey(key)) {
-        System.out.print("Matching Points: ");
+        log.info("Matching Points: ");
+        Collections.sort(matchingPoints.get(key), Constants.comp2);
         for (PointOfInterest[] pois: matchingPoints.get(key))
-          System.out.println(Arrays.toString(pois));
+          log.info(Arrays.toString(pois));
       }
     }
     if (activity.equalsIgnoreCase("Refrigeration"))
-      System.out.println("Mean Duration: " + getMeanDuration());
-    System.out.println("Mean Power: " + getMeanActive());
-    System.out.println("Mean Reactive: " + getMeanReactive());
+      log.info("Mean Duration: " + getMeanDuration());
+    log.info("Mean Power: " + getMeanActive());
+    log.info("Mean Reactive: " + getMeanReactive());
+
+    if (consumptionModel != null) {
+      log.info("Active Power: " + Arrays.toString(consumptionModel[0]));
+      log.info("Reactive Power: " + Arrays.toString(consumptionModel[1]));
+      log.info("TimeStamp: " + Arrays.toString(timeStamp));
+    }
+  }
+
+  public boolean isSwitchedOn (Event event, int start, int end)
+  {
+    boolean result = false;
+    int offset = -1, poiStart = -1, poiEnd = -1;
+    ArrayList<PointOfInterest[]> tempMatching =
+      matchingPoints.get(event.getId());
+
+    // System.out.println("Matching Points: " + tempMatching);
+    if (tempMatching != null && tempMatching.size() > 0) {
+      for (PointOfInterest[] pois: tempMatching) {
+
+        offset = event.getStartMinute();
+        poiStart = pois[0].getMinute() + offset;
+        poiEnd = pois[1].getMinute() + offset;
+
+        result = result || (start >= poiStart && start <= poiEnd);
+
+        result = result || (end >= poiStart && end <= poiEnd);
+
+        if (result) {
+          log.info("Pois: " + poiStart + " " + poiEnd);
+          log.info("Start: " + start + " End:" + end);
+          log.info("Switched On!");
+          break;
+        }
+
+      }
+    }
+    return result;
+
+  }
+
+  public void setName (String name)
+  {
+    this.name = name;
+  }
+
+  public void setActivity (String activity)
+  {
+    this.activity = activity;
+  }
+
+  public void setTimeStamp (int[] timeStamp)
+  {
+    this.timeStamp = timeStamp;
+  }
+
+  public void setConsumption (double[][] consumption)
+  {
+    consumptionModel = consumption;
+  }
+
+  public void estimateDistance (ArrayList<Event> events, boolean median)
+  {
+
+    ArrayList<int[]> temp = new ArrayList<int[]>();
+    ArrayList<Double> distanceList = new ArrayList<Double>();
+    int offset = 0, start = -1, end = -1;
+    double tempDistance = 0;
+
+    for (Integer key: matchingPoints.keySet()) {
+
+      offset = events.get(key - 1).getStartMinute();
+
+      for (PointOfInterest[] pois: matchingPoints.get(key)) {
+        start = offset + pois[0].getMinute();
+        end = offset + pois[1].getMinute();
+        if (start < end) {
+          int[] timeStamp = { start, end };
+          temp.add(timeStamp);
+        }
+      }
+    }
+
+    // for (int[] timeStamp: temp)
+    // System.out.print(Arrays.toString(timeStamp) + " ");
+    // System.out.println();
+
+    for (int i = 0; i < temp.size() - 1; i++) {
+
+      tempDistance = temp.get(i + 1)[0] - temp.get(i)[1];
+
+      log.info("Previous end: " + temp.get(i)[1] + " Next Start: "
+               + temp.get(i + 1)[0] + " Distance: " + tempDistance);
+
+      distanceList.add(tempDistance);
+
+    }
+
+    log.info(toString());
+
+    // System.out.println(distanceList.toString());
+    if (median)
+      distance = Utils.estimateMedian(distanceList);
+    else
+      distance = Utils.estimateMean(distanceList);
+
+    // System.out.println("Distance:" + distance);
+  }
+
+  @Override
+  public String toString ()
+  {
+    return name;
+  }
+
+  public int operationTimes ()
+  {
+
+    int result = 0;
+
+    for (Integer index: matchingPoints.keySet()) {
+      result += matchingPoints.get(index).size();
+    }
+
+    return result;
   }
 }

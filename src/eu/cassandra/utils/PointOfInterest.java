@@ -78,6 +78,7 @@ public class PointOfInterest
     this.rising = rising;
     pDiff = pdiff;
     qDiff = qdiff;
+
   }
 
   /**

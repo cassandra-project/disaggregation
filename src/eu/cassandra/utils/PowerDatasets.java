@@ -19,9 +19,13 @@ package eu.cassandra.utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
+
+import org.apache.log4j.Logger;
 
 /**
  * This class is used for parsing the power consumption measurements and storing
@@ -35,17 +39,25 @@ import java.util.TreeMap;
  */
 public class PowerDatasets
 {
+  static Logger log = Logger.getLogger(PowerDatasets.class);
+
   /**
    * This is an array of the active power measurements contained in the
    * measurement file.
    */
-  double[] activePower;
+  ArrayList<Double> activePower = new ArrayList<Double>();
 
   /**
    * This is an array of the reactive power measurements contained in the
    * measurement file.
    */
-  double[] reactivePower;
+  ArrayList<Double> reactivePower = new ArrayList<Double>();
+
+  ArrayList<Integer> days = new ArrayList<Integer>();
+
+  ArrayList<Double> temp = new ArrayList<Double>();
+
+  Map<Double, Integer> counter = new HashMap<Double, Integer>();
 
   /**
    * This is the constructor function of the class. It takes the measurement
@@ -55,7 +67,8 @@ public class PowerDatasets
    *          The name of the file that is imported from the user.
    * @throws FileNotFoundException
    */
-  public PowerDatasets (String filename) throws FileNotFoundException
+  public PowerDatasets (String filename, boolean timestamps)
+    throws FileNotFoundException
   {
     // Since we don't know at first if the data sets are compatible (starting at
     // the same time) as well as how large they are, we use maps to store the
@@ -67,7 +80,10 @@ public class PowerDatasets
     // respective maps.
     File file = new File(filename);
     Scanner input = new Scanner(file);
+    String[] contents = null;
+
     int counter = 0;
+    int power = -1;
 
     while (input.hasNext()) {
 
@@ -75,26 +91,24 @@ public class PowerDatasets
 
       // System.out.println(line);
 
-      String[] contents = line.split(",");
+      contents = line.split(",");
 
-      if (contents.length == 3) {
-        if (Double.parseDouble(contents[contents.length - 2]) > 0)
-          activeMap.put(counter,
-                        Double.parseDouble(contents[contents.length - 2]));
+      if (contents.length == 2 || contents.length == 3)
+        power = 1;
+
+      if (power == 1) {
+
+        if (Double.parseDouble(contents[power]) > 0)
+          activeMap.put(counter, Double.parseDouble(contents[power]));
         else
           activeMap.put(counter, 0.0);
 
-        reactiveMap.put(counter++,
-                        Double.parseDouble(contents[contents.length - 1]));
-      }
-      else if (contents.length == 2) {
-        if (Double.parseDouble(contents[contents.length - 2]) > 0)
-          activeMap.put(counter,
-                        Double.parseDouble(contents[contents.length - 2]));
+        if (contents.length == 3)
+          reactiveMap.put(counter, Double.parseDouble(contents[power + 1]));
         else
-          activeMap.put(counter, 0.0);
+          reactiveMap.put(counter, 0.0);
 
-        reactiveMap.put(counter++, 0.0);
+        counter++;
       }
       else {
         System.out
@@ -105,28 +119,101 @@ public class PowerDatasets
 
     input.close();
 
-    // Now that the size is known the data sets are stored in arrays.
-    activePower = new double[activeMap.size()];
-    reactivePower = new double[reactiveMap.size()];
+    log.info("================WEEKS SETTING==================");
+    log.info("Counter:" + activeMap.size());
 
-    counter = 0;
+    int numOfDays = activeMap.size() / Constants.MINUTES_PER_DAY;
 
-    // Adding the values in the arrays, one by one.
-    for (Integer timestamp: activeMap.keySet()) {
+    log.info("Days: " + numOfDays);
 
-      activePower[counter] = activeMap.get(timestamp);
-      reactivePower[counter] = reactiveMap.get(timestamp);
+    ArrayList<Double> active = new ArrayList<Double>();
 
-      counter++;
+    for (Integer index: activeMap.keySet())
+      active.add(activeMap.get(index));
+
+    Utils.createLineDiagram("Before", "Minute", "Power", active);
+
+    active.clear();
+
+    int weeks =
+      (int) Math
+              .floor((double) counter
+                     / (double) (Constants.MINUTES_PER_DAY * Constants.DAYS_PER_WEEK));
+
+    Constants.setWeeks(weeks);
+
+    log.info("Weeks:" + Constants.WEEKS);
+
+    for (int i = 0; i < numOfDays; i++) {
+
+      if (checkDay(i, activeMap) == false)
+        days.add(i);
+
     }
 
-    // Cleaning the unnecessary maps.
+    log.info("Kept Days: " + days.toString());
+
+    int start = -1;
+    int end = -1;
+
+    for (Integer day: days) {
+
+      start = day * Constants.MINUTES_PER_DAY;
+      end = (day + 1) * Constants.MINUTES_PER_DAY;
+
+      for (int i = start; i < end; i++) {
+        activePower.add(activeMap.get(i));
+        reactivePower.add(reactiveMap.get(i));
+      }
+
+    }
+
+    log.info("");
+
+    Utils.createLineDiagram("After", "Minute", "Power", activePower);
+
+    log.info("================POWER MEASUREMENTS==================");
+    log.info(activePower.toString());
+    log.info(reactivePower.toString());
+    // log.info(activePower.subList(1710, 1800).toString());
+    log.info("");
+    log.info("");
+
+    days.clear();
     activeMap.clear();
     reactiveMap.clear();
 
-    // System.out.println(Arrays.toString(activePower));
-    // System.out.println(Arrays.toString(reactivePower));
+  }
 
+  private boolean checkDay (int index, Map<Integer, Double> activeMap)
+  {
+    boolean flag = false;
+
+    int start = index * Constants.MINUTES_PER_DAY;
+    int end = (index + 1) * Constants.MINUTES_PER_DAY;
+
+    for (int i = start; i < end; i++) {
+
+      if (counter.containsKey(activeMap.get(i)))
+        counter.put(activeMap.get(i), counter.get(activeMap.get(i)) + 1);
+      else
+        counter.put(activeMap.get(i), 1);
+
+      if (counter.get(activeMap.get(i)) > Constants.REMOVAL_THRESHOLD) {
+
+        log.debug("Day: " + index + " Value: " + activeMap.get(i));
+
+        flag = true;
+        break;
+
+      }
+
+    }
+
+    temp.clear();
+    counter.clear();
+
+    return flag;
   }
 
   /**
@@ -137,7 +224,13 @@ public class PowerDatasets
    */
   public double[] getActivePower ()
   {
-    return activePower;
+
+    double[] result = new double[activePower.size()];
+
+    for (int i = 0; i < activePower.size(); i++)
+      result[i] = activePower.get(i);
+
+    return result;
   }
 
   /**
@@ -148,7 +241,12 @@ public class PowerDatasets
    */
   public double[] getReactivePower ()
   {
-    return reactivePower;
+    double[] result = new double[reactivePower.size()];
+
+    for (int i = 0; i < reactivePower.size(); i++)
+      result[i] = reactivePower.get(i);
+
+    return result;
   }
 
 }
