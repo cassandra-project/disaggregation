@@ -321,6 +321,11 @@ public class Constants
    */
   public static int VACUUM_CLEANER_ID = 1;
 
+  /**
+   * Constant used for auto-increment vacuum cleaner ids.
+   */
+  public static int GENERIC_ID = 1;
+
   // ================= BACKGROUND CONSTANTS =================
 
   /**
@@ -468,6 +473,12 @@ public class Constants
    * order to recognize a pair of points of interest as refrigerator.
    */
   public static final double REF_THRESHOLD = 10;
+
+  /**
+   * This constant signifies the threshold of similarity that is acceptable in
+   * order to recognize a pair of points of interest as refrigerator.
+   */
+  public static final double REF_UPPER_THRESHOLD = 300;
 
   // ================= WASHING MACHINE CONSTANTS =================
 
@@ -698,7 +709,9 @@ public class Constants
     EXTRACTOR_ID = 1;
 
     VACUUM_CLEANER_ID = 1;
-    
+
+    GENERIC_ID = 1;
+
     BACKGROUND_THRESHOLD = 30;
 
   }

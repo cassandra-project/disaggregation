@@ -377,25 +377,31 @@ public class IsolatedEventsExtractor
     double[] meanRef = { 100, 60 };
 
     for (String cluster: clusters.keySet()) {
-      if (maxSize < clusters.get(cluster).size()) {
+
+      double mean = clusterMeans(cluster)[0];
+
+      log.info("Mean for Cluster " + cluster + ":" + mean);
+
+      if (maxSize < clusters.get(cluster).size()
+          && mean < Constants.REF_UPPER_THRESHOLD) {
         maxSize = clusters.get(cluster).size();
         refrigeratorCluster = cluster;
         distance1 =
           Utils.percentageEuclideanDistance(meanRef, clusterMeans(cluster));
-        // System.out.println("Mean Ref Distance: " + distance1);
+        log.info("Mean Ref Distance: " + distance1);
       }
       else if (maxSize == clusters.get(cluster).size()) {
         distance2 =
           Utils.percentageEuclideanDistance(meanRef, clusterMeans(cluster));
-        // System.out.println("Mean Previous Ref Distance: " + distance1);
-        // System.out.println("New Ref Distance: " + distance2);
-        // System.out.println("Smaller?: " + (distance2 < distance1));
+        log.info("Mean Previous Ref Distance: " + distance1);
+        log.info("New Ref Distance: " + distance2);
+        log.info("Smaller?: " + (distance2 < distance1));
         if (distance2 < distance1) {
           maxSize = clusters.get(cluster).size();
           refrigeratorCluster = cluster;
           distance1 =
             Utils.percentageEuclideanDistance(meanRef, clusterMeans(cluster));
-          // System.out.println("Mean Ref Distance: " + distance1);
+          log.info("Mean Ref Distance: " + distance1);
         }
       }
     }

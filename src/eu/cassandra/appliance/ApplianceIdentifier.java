@@ -901,6 +901,9 @@ public class ApplianceIdentifier
                           "Cleaning");
       }
     }
+    else {
+      appliance = new Appliance("Generic " + Constants.GENERIC_ID++, "Generic");
+    }
     appliance.addMatchingPoints(eventIndex, finalPair);
     applianceList.add(appliance);
   }

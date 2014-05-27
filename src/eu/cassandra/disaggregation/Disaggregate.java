@@ -293,11 +293,29 @@ public class Disaggregate
       ai.appliancesFromIsolated(iso);
 
     // Setting the refrigerator
-    Collections.sort(ai.getApplianceList(), Constants.comp6);
     if (ai.getApplianceList().size() > 0) {
-      ai.getApplianceList().get(0).setActivity("Refrigeration");
-      ai.getApplianceList().get(0).setName("Refrigerator");
-      ai.refrigeratorIdentification(events);
+      if (Constants.REF_LOOSE_COUPLING) {
+
+        Collections.sort(ai.getApplianceList(), Constants.comp6);
+
+        boolean flag = true;
+        int i = 0;
+
+        while (flag) {
+          if (ai.getApplianceList().get(i).getMeanActive() < Constants.REF_UPPER_THRESHOLD) {
+            ai.getApplianceList().get(i).setActivity("Refrigeration");
+            ai.getApplianceList().get(i).setName("Refrigerator");
+            Appliance temp = ai.getApplianceList().remove(i);
+            ai.getApplianceList().add(0, temp);
+            flag = false;
+          }
+          i++;
+        }
+
+      }
+      else {
+        ai.refrigeratorIdentification(events);
+      }
     }
 
     if (Constants.WASHING_MACHINE_DETECTION)
