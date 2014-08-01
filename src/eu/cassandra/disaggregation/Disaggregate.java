@@ -171,6 +171,12 @@ public class Disaggregate
         Double.parseDouble(configuration.getProperty("CleaningThreshold"));
     }
 
+    boolean cleanDataset =
+      Boolean.parseBoolean(configuration.getProperty("CleanDataset"));
+
+    boolean normalizeDataset =
+      Boolean.parseBoolean(configuration.getProperty("NormalizeDataset"));
+
     log.info("==============CONFIGURATION====================");
     log.info("Appliance Type: " + type);
     log.info("Loose Coupling: " + loose);
@@ -187,6 +193,9 @@ public class Disaggregate
     log.info("Remove Large Events: " + removeLargeEvents);
     if (removeLargeEvents)
       log.info("Large Events Threshold: " + largeEventThreshold);
+    log.info("Clean Dataset: " + cleanDataset);
+    log.info("Normalize Dataset: " + normalizeDataset);
+
     log.info("");
     log.info("");
 
@@ -205,6 +214,10 @@ public class Disaggregate
     Constants.setPointsPerCluster(clusterPoints);
 
     Constants.setCombinationPointsPerCluster(combinationPoints);
+
+    Constants.setCleaningDataset(cleanDataset);
+
+    Constants.setNormalizingDataset(normalizeDataset);
 
     if (timeThresholdComplexity.equalsIgnoreCase("Complex"))
       Constants.setTimeThresholdComplexity(false);
@@ -270,16 +283,22 @@ public class Disaggregate
     // Initialize the auxiliary variables
     EventDetector ed = new EventDetector();
 
-    // if (appliancesFile.exists())
-    // ai = new ApplianceIdentifier(applianceFilename);
-    // else
-    ai = new ApplianceIdentifier();
+    File appliancesFile = new File(outputAppliance);
+
+    if (Constants.APPLIANCE_TYPE.equalsIgnoreCase("List")
+        && appliancesFile.exists())
+      ai = new ApplianceIdentifier(outputAppliance);
+    else
+      ai = new ApplianceIdentifier();
 
     // Run the event detector in order to find the possible events in the
     // data
     events = ed.detectEvents(data.getActivePower(), data.getReactivePower());
 
     System.setOut(realSystemOut);
+
+    System.out.println("Appliances in the beginning:"
+                       + ai.getApplianceList().size());
 
     Utils.durationCheck(events);
 
@@ -294,6 +313,7 @@ public class Disaggregate
 
     // Setting the refrigerator
     if (ai.getApplianceList().size() > 0) {
+
       if (Constants.REF_LOOSE_COUPLING) {
 
         Collections.sort(ai.getApplianceList(), Constants.comp6);
@@ -301,7 +321,7 @@ public class Disaggregate
         boolean flag = true;
         int i = 0;
 
-        while (flag) {
+        while (flag && i < ai.getApplianceList().size()) {
           if (ai.getApplianceList().get(i).getMeanActive() < Constants.REF_UPPER_THRESHOLD) {
             ai.getApplianceList().get(i).setActivity("Refrigeration");
             ai.getApplianceList().get(i).setName("Refrigerator");
@@ -407,9 +427,12 @@ public class Disaggregate
 
   private void clearAll ()
   {
-    events.clear();
-    ai.clear();
-    iso.clear();
+    if (events != null)
+      events.clear();
+    if (ai != null)
+      ai.clear();
+    if (iso != null)
+      iso.clear();
     Constants.clear();
     // Utils.cleanFiles();
   }

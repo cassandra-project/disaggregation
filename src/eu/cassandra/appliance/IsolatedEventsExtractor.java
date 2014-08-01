@@ -380,7 +380,8 @@ public class IsolatedEventsExtractor
 
       double mean = clusterMeans(cluster)[0];
 
-      log.info("Mean for Cluster " + cluster + ":" + mean);
+      log.info("Mean for Cluster " + cluster + ":" + mean + " Members:"
+               + clusters.get(cluster).size());
 
       if (maxSize < clusters.get(cluster).size()
           && mean < Constants.REF_UPPER_THRESHOLD) {

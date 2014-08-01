@@ -257,6 +257,14 @@ public class Constants
 
   // ================= PREPROCESS CONSTANTS =================
 
+  public static boolean CLEANING_DATASET = true;
+
+  public static boolean NORMALIZING_DATASET = true;
+
+  public static final double NORMALIZING_THRESHOLD = 10E-50;
+
+  public static final double NORMALIZING_POINT = 0.9;
+
   public static final int REMOVAL_THRESHOLD = 2 * MINUTES_PER_DAY / 3;
 
   // ================= ID CONSTANTS =================
@@ -794,6 +802,16 @@ public class Constants
   public static final void setLargeEventThreshold (int threshold)
   {
     LARGE_EVENT_THRESHOLD = threshold;
+  }
+
+  public static final void setCleaningDataset (boolean clean)
+  {
+    CLEANING_DATASET = clean;
+  }
+
+  public static final void setNormalizingDataset (boolean normalize)
+  {
+    NORMALIZING_DATASET = normalize;
   }
 
   public static final void setWeeks (int weeks)

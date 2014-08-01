@@ -622,11 +622,13 @@ public class Appliance
 
     log.info(toString());
 
-    // System.out.println(distanceList.toString());
-    if (median)
-      distance = Utils.estimateMedian(distanceList);
-    else
-      distance = Utils.estimateMean(distanceList);
+    if (distanceList.size() > 0) {
+      // System.out.println(distanceList.toString());
+      if (median)
+        distance = Utils.estimateMedian(distanceList);
+      else
+        distance = Utils.estimateMean(distanceList);
+    }
 
     // System.out.println("Distance:" + distance);
   }

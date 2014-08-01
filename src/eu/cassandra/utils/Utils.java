@@ -22,7 +22,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
@@ -551,6 +553,24 @@ public class Utils
   }
 
   /**
+   * This function is used in order to find the maximum value from an array.
+   * 
+   * @param matrix
+   * @return
+   */
+  public static double findMax (ArrayList<Double> matrix)
+  {
+
+    double result = Double.NEGATIVE_INFINITY;
+
+    for (int i = 0; i < matrix.size(); i++)
+      if (result < matrix.get(i))
+        result = matrix.get(i);
+
+    return result;
+  }
+
+  /**
    * This function is used when the user has already tracked the electrical
    * appliances installed in the installation. He can used them as a base case
    * and extend it with any additional ones that may be found during the later
@@ -574,18 +594,23 @@ public class Utils
     String nextLine;
     String[] line;
 
-    while (input.hasNext()) {
+    while (input.hasNextLine()) {
       nextLine = input.nextLine();
       line = nextLine.split(",");
       String name = line[0];
       String activity = line[1];
-      double p = Double.parseDouble(line[3]);
-      double q = Double.parseDouble(line[4]);
 
-      // For each appliance found in the file, an temporary Appliance
-      // Entity is created.
-      appliances.add(new Appliance(name, activity, p, q, 0, 0));
+      if (activity.contains("Standby") == false
+          && activity.contains("Refrigeration") == false) {
 
+        double p = Double.parseDouble(line[2]);
+        double q = Double.parseDouble(line[3]);
+
+        // For each appliance found in the file, an temporary Appliance
+        // Entity is created.
+        appliances.add(new Appliance(name, activity, p, q, 0, 0));
+
+      }
     }
 
     System.out.println("Appliances:" + appliances.size());
@@ -714,13 +739,26 @@ public class Utils
   public static double estimateMean (ArrayList<Double> values)
   {
     double result = 0.0;
-    double sum = 0;
+    double sum = 0.0;
 
     for (double minimum: values)
       sum += minimum;
 
     result = sum / values.size();
 
+    return result;
+  }
+
+  public static double estimateStd (ArrayList<Double> values, double mean)
+  {
+    double result = 0.0;
+    double sum = 0;
+
+    for (double value: values)
+      sum += Math.pow((value - mean), 2);
+
+    sum /= values.size();
+    result = Math.sqrt(sum);
     return result;
   }
 
@@ -846,6 +884,30 @@ public class Utils
         break;
 
     points.remove(i);
+
+  }
+
+  public static Map<Double, Double>
+    estimateCumulativeValues (ArrayList<Double> dataset)
+  {
+
+    log.info("============ESTIMATE CUMULATIVE VALUES==================");
+
+    Map<Double, Double> result = new TreeMap<Double, Double>();
+
+    double mean = estimateMean(dataset);
+    double std = estimateStd(dataset, mean);
+
+    log.info("Mean: " + mean);
+    log.info("Standard Deviation: " + std);
+
+    for (Double value: dataset)
+      if (result.containsKey(value) == false)
+        result.put(value, 1 - Gaussian.bigPhi(value, mean, std));
+
+    // System.out.println(result.toString());
+
+    return result;
 
   }
 }

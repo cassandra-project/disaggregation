@@ -242,6 +242,7 @@ public class ApplianceIdentifier
 
     cleanSecondPass(events, ref);
 
+    // if (Constants.REF_LOOSE_COUPLING == false)
     // ref.status();
 
   }
@@ -604,6 +605,8 @@ public class ApplianceIdentifier
    */
   public void analyseEvent (Event event, boolean isolated)
   {
+    // log.info("Event Under Analysis:" + event.getId());
+
     // Initializing the auxiliary variables
     double[] meanValues = null;
     double minDistance = Double.POSITIVE_INFINITY;
@@ -712,11 +715,12 @@ public class ApplianceIdentifier
 
       }
       else {
-        if (Constants.APPLIANCE_TYPE.equalsIgnoreCase("Generic"))
-          createNewAppliance(event.getId(), event.getFinalPairs(i), meanValues);
-        else if (Constants.APPLIANCE_TYPE.equalsIgnoreCase("Activity"))
+        if (Constants.APPLIANCE_TYPE.equalsIgnoreCase("Activity"))
           createNewApplianceActivity(event.getId(), event.getFinalPairs(i),
                                      meanValues);
+        else
+          createNewAppliance(event.getId(), event.getFinalPairs(i), meanValues);
+
         if (!isolated) {
           log.debug("No Match! New Appliance");
 
@@ -806,6 +810,7 @@ public class ApplianceIdentifier
 
   public void appliancesFromIsolated (IsolatedEventsExtractor iso)
   {
+
     if (Constants.REF_LOOSE_COUPLING == false) {
       double[] meanValues = iso.getRefMeans();
       Appliance fridge =

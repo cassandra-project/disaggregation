@@ -131,7 +131,7 @@ public class PowerDatasets
     for (Integer index: activeMap.keySet())
       active.add(activeMap.get(index));
 
-    Utils.createLineDiagram("Before", "Minute", "Power", active);
+    // Utils.createLineDiagram("00_Before Cleaning", "Minute", "Power", active);
 
     active.clear();
 
@@ -146,7 +146,8 @@ public class PowerDatasets
 
     for (int i = 0; i < numOfDays; i++) {
 
-      if (checkDay(i, activeMap) == false)
+      if (checkDay(i, activeMap) == false
+          || Constants.CLEANING_DATASET == false)
         days.add(i);
 
     }
@@ -170,7 +171,16 @@ public class PowerDatasets
 
     log.info("");
 
-    Utils.createLineDiagram("After", "Minute", "Power", activePower);
+    // if (Constants.CLEANING_DATASET)
+    // Utils.createLineDiagram("01_After Cleaning", "Minute", "Power",
+    // activePower);
+
+    if (Constants.NORMALIZING_DATASET) {
+      normalizeData(activePower);
+
+      // Utils.createLineDiagram("02_After Normalizing", "Minute", "Power",
+      // activePower);
+    }
 
     log.info("================POWER MEASUREMENTS==================");
     log.info(activePower.toString());
@@ -214,6 +224,23 @@ public class PowerDatasets
     counter.clear();
 
     return flag;
+  }
+
+  private void normalizeData (ArrayList<Double> dataset)
+  {
+
+    double mean = Utils.estimateMean(dataset);
+    double maxThreshold = 0.9 * Utils.findMax(dataset);
+    Map<Double, Double> percentages = Utils.estimateCumulativeValues(dataset);
+
+    for (int i = 0; i < dataset.size(); i++) {
+      if (percentages.get(dataset.get(i)) < Constants.NORMALIZING_THRESHOLD
+          && dataset.get(i) > maxThreshold) {
+        // System.out.println("Value: " + dataset.get(i) + " Percentage: "
+        // + percentages.get(dataset.get(i)));
+        dataset.set(i, mean);
+      }
+    }
   }
 
   /**
