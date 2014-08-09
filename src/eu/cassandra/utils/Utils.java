@@ -608,7 +608,7 @@ public class Utils
 
         // For each appliance found in the file, an temporary Appliance
         // Entity is created.
-        appliances.add(new Appliance(name, activity, p, q, 0, 0));
+        appliances.add(new Appliance(name, activity, p, q, 0, 100));
 
       }
     }

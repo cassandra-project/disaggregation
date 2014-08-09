@@ -642,12 +642,14 @@ public class Appliance
   public int operationTimes ()
   {
 
-    int result = 0;
+    // int result = 0;
+    //
+    // for (Integer index: matchingPoints.keySet()) {
+    // result += matchingPoints.get(index).size();
+    // }
+    //
+    // return result;
 
-    for (Integer index: matchingPoints.keySet()) {
-      result += matchingPoints.get(index).size();
-    }
-
-    return result;
+    return numberOfMatchingPoints;
   }
 }

@@ -95,6 +95,7 @@ public class ApplianceIdentifier
     throws FileNotFoundException
   {
     clear();
+    log.info("Inside correctly with file:" + applianceFilename);
     applianceList = Utils.appliancesFromFile(applianceFilename);
   }
 

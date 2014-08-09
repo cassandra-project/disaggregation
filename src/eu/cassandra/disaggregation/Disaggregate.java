@@ -132,7 +132,11 @@ public class Disaggregate
       return;
     }
 
+    String oldApplianceFile = "";
     String type = configuration.getProperty("ApplianceType");
+    if (type.equalsIgnoreCase("List"))
+      oldApplianceFile = configuration.getProperty("OldApplianceFile");
+
     boolean loose =
       Boolean.parseBoolean(configuration.getProperty("LooseCoupling"));
     boolean fridgeLoose =
@@ -179,6 +183,7 @@ public class Disaggregate
 
     log.info("==============CONFIGURATION====================");
     log.info("Appliance Type: " + type);
+    log.info("Old Appliance File: " + oldApplianceFile);
     log.info("Loose Coupling: " + loose);
     log.info("Fridge Loose Coupling: " + fridgeLoose);
     log.info("Washing Machine Detection: " + washingMachineDetection);
@@ -199,7 +204,7 @@ public class Disaggregate
     log.info("");
     log.info("");
 
-    Constants.setApplianceType(type);
+    Constants.setApplianceType(type, oldApplianceFile);
 
     Constants.setClusterAppliances(loose);
 
@@ -283,11 +288,11 @@ public class Disaggregate
     // Initialize the auxiliary variables
     EventDetector ed = new EventDetector();
 
-    File appliancesFile = new File(outputAppliance);
+    File oldAppliancesFile = new File(Constants.OLD_APPLIANCE_FILE);
 
     if (Constants.APPLIANCE_TYPE.equalsIgnoreCase("List")
-        && appliancesFile.exists())
-      ai = new ApplianceIdentifier(outputAppliance);
+        && oldAppliancesFile.exists())
+      ai = new ApplianceIdentifier(Constants.OLD_APPLIANCE_FILE);
     else
       ai = new ApplianceIdentifier();
 

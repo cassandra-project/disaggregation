@@ -197,6 +197,12 @@ public class Constants
   public static String APPLIANCE_TYPE = "Generic";
 
   /**
+   * In case we have a list of appliances then the file containing the
+   * specifications in included in the setting.
+   */
+  public static String OLD_APPLIANCE_FILE = "";
+
+  /**
    * This constant shows if the appliances in the end will be loosely clustered
    * or not.
    */
@@ -741,7 +747,8 @@ public class Constants
     log.info("");
   }
 
-  public static final void setApplianceType (String type)
+  public static final void setApplianceType (String type,
+                                             String oldApplianceFile)
   {
 
     if (type.equalsIgnoreCase("Generic") || type.equalsIgnoreCase("List")
@@ -749,6 +756,9 @@ public class Constants
       APPLIANCE_TYPE = type;
     else
       System.out.println("Error with type input. Set to Generic by default.");
+
+    if (type.equalsIgnoreCase("List"))
+      OLD_APPLIANCE_FILE = oldApplianceFile;
   }
 
   public static final void setClusterAppliances (boolean loose)
